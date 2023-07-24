@@ -33,3 +33,13 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Fichiers de configuration spécifiques au projet
+/jsconfig.json
+/next.config.js
+/postvss.config.js
+/tailwind.config.js
+
+# Fichiers de verrouillage de dépendances
+/package-lock.json
+/yarn.lock

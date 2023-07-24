@@ -1,0 +1,248 @@
+.postViewContainer {
+  padding: 16px;
+  background-color: white;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.profilePhoto {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.usernameMoment {
+  display: flex;
+  align-items: center;
+}
+
+.username {
+  font-weight: bold;
+  margin-right: 4px;
+}
+
+.separator {
+  margin-right: 4px;
+  color: #777;
+}
+
+.moment {
+  color: #777;
+  font-size: 12px;
+}
+
+.postContent {
+  margin-bottom: 16px;
+}
+
+.postContent p {
+  margin-bottom: 8px;
+}
+
+.media {
+  max-width: 100%;
+  width: 100%;
+  height: auto;
+  margin-bottom: 8px;
+}
+
+.likes {
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.comments {
+  margin-bottom: 16px;
+  margin-top: 20px;
+}
+
+.comment {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  justify-content: flex-start;
+}
+
+.commentProfilePhoto {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.commentUsername {
+  font-weight: bold;
+  margin-right: 4px;
+}
+
+.commentMoment {
+  color: #777;
+  font-size: 12px;
+}
+
+.commentText {
+  margin-top: 4px;
+  align-self: flex-start;
+}
+
+.showMoreButton,
+.reduceCommentsButton {
+  background-color: transparent;
+  border: none;
+  color: blue;
+  cursor: pointer;
+  font-size: 14px;
+  outline: none;
+  /* margin-right: 8px; */
+  display: flex;
+  justify-content: center;
+}
+
+.addComment {
+  display: flex;
+  align-items: center;
+}
+
+.commentInput {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-right: 8px;
+}
+
+.sendButton {
+  background-color: blue;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.likes {
+  color: #333;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.likes span {
+  margin-right: 8px;
+}
+
+.likeButtonContainer {
+  display: flex;
+  align-items: center;
+}
+
+.likeButton {
+  background-color: transparent;
+  border: none;
+  color: black;
+  cursor: pointer;
+  /* font-size: 24px; */
+  outline: none;
+  margin-right: 8px;
+}
+.commentButton {
+  background-color: transparent;
+  border: none;
+  color: black;
+  cursor: pointer;
+  /* font-size: 24px; */
+  outline: none;
+  margin-right: 8px;
+}
+
+.liked {
+  color: blue;
+}
+
+.likeText {
+  font-size: 14px;
+}
+
+.likedText {
+  font-size: 14px;
+  color: blue;
+}
+.separatorBar {
+  border-bottom: 1px solid #ccc;
+  margin: 16px 0;
+}
+.replies {
+  margin-left: 20px; /* Ajoute un espace à gauche pour les réponses */
+  border-left: 2px solid #ccc; /* Ajoute une ligne verticale pour différencier les réponses */
+  padding-left: 10px; /* Ajoute un peu de padding à gauche pour les réponses */
+}
+.postInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.eventInfo {
+  margin-top: 5px;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 5px;
+}
+
+.eventTitle {
+  font-size: 18px;
+  font-weight: bold;
+  color: green;
+}
+.eventDateTime {
+  display: flex;
+  align-items: center;
+  margin-top: 5px;
+}
+
+.eventDateTime .icon {
+  margin-right: 5px;
+}
+
+.eventDate,
+.eventTime,
+.eventLocation {
+  margin-right: 10px;
+}
+.video {
+  max-width: 100%;
+  width: 100%;
+  height: auto;
+  margin-bottom: 8px;
+}
+
+/* Styles pour les petits écrans (mobiles) */
+@media (max-width: 768px) {
+  .eventInfo {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .eventDateTime {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .eventDateTime .icon {
+    margin-right: 0;
+    margin-bottom: 5px;
+  }
+
+  /* Ajoutez ces styles pour aligner chaque paire d'icône et valeur côte à côte */
+  .eventDateTime > div {
+    display: flex;
+    align-items: center;
+  }
+}

@@ -1,0 +1,139 @@
+/* ProfilePage.module.css */
+.profileContainer {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: center;
+}
+
+.pageTitle {
+  font-size: 46px;
+  font-weight: bold;
+  margin-bottom: 100px;
+  width: 80%;
+  /* padding-left: 5px solid; */
+}
+.pageTitle2 {
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  display: none;
+}
+
+.profileInfo {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  width: min-content;
+}
+
+.profileBox {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 300px;
+}
+.profilePhotoContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: white;
+  margin-right: 12px;
+  padding: 12px;
+  border-radius: 12px;
+}
+
+.profilePhoto {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.photoTitle {
+  margin-top: 0px;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+.buttonsContainer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+  width: "100%";
+}
+.formTitle {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 15px;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  margin-left: 10px;
+}
+.formContainer {
+  justify-content: center;
+  align-items: center;
+  width: 350px;
+  background-color: white;
+  border-radius: 10px;
+  padding: 10px;
+  margin-right: 12px;
+  margin-left: 2px;
+}
+
+@media (max-width: 1000px) {
+  .pageTitle {
+    font-size: 36px;
+    font-weight: bold;
+    display: none;
+  }
+  .pageTitle2 {
+    font-size: 36px;
+    font-weight: bold;
+    margin-bottom: 50px;
+    display: none;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .profileInfo {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    align-items: center;
+    margin-right: 0px;
+  }
+  .profileBox {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .profileContainer {
+    padding: 20px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+  }
+  .formContainer {
+    justify-content: center;
+    align-items: center;
+    width: 350px;
+    background-color: white;
+    border-radius: 10px;
+    padding: 10px;
+    margin-right: 12px;
+    margin-top: 12px;
+  }
+  .photoTitle {
+    margin-top: 0px;
+    font-size: 30px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+}

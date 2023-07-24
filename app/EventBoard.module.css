@@ -1,0 +1,44 @@
+.eventBoardContainer {
+  background-color: #ffffff;
+  border-radius: 20px;
+  padding: 10px;
+  width: 300px;
+}
+
+.eventBoardTitle {
+  text-align: left;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.eventBoardDivider {
+  border: none;
+  border-top: 1px solid #e4e4e4;
+  margin-bottom: 10px;
+}
+
+.itemContainer {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+}
+
+.itemPhoto {
+  width: 64px;
+  height: 64px;
+  margin-right: 10px;
+}
+
+.itemDate {
+  font-weight: bold;
+}
+
+.viewAllButton {
+  border: 1px solid #ccc;
+  /* Ajoutez d'autres styles de bordure si nécessaire */
+}
+
+.reduceButton {
+  border: 1px solid #ccc;
+  /* Ajoutez d'autres styles de bordure si nécessaire */
+}
