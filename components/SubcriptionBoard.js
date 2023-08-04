@@ -1,40 +1,40 @@
 import React, { useState } from "react";
-import { Box, Button } from "gestalt";
+import { Box } from "gestalt";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faEyeSlash,
   faPlus,
   faArrowRight,
   faArrowLeft,
-  faEye,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "../app/SuggestionBoard.module.css";
 import IconButton from "./IconButton";
 import Link from "next/link";
+
 const ITEMS_PER_PAGE = 3;
 
-const SuggestionBoard = ({ suggestions }) => {
+const SubscriptionBoard = ({ subscriptions }) => {
   const [showAll, setShowAll] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
   // Utiliser un objet plutôt qu'un tableau pour l'état followingStates
   const [followingStates, setFollowingStates] = useState(
-    suggestions.reduce((map, suggestion) => {
-      map[suggestion.id] = false;
+    subscriptions.reduce((map, subcription) => {
+      map[subcription.id] = false;
       return map;
     }, {})
   );
-  const displayedSuggestions = showAll
-    ? suggestions
-    : suggestions.slice(startIndex, endIndex);
+  const displayedSubcription = showAll
+    ? subscriptions
+    : subscriptions.slice(startIndex, endIndex);
 
-  const handleFollow = (suggestionId) => {
+  const handleFollow = (userId) => {
     setFollowingStates((prevStates) => ({
       ...prevStates,
-      [suggestionId]: !prevStates[suggestionId],
+      [userId]: !prevStates[userId],
     }));
   };
-
   const handleNextPage = () => {
     setCurrentPage((prevPage) => prevPage + 1);
   };
@@ -44,22 +44,20 @@ const SuggestionBoard = ({ suggestions }) => {
   };
   return (
     <div className={styles.suggestionBoardContainer}>
-      <h2 className={styles.suggestionBoardTitle}>Des suggestions</h2>
+      <h2 className={styles.suggestionBoardTitle}>Abonnements</h2>
       <hr className={styles.suggestionBoardDivider} />
-      {displayedSuggestions.map((suggestion, index) => {
+      {displayedSubcription.map((subscription, index) => {
         return (
           <div key={index} className={styles.suggestionItemWrapper}>
-            <Item
-              photo={suggestion.photo}
-              suggestionId={suggestion.id}
-              username={suggestion.username}
-              following={followingStates[suggestion.id] || false}
-              onFollow={() => handleFollow(suggestion.id)}
+            <SubscriptionItem
+              photo={subscription.photo}
+              username={subscription.username}
+              userId={subscription.id}
             />
           </div>
         );
       })}
-      {suggestions.length > ITEMS_PER_PAGE && !showAll && (
+      {subscriptions.length > ITEMS_PER_PAGE && !showAll && (
         <div className={styles.suggestionButtonContainer}>
           {currentPage > 1 && (
             <IconButton
@@ -74,7 +72,7 @@ const SuggestionBoard = ({ suggestions }) => {
             />
           )}
 
-          {endIndex < suggestions.length && (
+          {endIndex < subscriptions.length && (
             <IconButton
               icon={<FontAwesomeIcon icon={faArrowRight} />}
               label="Page suivante"
@@ -92,40 +90,49 @@ const SuggestionBoard = ({ suggestions }) => {
   );
 };
 
-const Item = ({ photo, username, suggestionId, following, onFollow }) => {
+const SubscriptionItem = ({ photo, username, userId }) => {
+  const handleUnsubscribe = () => {
+    // Placez ici le code pour gérer le désabonnement de l'utilisateur avec l'ID "userId"
+    // Vous pouvez utiliser une fonction pour supprimer l'utilisateur de la liste des abonnements
+    // par exemple : handleUnsubscribe(userId)
+  };
+
   return (
     <div className={styles.suggestionItemContainer}>
-      {/* <Link href={`/profil_utilisateur/${suggestionId}`}> */}
-      <Link href={`/profil_utilisateur/ `}>
-        <img src={photo} alt="Profile" className={styles.profilePhoto} />
-      </Link>
-      <div className={styles.usernameContainer}>
-        <div className={styles.username}>{username}</div>
-        <div className={styles.usernameLowercase}>
-          @{username.toLowerCase()}
+      <Link href={`/profilArtisteImages/${userId}`}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignContent: "center",
+          }}
+        >
+          <div style={{}}>
+            <img src={photo} alt="Profile" className={styles.profilePhoto} />
+          </div>
+          <div className={styles.usernameContainer}>
+            <div className={styles.username}>{username}</div>
+            <div className={styles.usernameLowercase}>
+              @{username.toLowerCase()}
+            </div>
+          </div>
         </div>
-      </div>
-      <div style={{ marginLeft: "20px" }}>
+      </Link>
+      <div style={{ marginLeft: "18px" }}>
         <IconButton
-          icon={
-            following ? (
-              <FontAwesomeIcon icon={faEye} />
-            ) : (
-              <FontAwesomeIcon icon={faPlus} />
-            )
-          }
-          label={following ? "Suivi" : "Suivre"}
-          buttonColor={following ? "blue" : "white"}
-          textColor={following ? "white" : "black"}
-          iconColor={following ? "white" : "blue"}
-          iconPosition="right"
+          icon={<FontAwesomeIcon icon={faEyeSlash} />}
+          label="Désabonner"
+          buttonColor="white"
+          textColor="red"
+          //   iconColor="red"
+          //   iconPosition="right"
           border
-          borderColor={following ? "blue" : "#ccc"}
-          onClick={() => onFollow(suggestionId)}
+          borderColor="red"
+          onClick={handleUnsubscribe}
         />
       </div>
     </div>
   );
 };
 
-export default SuggestionBoard;
+export default SubscriptionBoard;

@@ -1,28 +1,59 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
   Box,
   Image,
   IconButton as GestaltIconButton,
   Modal,
-  Sheet,
   TextField,
   SearchField,
+  OverlayPanel,
+  SideNavigation,
   Button,
+  TextArea,
 } from "gestalt";
-import { useRouter } from "next/router";
 import "@/app/globals.css";
 import IconButton from "../components/IconButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useAppContext } from "../context/AppContext";
+import { useRouter } from "next/router";
 import { faPlus, faSignOut, faUser } from "@fortawesome/free-solid-svg-icons";
 
 const Navigation = () => {
   const router = useRouter();
   const [isSmallScreen, setIsSmallScreen] = useState(false);
-  const [showSheet, setShowSheet] = useState(false);
   const [showSearchField, setShowSearchField] = useState(false);
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [showOverlayPanel, setShowOverlayPanel] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedMedia, setSelectedMedia] = useState(null);
+  const inputFileRef = useRef(null);
+  const { setUser, setToken, user, token } = useAppContext();
 
+  const handleLogout = () => {
+    setUser(null);
+    setToken(null);
+    router.push("/");
+  };
+
+  const [eventData, setEventData] = useState({
+    eventName: "",
+    date: new Date(),
+    time: "",
+    location: "",
+    description: "",
+    media: "", // You can store the selected media URL here
+  });
+  const handleOpenFileSelector = () => {
+    inputFileRef.current.click();
+  };
+
+  const handleMediaChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      // Mettez en œuvre ici la logique pour afficher l'aperçu du média sélectionné
+      setSelectedMedia(file);
+    }
+  };
   useEffect(() => {
     if (typeof window !== "undefined") {
       setIsSmallScreen(window.innerWidth < 1290); // Mettre à jour la taille initiale
@@ -42,9 +73,7 @@ const Navigation = () => {
   const handleToggleSearchField = () => {
     setShowSearchField((prevState) => !prevState);
   };
-  const handleToggleDropdown = () => {
-    setShowDropdown((prevState) => !prevState);
-  };
+
   const logoStyle = {
     width: "100%",
     height: "auto",
@@ -69,17 +98,62 @@ const Navigation = () => {
     alignItems: "center",
     cursor: "pointer",
   };
-
-  const handleOpenSheet = () => {
-    setShowSheet(true);
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+  };
+  const handleInputChange = (name, value) => {
+    setEventData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
 
-  const handleCloseSheet = () => {
-    setShowSheet(false);
-  };
+  const handlePublishEvent = () => {
+    // Add your logic to publish the event using eventData
+    // For example, you can make an API call to save the event data to the server
+    console.log("Event Data:", eventData);
 
+    // Close the modal after publishing the event
+    setIsModalOpen(false);
+  };
+  const handleModalOpen = () => {
+    console.log("hello");
+    setIsModalOpen(true);
+  };
+  const handleOpenOverlayPanel = () => {
+    setShowOverlayPanel(true);
+    console.log("Opening overlay panel");
+  };
+  const handleCloseOverlayPanel = () => {
+    setShowOverlayPanel(false);
+  };
+  const overlayPanelStyle = {
+    position: "fixed",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Couleur d'arrière-plan semi-transparente
+    zIndex: 999, // Définir une valeur de zIndex élevée pour placer le OverlayPanel au-dessus du contenu de la page
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  };
   const handleChange = () => {};
+  useEffect(() => {
+    // Mettre à jour la date et l'heure actuelles comme placeholder lorsque le composant est monté
+    const currentDate = new Date().toISOString().split("T")[0];
+    const currentTime = new Date().toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
 
+    setEventData((prevData) => ({
+      ...prevData,
+      date: currentDate,
+      time: currentTime,
+    }));
+  }, []);
   return (
     <Box
       display="flex"
@@ -147,65 +221,189 @@ const Navigation = () => {
             onClick={handleToggleSearchField}
           />
 
-          <Box style={userBoxStyle} onClick={handleToggleDropdown}>
-            <GestaltIconButton
-              accessibilityLabel="Utilisateur"
-              icon="person"
-              size="md"
-              onClick={handleToggleDropdown}
-            />
-          </Box>
-          {/* Show the dropdown when showDropdown is true */}
-          {showDropdown && (
-            <div
-              style={{
-                position: "absolute",
-                right: "20px",
-                top: "40px",
-                backgroundColor: "white",
-                padding: "12px",
-                marginTop: "20px",
-                borderRadius: "20px",
-              }}
-            >
-              <ul>
-                <Box marginBottom={2}>
-                  <Box marginBottom={2}>
-                    <IconButton
-                      icon={<FontAwesomeIcon icon={faUser} />}
-                      label="Mon profil"
-                      buttonColor="white"
-                      textColor="black"
-                      iconColor="black"
-                      iconPosition="left"
-                      href="/profil"
-                    />
-                  </Box>
-                  <IconButton
-                    icon={<FontAwesomeIcon icon={faSignOut} />}
+          {/* <Box style={userBoxStyle}> */}
+          <GestaltIconButton
+            accessibilityLabel="Utilisateur"
+            icon="menu"
+            size="md"
+            onClick={handleOpenOverlayPanel}
+          />
+          {showOverlayPanel && isSmallScreen && (
+            <div style={overlayPanelStyle}>
+              <OverlayPanel
+                show={showOverlayPanel}
+                role="menu"
+                anchor={null}
+                onDismiss={handleCloseOverlayPanel}
+                positionRelativeToAnchor={false}
+                heading="Menu"
+                size=""
+              >
+                <SideNavigation>
+                  <SideNavigation.TopItem
+                    href="/profil"
+                    // onClick={({ event }) => event.preventDefault()}
+                    label="Profil"
+                    icon="person"
+                  />
+                  <SideNavigation.TopItem
+                    href="#"
+                    onClick={handleLogout}
                     label="Déconnexion"
-                    buttonColor="white"
-                    textColor="red"
-                    iconColor="red"
-                    iconPosition="left"
+                    icon="logout"
                   />
-                </Box>
-
-                <Box marginBottom={2}>
-                  <IconButton
-                    icon={<FontAwesomeIcon icon={faPlus} />}
-                    label="Nouvelle publication"
-                    buttonColor="blue"
-                    textColor="white"
-                    iconColor="white"
-                    iconPosition="left"
+                  <SideNavigation.TopItem
+                    // href="#"
+                    // onClick={({ event }) => event.preventDefault()}
+                    label="Nouvel évènement"
+                    icon="add"
+                    onClick={handleModalOpen}
                   />
-                </Box>
-              </ul>
+                  <SideNavigation.TopItem
+                    // href="#"
+                    // onClick={({ event }) => event.preventDefault()}
+                    label="Mes abonnements"
+                    icon="people"
+                    onClick={() => {}}
+                  />
+                </SideNavigation>
+                {isModalOpen && (
+                  <Modal
+                    accessibilityCloseLabel="Fermer"
+                    accessibilityModalLabel="Créer un événement"
+                    heading="Créer un événement"
+                    size="sm"
+                    onDismiss={handleModalClose}
+                    footer={
+                      <Box display="flex" justifyContent="end">
+                        <Button
+                          text="Publier"
+                          color="red"
+                          onClick={handlePublishEvent}
+                        />
+                        <Box marginLeft={2}>
+                          <Button text="Annuler" onClick={handleModalClose} />
+                        </Box>
+                      </Box>
+                    }
+                    role="alertdialog"
+                  >
+                    <Box marginTop={4} marginBottom={4}>
+                      {/* Media preview */}
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          height: "150px",
+                          border: "1px dashed #000",
+                          marginBottom: "2px",
+                          cursor: "pointer",
+                          position: "relative",
+                        }}
+                        onClick={handleOpenFileSelector}
+                      >
+                        {selectedMedia ? (
+                          <img
+                            src={URL.createObjectURL(selectedMedia)} // Utilisez l'URL.createObjectURL pour afficher l'aperçu de l'image
+                            alt="Media Preview"
+                            style={{ maxWidth: "100%", maxHeight: "100%" }}
+                          />
+                        ) : (
+                          <div>
+                            <FontAwesomeIcon
+                              icon={faPlus}
+                              size="3x"
+                              color="#ccc"
+                            />
+                          </div>
+                        )}
+                      </div>
+                      {/* Sélecteur de fichiers caché */}
+                      <input
+                        type="file"
+                        ref={inputFileRef}
+                        style={{ display: "none" }}
+                        accept="image/*, video/*" // Acceptez à la fois les images et les vidéos
+                        onChange={handleMediaChange}
+                      />
+                    </Box>
+                    <Box
+                      marginTop={4}
+                      display="flex"
+                      alignItems="start"
+                      direction="column"
+                    >
+                      <TextField
+                        id="eventName"
+                        name="eventName"
+                        onChange={({ value }) =>
+                          handleInputChange("eventName", value)
+                        }
+                        placeholder="Nom de l'événement"
+                        value={eventData.eventName}
+                      />
+                      <Box
+                        display="flex"
+                        marginTop={2}
+                        justifyContent="between"
+                      >
+                        <Box marginEnd={2}>
+                          <TextField
+                            id="eventDate"
+                            name="eventDate"
+                            type="date"
+                            onChange={({ value }) =>
+                              handleInputChange("date", value)
+                            }
+                            value={eventData.date}
+                          />
+                        </Box>
+                        <Box marginL={4}>
+                          <TextField
+                            id="eventTime"
+                            name="eventTime"
+                            type="time"
+                            onChange={({ value }) =>
+                              handleInputChange("time", value)
+                            }
+                            value={eventData.time}
+                          />
+                        </Box>
+                      </Box>
+                      <Box marginTop={2}>
+                        <TextField
+                          id="eventTime"
+                          name="eventTime"
+                          type="text"
+                          placeholder="Lieu"
+                          onChange={({ value }) =>
+                            handleInputChange("location", value)
+                          }
+                          value={eventData.location}
+                        />
+                      </Box>
+                      <Box marginTop={2} width="100%">
+                        <TextArea
+                          id="eventDescription"
+                          name="eventDescription"
+                          type="text"
+                          placeholder="Description"
+                          onChange={({ value }) =>
+                            handleInputChange("description", value)
+                          }
+                          value={eventData.description}
+                        />
+                      </Box>
+                    </Box>
+                  </Modal>
+                )}
+              </OverlayPanel>
             </div>
           )}
         </Box>
       ) : (
+        // </Box>
         // Afficher le champ de recherche et les liens Explorer et Événements seulement sur les grands écrans
         <>
           <Box flex="grow" marginRight={3} marginLeft={3}>
@@ -228,32 +426,6 @@ const Navigation = () => {
           </Box>
         </>
       )}
-
-      {/* Ajouter le composant de la Sheet */}
-      {showSheet && (
-        <Sheet
-          accessibilityDismissLabel="Fermer"
-          onDismiss={handleCloseSheet}
-          heading="Mon compte"
-          size="md"
-        >
-          {/* Contenu de la Sheet */}
-          {/* Vous pouvez afficher les détails de l'utilisateur ici */}
-        </Sheet>
-      )}
-      <style jsx>{`
-        .nav-link {
-          color: black;
-          text-decoration: none;
-          cursor: pointer;
-        }
-
-        .active {
-          color: blue;
-          text-decoration: underline;
-          font-weight: SemiBold;
-        }
-      `}</style>
     </Box>
   );
 };

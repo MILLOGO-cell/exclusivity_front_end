@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Image, Button, Modal, IconButton } from "gestalt";
+import { Box, Image, Button, Modal, IconButton, OverlayPanel } from "gestalt";
 import Logo from "../public/logo.png";
 import "@/app/globals.css";
 import LoginForm from "./LoginForm";
@@ -143,7 +143,10 @@ const Navbar = () => {
             size={400}
           >
             <Box padding={4}>
-              <RegisterForm handleCloseRegisterForm={handleCloseRegisterForm} />
+              <RegisterForm
+                handleCloseRegisterForm={handleCloseRegisterForm}
+                showCloseButton={true}
+              />
             </Box>
           </Modal>
         </div>

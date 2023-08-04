@@ -1,0 +1,25 @@
+/* CustomSideNavigation.module.css */
+
+/* Styles pour la Side Navigation */
+.sideNav {
+  position: fixed;
+  top: 0;
+  right: -250px; /* Initial position à droite en dehors de l'écran */
+  bottom: 0;
+  width: 250px;
+  background-color: white;
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.2);
+  transition: right 0.3s ease-in-out; /* Transition pour l'ouverture et la fermeture */
+}
+
+/* Classe pour ouvrir la Side Navigation */
+.open {
+  right: 0; /* Position à droite pour afficher la navigation */
+}
+
+/* Styles pour l'icône de fermeture */
+.closeIcon {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+}

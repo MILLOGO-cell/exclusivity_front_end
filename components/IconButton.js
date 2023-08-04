@@ -10,7 +10,8 @@ const IconButton = ({
   textColor,
   iconColor,
   border,
-  iconPosition, // Ajout de la prop iconPosition pour spécifier la position de l'icône
+  borderColor,
+  iconPosition,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
@@ -34,7 +35,7 @@ const IconButton = ({
     justifyContent: "center",
     alignItems: "center",
     width: "100%",
-    border: border ? "1px solid #ccc" : "none", // Ajout de la bordure si la prop border est true
+    border: border ? `1px solid ${borderColor || "#000"}` : "none", // Ajout de la bordure si la prop border est true
   };
 
   const iconStyles = {

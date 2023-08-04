@@ -145,6 +145,7 @@ const Home = () => {
                 <Box padding={4}>
                   <RegisterForm
                     handleCloseRegisterForm={handleCloseRegisterForm}
+                    showCloseButton={true}
                   />
                 </Box>
               </Modal>
@@ -369,11 +370,11 @@ const Home = () => {
                 <Box
                   marginY={4}
                   color="default"
-                  paddingX={12}
+                  paddingX={5}
                   paddingY={5}
                   rounding={8}
                 >
-                  <RegisterForm />
+                  <RegisterForm showCloseButton={false} />
                   <Text align="center">
                     Déjà membre ?{" "}
                     <a

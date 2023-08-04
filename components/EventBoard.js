@@ -48,7 +48,7 @@ const EventBoard = ({ events }) => {
             borderRadius: "20px",
           }}
         >
-          <GestaltIconButton icon="add" iconColor="white" size="sm" />
+          {/* <GestaltIconButton icon="add" iconColor="white" size="sm" /> */}
         </div>
       </Flex>
       <hr className={styles.eventBoardDivider} />
