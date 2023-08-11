@@ -83,7 +83,7 @@ const ProfileArtisteImages = ({}) => {
     const storedIsAuthenticated = localStorage.getItem("isAuthenticated");
     setUserIdentity(JSON.parse(storedUser));
     setToken(storedToken);
-  });
+  }, []);
 
   useEffect(() => {
     // Récupérer l'image de profil de l'utilisateur connecté

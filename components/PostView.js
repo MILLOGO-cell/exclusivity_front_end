@@ -57,7 +57,7 @@ const PostView = ({
     const storedIsAuthenticated = localStorage.getItem("isAuthenticated");
     setUserIdentity(JSON.parse(storedUser));
     setToken(storedToken);
-  });
+  }, []);
 
   useEffect(() => {
     const fetchLikedUsers = async () => {
@@ -313,7 +313,7 @@ const PostView = ({
           <span className={styles.username}>{username}</span>
           <span className={styles.separator}>|</span>
           <span className={styles.moment}>
-            il y'a {formatMomentText(moment)}
+            il y&apos;a {formatMomentText(moment)}
           </span>
         </div>
       </div>
@@ -677,7 +677,7 @@ const Comment = ({ commentData, token, userIdentity, postId, level = 0 }) => {
             onClick={handleLike}
           >
             {liked ? (
-              <span style={{ color: "black" }}>J'aime ·👍 </span>
+              <span style={{ color: "black" }}>J&apos;aime ·👍 </span>
             ) : (
               <span style={{ color: "blue" }}>Vous aimez ·👍 </span>
             )}

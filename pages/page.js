@@ -66,7 +66,7 @@ const Home = () => {
     const storedIsAuthenticated = localStorage.getItem("isAuthenticated");
     setUserIdentity(JSON.parse(storedUser));
     setToken(storedToken);
-  });
+  }, []);
 
   useEffect(() => {
     const incrementLoadingDots = () => {
