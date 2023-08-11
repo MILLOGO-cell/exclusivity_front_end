@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 
 const Layout = ({ children }) => {
   return (
@@ -9,13 +10,19 @@ const Layout = ({ children }) => {
         <nav>
           <ul>
             <li>
-              <a href="/">Accueil</a>
+              <Link href="/">
+                <a>Accueil</a>
+              </Link>
             </li>
             <li>
-              <a href="/about">À propos</a>
+              <Link href="/about">
+                <a>À propos</a>
+              </Link>
             </li>
             <li>
-              <a href="/contact">Contact</a>
+              <Link href="/contact">
+                <a>Contact</a>
+              </Link>
             </li>
           </ul>
         </nav>
