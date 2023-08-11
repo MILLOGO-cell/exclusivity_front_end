@@ -403,7 +403,7 @@ const Navigation = () => {
           <div
             className="nav-link"
             style={{ margin: "0 20px", cursor: "pointer" }}
-            onClick={() => handleNavigation("event")}
+            // onClick={() => handleNavigation("event")}
           >
             <a className={`nav-link ${isActive("/event")}`} href="event">
               Événements
