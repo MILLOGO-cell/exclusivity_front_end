@@ -6,6 +6,8 @@ import styles from "../app/EventBoard.module.css";
 import IconButton from "./IconButton";
 import { format, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
+import Image from "next/image";
+
 const ITEMS_PER_PAGE = 3;
 
 const EventBoard = ({ events }) => {
@@ -104,7 +106,7 @@ const EventBoard = ({ events }) => {
 const Item = ({ photo, date, title }) => {
   return (
     <div className={styles.itemContainer}>
-      <img src={photo} alt="Event" className={styles.itemPhoto} />
+      <Image src={photo} alt="Event" className={styles.itemPhoto} />
       <div>
         <div className={styles.itemDate}>{date}</div>
         <div className={styles.itemTitle}>{title}</div>

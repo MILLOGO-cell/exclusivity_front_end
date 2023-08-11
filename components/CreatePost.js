@@ -14,7 +14,7 @@ import { faImage, faVideo } from "@fortawesome/free-solid-svg-icons";
 import { SIMPLE_POST } from "@/configs/api";
 import axios from "axios";
 import { useAppContext } from "@/context/AppContext";
-
+import Image from "next/image";
 const CreatePost = ({ userPhoto }) => {
   const [showModal, setShowModal] = useState(false);
   const [postText, setPostText] = useState("");
@@ -229,7 +229,7 @@ const CreatePost = ({ userPhoto }) => {
               {/* Afficher le média sélectionné dans la zone de texte du modal */}
               {selectedMedia && selectedIcon === "camera" && (
                 <>
-                  <img
+                  <Image
                     src={URL.createObjectURL(selectedMedia)}
                     alt="Media"
                     style={{ maxWidth: "100%", marginTop: "10px" }}

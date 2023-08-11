@@ -13,7 +13,7 @@ import Navigation from "@/components/Nav1";
 import axios from "axios";
 import { API_URL, BASIC_URL } from "@/configs/api";
 import { useAppContext } from "@/context/AppContext";
-
+import Image from "next/image";
 const ProfileArtisteImages = ({}) => {
   const router = useRouter();
   const suggestionId = router.query?.id;
@@ -83,7 +83,7 @@ const ProfileArtisteImages = ({}) => {
     const storedIsAuthenticated = localStorage.getItem("isAuthenticated");
     setUserIdentity(JSON.parse(storedUser));
     setToken(storedToken);
-  }, []);
+  });
 
   useEffect(() => {
     // Récupérer l'image de profil de l'utilisateur connecté
@@ -238,7 +238,7 @@ const ProfileArtisteImages = ({}) => {
               justifyContent: "center",
             }}
           >
-            <img
+            <Image
               src={userImage}
               alt={userIdentity?.username}
               style={{
@@ -312,8 +312,9 @@ const ProfileArtisteImages = ({}) => {
               <Box padding={2}>
                 <Text>
                   Cher utilisateur/trice, en vous désabonnant de ce compte, vous
-                  n'aurez plus accès aux différents contenus qui y sont liés.
-                  Êtes-vous sûr(e) de vouloir continuer et vous désabonner ?
+                  n&apos;aurez plus accès aux différents contenus qui y sont
+                  liés. Êtes-vous sûr(e) de vouloir continuer et vous désabonner
+                  ?
                 </Text>
               </Box>
             </Modal>

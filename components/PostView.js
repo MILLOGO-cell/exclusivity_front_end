@@ -5,6 +5,7 @@ import formatMomentText from "../utils/utils";
 import { API_URL, BASIC_URL } from "@/configs/api";
 import axios from "axios";
 import { useAppContext } from "@/context/AppContext";
+import Image from "next/image";
 
 const PostView = ({
   profilePhoto,
@@ -56,7 +57,7 @@ const PostView = ({
     const storedIsAuthenticated = localStorage.getItem("isAuthenticated");
     setUserIdentity(JSON.parse(storedUser));
     setToken(storedToken);
-  }, []);
+  });
 
   useEffect(() => {
     const fetchLikedUsers = async () => {
@@ -92,7 +93,7 @@ const PostView = ({
     };
 
     fetchLikedUsers();
-  }, [token, postId, userIdentity?.id]);
+  }, [token, postId, userIdentity?.id, eventTitle, userIdentity?.username]);
 
   const Refresh = async () => {
     try {
@@ -303,7 +304,7 @@ const PostView = ({
   return (
     <div className={styles.postViewContainer}>
       <div className={styles.userInfo}>
-        <img
+        <Image
           src={profilePhoto}
           alt="Photo de profil"
           className={styles.profilePhoto}
@@ -340,7 +341,7 @@ const PostView = ({
       <div className={styles.postContent}>
         <p>{postText}</p>
         {media && !video && (
-          <img src={media} alt="Photo" className={styles.media} />
+          <Image src={media} alt="Photo" className={styles.media} />
         )}
         {video && (
           <video controls className={styles.video}>
@@ -586,7 +587,7 @@ const Comment = ({ commentData, token, userIdentity, postId, level = 0 }) => {
         observer.unobserve(commentRef.current);
       }
     };
-  }, []);
+  }, [commentRef, setIsVisible, observer]);
 
   // Fonction pour charger plus de réponses
   const handleLoadMoreReplies = () => {
@@ -652,7 +653,7 @@ const Comment = ({ commentData, token, userIdentity, postId, level = 0 }) => {
           }}
         >
           <div style={{ display: "flex", justifyContent: "center" }}>
-            <img
+            <Image
               src={
                 commentData?.user_details?.image.startsWith("http")
                   ? commentData?.user_details?.image

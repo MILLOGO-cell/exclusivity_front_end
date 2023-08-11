@@ -3,6 +3,8 @@ import React, { useRef, useState, useEffect } from "react";
 import { formatMomentText } from "../utils/utils"; // Utilitaire pour formater le moment
 import axios from "axios";
 import { useAppContext } from "@/context/AppContext";
+import Image from "next/image";
+
 const EventPost = ({
   profilePhoto,
   username,
@@ -37,10 +39,11 @@ const EventPost = ({
     setUserIdentity(JSON.parse(storedUser));
     setToken(storedToken);
   }, [setToken]);
+
   return (
     <div className="event-post">
       <div className="post-header">
-        <img
+        <Image
           src={profilePhoto}
           alt="Photo de profil"
           className="profile-photo"
@@ -55,7 +58,7 @@ const EventPost = ({
         <p className="event-location">{eventLocation}</p>
       </div>
       <p className="post-text">{postText}</p>
-      {media && <img src={media} alt="Photo" className="post-media" />}
+      {media && <Image src={media} alt="Photo" className="post-media" />}
       <div className="likes-comments">
         <span>
           {lastLikeUser} et {likesCount - 1} autres personnes aiment ceci

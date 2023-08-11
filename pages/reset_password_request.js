@@ -79,7 +79,7 @@ const ResetPasswordPage = () => {
 
       return () => clearTimeout(timer);
     }
-  }, [emailSent, emailConfirmed]);
+  }, [emailSent, emailConfirmed, router]);
   return (
     <Box
       display="flex"

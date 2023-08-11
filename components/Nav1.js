@@ -30,10 +30,10 @@ import { API_URL, BASIC_URL } from "@/configs/api";
 import axios from "axios";
 import EventPage from "../components/EventPage";
 import ExplorerPage from "../components/ExplorerPage";
-
+import Image from "next/image";
 const UserItem = ({ user }) => (
   <div className={styles["user-item"]}>
-    <img
+    <Image
       className={styles["user-item-img"]}
       src={`${BASIC_URL}${user.image}`}
       alt={user.username}
@@ -252,7 +252,7 @@ const Navigation = () => {
           //   marginRight: "30px",
         }}
       >
-        <img
+        <Image
           alt="Logo"
           src="/logo.png"
           style={{ maxWidth: "100%", maxHeight: "100%" }}
@@ -531,7 +531,7 @@ const Navigation = () => {
                             onClick={handleOpenFileSelector}
                           >
                             {selectedMedia ? (
-                              <img
+                              <Image
                                 src={URL.createObjectURL(selectedMedia)} // Utilisez l'URL.createObjectURL pour afficher l'aperçu de l'image
                                 alt="Media Preview"
                                 style={{ maxWidth: "100%", maxHeight: "100%" }}

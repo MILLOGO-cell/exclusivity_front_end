@@ -23,6 +23,8 @@ import {
   BASIC_URL,
 } from "@/configs/api";
 import axios from "axios";
+import Image from "next/image";
+
 const ProfilePage = () => {
   const [selectedPhoto, setSelectedPhoto] = useState(null);
   const { user, token, setToken } = useAppContext();
@@ -115,7 +117,7 @@ const ProfilePage = () => {
       // Utiliser fetchUserDetails depuis le useEffect
       fetchUserDetails();
     }
-  }, [userIdentity, token]);
+  }, [userIdentity, token, fetchUserDetails]);
 
   const handlePhotoChange = (event) => {
     const file = event.target.files[0];
@@ -245,7 +247,7 @@ const ProfilePage = () => {
                   htmlFor="photoInput"
                   className={styles.profilePhotoLabel}
                 >
-                  <img
+                  <Image
                     src={
                       selectedPhoto
                         ? URL.createObjectURL(selectedPhoto)

@@ -31,7 +31,7 @@ const SuggestionBoard = ({ suggestions }) => {
     const storedIsAuthenticated = localStorage.getItem("isAuthenticated");
     setUserIdentity(JSON.parse(storedUser));
     setToken(storedToken);
-  });
+  }, []);
 
   // Utiliser le localStorage pour initialiser l'état local des abonnements
   const [followingStates, setFollowingStates] = useState(

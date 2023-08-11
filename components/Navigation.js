@@ -18,7 +18,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAppContext } from "../context/AppContext";
 import { useRouter } from "next/router";
 import { faPlus, faSignOut, faUser } from "@fortawesome/free-solid-svg-icons";
-
+import Image from "next/image";
 const Navigation = () => {
   const router = useRouter();
   const [isSmallScreen, setIsSmallScreen] = useState(false);
@@ -303,7 +303,7 @@ const Navigation = () => {
                         onClick={handleOpenFileSelector}
                       >
                         {selectedMedia ? (
-                          <img
+                          <Image
                             src={URL.createObjectURL(selectedMedia)} // Utilisez l'URL.createObjectURL pour afficher l'aperçu de l'image
                             alt="Media Preview"
                             style={{ maxWidth: "100%", maxHeight: "100%" }}
