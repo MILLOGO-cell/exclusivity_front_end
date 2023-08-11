@@ -30,7 +30,7 @@ const Post = ({ username, timestamp, content, mediaUrl, mediaType }) => {
             </Text>
             <Text> @{username}</Text>
           </Box>
-          <Box>il y'a {timestamp}</Box>
+          <Box>il y&apos;a {timestamp}</Box>
         </Box>
         <Box marginTop={12}>
           <Text>{content}</Text>

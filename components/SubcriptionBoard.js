@@ -10,7 +10,7 @@ import {
 import styles from "../app/SuggestionBoard.module.css";
 import IconButton from "./IconButton";
 import Link from "next/link";
-
+import Image from "next/image";
 const ITEMS_PER_PAGE = 3;
 
 const SubscriptionBoard = ({ subscriptions }) => {
@@ -108,7 +108,7 @@ const SubscriptionItem = ({ photo, username, userId }) => {
           }}
         >
           <div style={{}}>
-            <img src={photo} alt="Profile" className={styles.profilePhoto} />
+            <Image src={photo} alt="Profile" className={styles.profilePhoto} />
           </div>
           <div className={styles.usernameContainer}>
             <div className={styles.username}>{username}</div>

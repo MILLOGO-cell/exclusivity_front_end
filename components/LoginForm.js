@@ -124,7 +124,7 @@ const LoginForm = ({ handleCloseLoginForm }) => {
           {" "}
           <Link href="/reset_password_request">
             <Text as="a" inline color="link" weight="bold">
-              😞 J'ai oublié mon mot de passe
+              😞 J&apos;ai oublié mon mot de passe
             </Text>
           </Link>
         </Text>

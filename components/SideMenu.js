@@ -18,6 +18,7 @@ import { useAppContext } from "../context/AppContext";
 import { useRouter } from "next/router";
 import { EVENT_POST, API_URL } from "@/configs/api";
 import axios from "axios";
+import Image from "next/image";
 
 const SideMenu = ({ username, fansCount, userPhoto }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -223,7 +224,7 @@ const SideMenu = ({ username, fansCount, userPhoto }) => {
                   onClick={handleOpenFileSelector}
                 >
                   {selectedMedia ? (
-                    <img
+                    <Image
                       src={URL.createObjectURL(selectedMedia)} // Utilisez l'URL.createObjectURL pour afficher l'aperçu de l'image
                       alt="Media Preview"
                       style={{ maxWidth: "100%", maxHeight: "100%" }}

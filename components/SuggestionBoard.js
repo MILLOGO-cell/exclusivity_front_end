@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { Box, Button } from "gestalt";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAppContext } from "@/context/AppContext";
+import Image from "next/image";
 
 import {
   faPlus,
@@ -30,7 +31,7 @@ const SuggestionBoard = ({ suggestions }) => {
     const storedIsAuthenticated = localStorage.getItem("isAuthenticated");
     setUserIdentity(JSON.parse(storedUser));
     setToken(storedToken);
-  }, []);
+  });
 
   // Utiliser le localStorage pour initialiser l'état local des abonnements
   const [followingStates, setFollowingStates] = useState(
@@ -160,7 +161,7 @@ const Item = ({
       <div className={styles.blockUserInfo}>
         <Link href={`/profil_utilisateur?id=${suggestionId}`} passHref>
           {/* <Link onClick={setUserId(suggestionId)} href={`/profil_utilisateur/ `}> */}
-          <img src={photo} alt="Profile" className={styles.profilePhoto} />
+          <Image src={photo} alt="Profile" className={styles.profilePhoto} />
         </Link>
         <div className={styles.usernameContainer}>
           <div className={styles.username}>{username}</div>
