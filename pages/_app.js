@@ -9,13 +9,6 @@ function MyApp({ Component, pageProps }) {
   const isAuthenticated = useAppContext();
   const isHomePage = router.pathname === "/";
 
-  //   useEffect(() => {
-  //     // Si l'utilisateur n'est pas connecté et qu'il n'est pas sur la page d'accueil, redirigez-le vers la page d'accueil
-  //     if (!isAuthenticated && !isHomePage) {
-  //       router.push("/");
-  //     }
-  //   }, [isAuthenticated, isHomePage, router]);
-
   return (
     <AppProvider>
       <Component {...pageProps} />

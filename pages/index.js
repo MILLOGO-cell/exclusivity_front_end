@@ -14,12 +14,16 @@ import "../app/globals.css";
 import Post from "@/components/Post";
 import RegisterForm from "@/components/RegisterForm";
 import LoginForm from "@/components/LoginForm";
+import axios from "axios";
+import { POSTS_REQUEST } from "@/configs/api";
+import formatMomentText from "@/utils/utils";
 
 const Home = () => {
   const [windowWidth, setWindowWidth] = useState(0);
   const [showRegisterForm, setShowRegisterForm] = useState(false);
   const [showLoginForm, setShowLoginForm] = useState(false);
-
+  const [posts, setPosts] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const handleOpenLoginForm = () => {
     setShowLoginForm(true);
   };
@@ -85,6 +89,48 @@ const Home = () => {
       behavior: "smooth", // Ajoutez cette option pour un défilement en douceur
     });
   };
+
+  const fetchPosts = async () => {
+    try {
+      // const headers = {
+      //   Authorization: `Bearer ${token}`, // Assurez-vous d'avoir le token approprié ici
+      // };
+      const response = await axios.get(POSTS_REQUEST);
+
+      if (!response.data || !Array.isArray(response.data)) {
+        throw new Error("Invalid response from the server.");
+      }
+
+      // Filter posts where is_public is true
+      const publicPosts = response.data.filter((post) => post.is_public);
+
+      // Process each post in the response to extract comments data
+      const processedPosts = publicPosts.map((post) => {
+        // Extract comments data from the response for each post
+        const commentData = post.comments;
+        // Return an object that includes the original post data and the comments data
+        return {
+          ...post,
+          commentData: post.comments,
+        };
+      });
+
+      setPosts(processedPosts);
+      setIsLoading(false);
+      if (processedPosts.length > 0) {
+        setCommentData(processedPosts[0].commentData);
+      }
+
+      console.log("post**", processedPosts);
+    } catch (error) {
+      console.error(error);
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPosts(); // Appel de la fonction fetchPosts au chargement de la page
+  }, []);
   return (
     <Box
       // borderStyle="sm"
@@ -318,15 +364,16 @@ const Home = () => {
             />
           </Flex>
         </Box>
-        <Post
-          username="exclusivity"
-          timestamp="Il y a 2 heures"
-          content="Lorem ipsum dolor sit amet consectetur. Ultrices amet a dui fusce
-           dignissim lectus iaculis Lorem ipsum dolor sit amet consectetur. Ultrices amet a dui 
-           fusce dignissim lectus iaculis Lorem ipsum dolor sit amet consectetur. Ultrices amet a dui fusce dignissim lectus iaculis..."
-          mediaUrl="../TANY.jpg"
-          mediaType="image"
-        />
+        {posts.map((post) => (
+          <Post
+            key={post.id}
+            username={post?.author_get.username}
+            timestamp={formatMomentText(new Date(post?.created_at))}
+            content={post.content}
+            mediaUrl={post.media}
+            mediaType={"image"}
+          />
+        ))}
         <Box
           borderStyle="sm"
           width="100%"

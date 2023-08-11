@@ -117,7 +117,6 @@ const Navigation = () => {
     setIsModalOpen(false);
   };
   const handleModalOpen = () => {
-    console.log("hello");
     setIsModalOpen(true);
   };
   const handleOpenOverlayPanel = () => {

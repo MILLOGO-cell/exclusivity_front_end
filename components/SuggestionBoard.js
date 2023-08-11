@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Box, Button } from "gestalt";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useAppContext } from "@/context/AppContext";
+
 import {
   faPlus,
   faArrowRight,
@@ -11,16 +13,32 @@ import styles from "../app/SuggestionBoard.module.css";
 import IconButton from "./IconButton";
 import Link from "next/link";
 const ITEMS_PER_PAGE = 3;
+import { BASIC_URL, SUBSCRIBE_URL, UNSUBSCRIBE_URL } from "@/configs/api";
+import axios from "axios";
 
 const SuggestionBoard = ({ suggestions }) => {
   const [showAll, setShowAll] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
-  // Utiliser un objet plutôt qu'un tableau pour l'état followingStates
+  const { token, setUser, setToken, userId, setUserId } = useAppContext();
+  const [userIdentity, setUserIdentity] = useState(null);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    const storedToken = localStorage.getItem("token");
+    const storedIsAuthenticated = localStorage.getItem("isAuthenticated");
+    setUserIdentity(JSON.parse(storedUser));
+    setToken(storedToken);
+  }, []);
+
+  // Utiliser le localStorage pour initialiser l'état local des abonnements
   const [followingStates, setFollowingStates] = useState(
     suggestions.reduce((map, suggestion) => {
-      map[suggestion.id] = false;
+      const storedFollowingState = localStorage.getItem(
+        `followingState_${suggestion.id}`
+      );
+      map[suggestion.id] = storedFollowingState === "true";
       return map;
     }, {})
   );
@@ -28,11 +46,45 @@ const SuggestionBoard = ({ suggestions }) => {
     ? suggestions
     : suggestions.slice(startIndex, endIndex);
 
-  const handleFollow = (suggestionId) => {
-    setFollowingStates((prevStates) => ({
-      ...prevStates,
-      [suggestionId]: !prevStates[suggestionId],
-    }));
+  const handleFollow = (suggestionId, isFollowing) => {
+    const action = isFollowing ? "unsubscribe" : "subscribe";
+    const requestBody = {
+      creator: suggestionId,
+      subscriber: userIdentity?.id,
+    };
+    // Sélectionnez l'URL appropriée en fonction de l'action
+    const apiUrl = action === "subscribe" ? SUBSCRIBE_URL : UNSUBSCRIBE_URL;
+    // Effectuez la requête appropriée pour abonner ou désabonner l'utilisateur
+    axios
+      .post(apiUrl, requestBody, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((response) => {
+        // Vérifiez la réponse de l'API ici
+        if (response.status === 200 || response.status === 201) {
+          // Mettez à jour l'état de suivi ici en fonction de la réponse de l'API
+          setFollowingStates((prevStates) => {
+            const newFollowingStates = {
+              ...prevStates,
+              [suggestionId]: !prevStates[suggestionId],
+            };
+            // Sauvegarde de l'état d'abonnement dans le localStorage
+            localStorage.setItem(
+              `followingState_${suggestionId}`,
+              newFollowingStates[suggestionId]
+            );
+            return newFollowingStates;
+          });
+        } else {
+          throw new Error("Erreur lors de la requête");
+        }
+      })
+      .catch((error) => {
+        console.error("Erreur lors de l'abonnement/désabonnement :", error);
+      });
   };
 
   const handleNextPage = () => {
@@ -50,11 +102,14 @@ const SuggestionBoard = ({ suggestions }) => {
         return (
           <div key={index} className={styles.suggestionItemWrapper}>
             <Item
-              photo={suggestion.photo}
+              photo={`${BASIC_URL}${suggestion.image}`}
               suggestionId={suggestion.id}
               username={suggestion.username}
               following={followingStates[suggestion.id] || false}
-              onFollow={() => handleFollow(suggestion.id)}
+              onFollow={() =>
+                handleFollow(suggestion.id, followingStates[suggestion.id])
+              }
+              setUserId={setUserId}
             />
           </div>
         );
@@ -92,17 +147,26 @@ const SuggestionBoard = ({ suggestions }) => {
   );
 };
 
-const Item = ({ photo, username, suggestionId, following, onFollow }) => {
+const Item = ({
+  photo,
+  username,
+  suggestionId,
+  following,
+  onFollow,
+  setUserId,
+}) => {
   return (
     <div className={styles.suggestionItemContainer}>
-      {/* <Link href={`/profil_utilisateur/${suggestionId}`}> */}
-      <Link href={`/profil_utilisateur/ `}>
-        <img src={photo} alt="Profile" className={styles.profilePhoto} />
-      </Link>
-      <div className={styles.usernameContainer}>
-        <div className={styles.username}>{username}</div>
-        <div className={styles.usernameLowercase}>
-          @{username.toLowerCase()}
+      <div className={styles.blockUserInfo}>
+        <Link href={`/profil_utilisateur?id=${suggestionId}`} passHref>
+          {/* <Link onClick={setUserId(suggestionId)} href={`/profil_utilisateur/ `}> */}
+          <img src={photo} alt="Profile" className={styles.profilePhoto} />
+        </Link>
+        <div className={styles.usernameContainer}>
+          <div className={styles.username}>{username}</div>
+          <div className={styles.usernameLowercase}>
+            @{username.toLowerCase()}
+          </div>
         </div>
       </div>
       <div style={{ marginLeft: "20px" }}>
@@ -121,7 +185,7 @@ const Item = ({ photo, username, suggestionId, following, onFollow }) => {
           iconPosition="right"
           border
           borderColor={following ? "blue" : "#ccc"}
-          onClick={() => onFollow(suggestionId)}
+          onClick={() => onFollow(suggestionId, following)}
         />
       </div>
     </div>

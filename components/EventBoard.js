@@ -4,7 +4,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import styles from "../app/EventBoard.module.css";
 import IconButton from "./IconButton";
-
+import { format, parseISO } from "date-fns";
+import { fr } from "date-fns/locale";
 const ITEMS_PER_PAGE = 3;
 
 const EventBoard = ({ events }) => {
@@ -32,6 +33,8 @@ const EventBoard = ({ events }) => {
     setShowAll(false);
   };
 
+  // Formater la date
+
   return (
     <div className={styles.eventBoardContainer}>
       <Flex
@@ -55,8 +58,12 @@ const EventBoard = ({ events }) => {
       {displayedEvents.map((event, index) => (
         <Item
           key={index}
-          photo={event.photo}
-          date={event.date}
+          photo={event.media}
+          date={
+            event.date
+              ? format(new Date(event?.date), "dd MMMM yyyy", { locale: fr })
+              : ""
+          }
           title={event.title}
         />
       ))}

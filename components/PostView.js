@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import styles from "../app/PostView.module.css";
 import { Box, Flex, TextField, IconButton } from "gestalt";
 import formatMomentText from "../utils/utils";
-import { API_URL, LIKE } from "@/configs/api";
+import { API_URL, BASIC_URL } from "@/configs/api";
 import axios from "axios";
 import { useAppContext } from "@/context/AppContext";
 
@@ -45,6 +45,8 @@ const PostView = ({
     setUser,
     setToken,
     setIsAuthenticated,
+    fetchPosts,
+    fetchEventPosts,
   } = useAppContext();
   const [userIdentity, setUserIdentity] = useState(null);
 
@@ -70,7 +72,9 @@ const PostView = ({
         };
 
         const response = await axios.get(
-          `${API_URL}/postes/postes/${postId}/likes/`,
+          `${API_URL}/postes/postes/${
+            eventTitle ? "event" : "simple"
+          }/${postId}/likes/`,
           config
         );
 
@@ -81,7 +85,7 @@ const PostView = ({
         setLikedUsers(likedUserIds);
 
         // Vérifier si l'utilisateur actuellement connecté a déjà liké le poste
-        setLiked(likedUserIds.includes(userIdentity.username));
+        setLiked(likedUserIds.includes(userIdentity?.username));
       } catch (error) {
         console.error("Erreur lors de la récupération des likes :", error);
       }
@@ -103,7 +107,9 @@ const PostView = ({
       };
 
       const response = await axios.get(
-        `${API_URL}/postes/postes/${postId}/likes/`,
+        `${API_URL}/postes/postes/${
+          eventTitle ? "event" : "simple"
+        }/${postId}/likes/`,
         config
       );
 
@@ -138,7 +144,7 @@ const PostView = ({
           `${API_URL}/postes/posts/${postId}/comments`,
           config
         );
-        console.log(response.data);
+        // console.log(response.data);
         // Extraire les données des commentaires et des réponses de la réponse
         const commentsWithRepliesData = response.data.comments;
         // Mettre à jour l'état des commentaires et des réponses
@@ -162,7 +168,6 @@ const PostView = ({
       setAreRepliesLoaded(true);
     }
   }, [isVisible, areRepliesLoaded]);
-
   const handleLike = async () => {
     try {
       if (!token) {
@@ -176,44 +181,42 @@ const PostView = ({
         },
       };
 
-      if (!liked) {
-        // L'utilisateur n'a pas encore liké le poste, effectuer un like
-        const data = {
-          user: userIdentity?.id,
-          post: postId,
-        };
-        const response = await axios.post(
-          `${API_URL}/postes/postes/${postId}/likes/`,
-          data,
-          config
-        );
-        setLikedUsers((prevLikedUsers) => [
-          ...prevLikedUsers,
-          userIdentity?.id,
-        ]);
+      const data = {
+        user: userIdentity?.id,
+        post: postId,
+      };
+
+      const response = await axios.post(
+        `${API_URL}/postes/postes/${
+          eventTitle ? "event" : "simple"
+        }/${postId}/likes/`,
+        data,
+        config
+      );
+
+      if (response.status === 201 || response.status === 200) {
+        // Mettre à jour l'état du like dans le frontend
+        setLiked(!liked);
+
+        // Mettre à jour la liste des utilisateurs aimés
+        if (!liked) {
+          setLikedUsers((prevLikedUsers) => [
+            ...prevLikedUsers,
+            userIdentity?.id,
+          ]);
+        } else {
+          setLikedUsers((prevLikedUsers) =>
+            prevLikedUsers.filter((userId) => userId !== userIdentity?.id)
+          );
+        }
+
+        // Actualiser les données si nécessaire
         Refresh();
-        // console.log("Like réussi!");
+
+        // console.log("Opération de like/dislike réussie!");
       } else {
-        const data = {
-          user: userIdentity?.id,
-          post: postId,
-        };
-        // L'utilisateur a déjà liké le poste, effectuer un dislike
-        const response = await axios.post(
-          `${API_URL}/postes/postes/${postId}/likes/`,
-          data,
-          config
-        );
-        Refresh();
-
-        setLikedUsers((prevLikedUsers) =>
-          prevLikedUsers.filter((userId) => userId !== userIdentity?.id)
-        );
-        // console.log("Dislike réussi!");
+        console.error("La requête de like/dislike a échoué.");
       }
-
-      // Mettre à jour l'état du like dans le frontend
-      setLiked(!liked);
     } catch (error) {
       console.error("Erreur lors de la requête de like/dislike :", error);
     }
@@ -257,17 +260,25 @@ const PostView = ({
       const data = {
         user: userIdentity?.id,
         content: commentInputValue,
+        parent_comment_id: null, // Mettez ici l'ID du commentaire parent si applicable, sinon laissez-le à null pour un commentaire direct au post.
       };
+
       const response = await axios.post(
-        `${API_URL}/postes/posts/${postId}/comments/`,
+        `${API_URL}/postes/${
+          eventTitle ? "eventposts" : "simpleposts"
+        }/${postId}/comments/`,
         data,
         config
       );
+      fetchPosts();
+      fetchEventPosts();
     } catch (error) {
+      console.error("Erreur lors de l'envoi du commentaire :", error);
     } finally {
       setCommentInputValue("");
     }
   };
+
   const formatLikeText = () => {
     if (likesCount === 0) {
       return null; // Ne rien afficher si aucun like
@@ -275,9 +286,9 @@ const PostView = ({
       likesCount === 1 &&
       likedUsers.includes(userIdentity?.username)
     ) {
-      return "Vous aimez ce poste";
+      return "Vous aimez ce poste ·";
     } else if (likesCount === 1) {
-      return "1 personne aime ce poste";
+      return "1 personne aime ce poste ·";
     } else if (likedUsers.includes(userIdentity?.username)) {
       return `Vous et ${likesCount - 1} personne${
         likesCount === 2 ? "" : "s"
@@ -286,6 +297,9 @@ const PostView = ({
       return `${likesCount} personnes aiment ce poste`;
     }
   };
+  const rootComments = commentData?.filter(
+    (comment) => comment.parent_comment === null
+  );
   return (
     <div className={styles.postViewContainer}>
       <div className={styles.userInfo}>
@@ -351,12 +365,12 @@ const PostView = ({
             {commentsCount > 0 ? (
               <span>
                 {" "}
-                - {formatCount(commentsCount)} commentaire
+                {formatCount(commentsCount)} commentaire
                 {commentsCount !== 1 ? "s" : ""}
               </span>
             ) : (
               <div className={styles.noCommentsText}>
-                | Soyez la première personne à commenter ce poste
+                Soyez la première personne à commenter ce poste.
               </div>
             )}
           </div>
@@ -414,25 +428,21 @@ const PostView = ({
         </div>
 
         <div className={styles.comments}>
-          {/* Afficher le texte "Soyez le premier à commenter ceci" lorsque qu'il n'y a pas de commentaire */}
-          {commentData?.length === 0 && (
+          {rootComments?.length === 0 && (
             <div className={styles.noCommentsText}>
-              Soyez le premier à commenter ceci
+              Soyez le première personne à commenter ce poste.
             </div>
           )}
-          {/* {Object.values(commentData)?.map((comment, index) => ( */}
-          <Comment
-            key={index}
-            comment={CommentData}
-            repliesVisible={CommentData?.replies && comment?.replies.length > 0}
-            // lastCommentUser={
-            //   commentData?.replies &&
-            //   comment?.replies[comment?.replies?.length - 1].username
-            // }
-            replyCount={CommentData?.replies ? comment?.replies?.length : 0}
-          />
-          {/* ))} */}
-          {commentData?.length > 3 && !showAllComments && (
+          {rootComments?.map((comment, index) => (
+            <Comment
+              key={index}
+              commentData={comment}
+              token={token}
+              userIdentity={userIdentity}
+              postId={postId}
+            />
+          ))}
+          {rootComments?.length > 3 && !showAllComments && (
             <button
               className={styles.showMoreButton}
               onClick={handleShowAllComments}
@@ -454,29 +464,110 @@ const PostView = ({
   );
 };
 
-const Comment = ({ commentData }) => {
+const Comment = ({ commentData, token, userIdentity, postId, level = 0 }) => {
   const [showReplyInput, setShowReplyInput] = useState(false);
   const [replyText, setReplyText] = useState("");
   const [liked, setLiked] = useState(false);
-  // const [likeCount, setLikeCount] = useState(comment.likeCount);
-  // const [commentCount, setCommentCount] = useState(comment.commentCount);
+  const [likeCount, setLikeCount] = useState(commentData.likeCount);
+  const [commentCount, setCommentCount] = useState(commentData?.comment_count);
   const [showReplies, setShowReplies] = useState(false);
   const [visibleReplies, setVisibleReplies] = useState(3);
   const [isVisible, setIsVisible] = useState(false);
-
+  const [areRepliesLoadedMap, setAreRepliesLoadedMap] = useState({});
   const commentRef = useRef(null);
+  const { fetchPosts, fetchEventPosts } = useAppContext();
+  const [likedUsers, setLikedUsers] = useState([]);
+  // const handleLike = () => {
+  //   setLiked((prevLiked) => !prevLiked);
+  //   setLikeCount((prevLikeCount) =>
+  //     liked ? prevLikeCount - 1 : prevLikeCount + 1
+  //   );
+  // };
 
-  const handleLike = () => {
-    setLiked((prevLiked) => !prevLiked);
-    setLikeCount((prevLikeCount) =>
-      liked ? prevLikeCount - 1 : prevLikeCount + 1
-    );
+  const Refresh = async () => {
+    try {
+      if (!token) {
+        return;
+      }
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+
+      const response = await axios.get(
+        `${API_URL}/postes/postes/comment/${commentData?.id}/likes/`,
+        config
+      );
+      // Extraire les ID des utilisateurs qui ont liké le commentaire
+      const likedUserIds = response.data.map((like) => like.user);
+      // console.log(likedUserIds);
+      // Mettre à jour l'état des utilisateurs qui ont liké le commentaire
+      setLikedUsers(likedUserIds);
+      // Vérifier si l'utilisateur actuellement connecté a déjà liké le commentaire
+      setLiked(likedUserIds.includes(userIdentity.username));
+    } catch (error) {
+      console.error("Erreur lors de la récupération des likes :", error);
+    }
+  };
+
+  const handleLike = async () => {
+    try {
+      if (!token) {
+        console.error("Utilisateur non authentifié.");
+        return;
+      }
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+
+      const data = {
+        user: userIdentity?.id,
+        post: postId,
+      };
+
+      const response = await axios.post(
+        `${API_URL}/postes/postes/comment/${commentData?.id}/likes/`,
+        data,
+        config
+      );
+
+      if (response.status === 201 || response.status === 200) {
+        // Mettre à jour l'état du like dans le frontend
+        setLiked(!liked);
+
+        // Mettre à jour la liste des utilisateurs aimés
+        if (!liked) {
+          setLikedUsers((prevLikedUsers) => [
+            ...prevLikedUsers,
+            userIdentity?.id,
+          ]);
+        } else {
+          setLikedUsers((prevLikedUsers) =>
+            prevLikedUsers.filter((userId) => userId !== userIdentity?.id)
+          );
+        }
+
+        // Actualiser les données si nécessaire
+        Refresh();
+
+        // console.log("Opération de like/dislike réussie!");
+      } else {
+        console.error("La requête de like/dislike a échoué.");
+      }
+    } catch (error) {
+      console.error("Erreur lors de la requête de like/dislike :", error);
+    }
   };
   useEffect(() => {
     const options = {
       root: null,
       rootMargin: "0px",
-      threshold: 0.5, // Définissez la valeur de seuil appropriée pour votre cas
+      threshold: 0.5,
     };
 
     const observer = new IntersectionObserver((entries) => {
@@ -511,20 +602,48 @@ const Comment = ({ commentData }) => {
     setShowReplies((prevShowReplies) => !prevShowReplies);
   };
 
-  const handleSendReply = () => {
-    // Ajoutez ici la logique pour envoyer la réponse au backend
-    // Utilisez la valeur de replyText pour envoyer la réponse
-    console.log("Réponse:", replyText);
-    // Réinitialisez l'état et cachez le champ de réponse après avoir envoyé la réponse
-    setReplyText("");
-    setShowReplyInput(false);
-    // Incrémentez le nombre de commentaires lorsque vous ajoutez une réponse
-    setCommentCount(commentCount + 1);
-  };
+  const handleSendReply = async () => {
+    try {
+      if (!token || !userIdentity || !userIdentity.id) {
+        console.error("Utilisateur non authentifié.");
+        return;
+      }
 
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+      const data = {
+        user: userIdentity?.id,
+        content: replyText,
+        parent_comment_id: commentData.id, // Mettez ici l'ID du commentaire parent
+      };
+      const response = await axios.post(
+        `${API_URL}/postes/posts/${postId}/comments/`,
+        data,
+        config
+      );
+      fetchPosts();
+      fetchEventPosts();
+      // Si l'envoi de la réponse réussit, l'API doit renvoyer la réponse nouvellement créée
+      // Nous pouvons extraire le nombre total de réponses du commentaire parent
+      const newReplyData = response.data;
+      const totalReplyCountFromAPI = newReplyData.commentCount;
+
+      // Mettre à jour le nombre total de réponses du commentaire parent dans le composant PostView
+      setCommentCount(totalReplyCountFromAPI);
+
+      // Réinitialisez l'état et cachez le champ de réponse après avoir envoyé la réponse
+      setReplyText("");
+      setShowReplyInput(false);
+    } catch (error) {
+      console.error("Erreur lors de l'envoi du commentaire :", error);
+    }
+  };
   return (
     <div className={styles.comment} ref={commentRef}>
-      <Box>
+      <Box marginLeft={`${level * 30}px`}>
         <div
           style={{
             display: "flex",
@@ -534,16 +653,20 @@ const Comment = ({ commentData }) => {
         >
           <div style={{ display: "flex", justifyContent: "center" }}>
             <img
-              src={commentData?.profilePhoto}
-              alt="Photo de profil du commentaire"
+              src={
+                commentData?.user_details?.image.startsWith("http")
+                  ? commentData?.user_details?.image
+                  : `${BASIC_URL}${commentData?.user_details?.image}`
+              }
+              alt="Photo"
               className={styles.commentProfilePhoto}
             />
             <span className={styles.commentUsername}>
-              {commentData.username}
+              {commentData?.user_details?.username}
             </span>
           </div>
           <span className={styles.commentMoment}>
-            {formatMomentText(commentData.moment)}
+            {formatMomentText(new Date(commentData?.created_at))}
           </span>
         </div>
         <p className={styles.commentText}>{commentData.content}</p>
@@ -552,7 +675,13 @@ const Comment = ({ commentData }) => {
             className={`${styles.likeButton} ${liked ? styles.liked : ""}`}
             onClick={handleLike}
           >
-            J'aime ·👍{likeCount}
+            {liked ? (
+              <span style={{ color: "black" }}>J'aime ·👍 </span>
+            ) : (
+              <span style={{ color: "blue" }}>Vous aimez ·👍 </span>
+            )}
+
+            {/* {likeCount} */}
           </button>
           {!showReplyInput && (
             <button className={styles.replyButton} onClick={handleReplyClick}>
@@ -560,7 +689,8 @@ const Comment = ({ commentData }) => {
             </button>
           )}
           <span style={{ marginLeft: "10px" }}>
-            · {commentCount} commentaire{commentCount !== 1 ? "s" : ""}
+            · {commentCount > 0 ? commentCount : "0 "} {""}
+            commentaire{commentCount > 1 ? "s" : ""}
           </span>
         </Box>
         {showReplyInput && (
@@ -589,28 +719,36 @@ const Comment = ({ commentData }) => {
             </div>
           </Box>
         )}
-
         {/* Afficher les réponses associées à ce commentaire si showReplies est vrai */}
         {showReplies && (
           <div className={styles.replies}>
-            {commentData.replies &&
-              commentData.replies
-                .slice(0, visibleReplies)
-                .map((reply, index) => <Comment key={index} comment={reply} />)}
-            {commentData.replies &&
-              commentData.replies.length > visibleReplies && (
+            {/* Appel récursif à Comment pour afficher les réponses hiérarchiquement */}
+            {commentData.sub_comments &&
+              commentData.sub_comments.map((reply) => (
+                <div key={reply.id}>
+                  <Comment
+                    commentData={reply}
+                    token={token}
+                    userIdentity={userIdentity}
+                    postId={postId}
+                    level={level + 1}
+                  />
+                </div>
+              ))}
+            {commentData.sub_comments &&
+              commentData.sub_comments.length > visibleReplies && (
                 <button
                   className={styles.loadMoreRepliesButton}
                   onClick={handleLoadMoreReplies}
                 >
                   Charger plus de réponses (
-                  {commentData.replies.length - visibleReplies})
+                  {commentData.sub_comments.length - visibleReplies})
                 </button>
               )}
           </div>
         )}
         {/* Afficher le nombre de réponses si le commentaire a des réponses */}
-        {commentData.replies && commentData.replies.length > 0 && (
+        {commentData?.sub_comments && commentData.sub_comments.length > 0 && (
           <button
             className={styles.viewRepliesButton}
             onClick={handleToggleReplies}
@@ -618,7 +756,7 @@ const Comment = ({ commentData }) => {
           >
             {showReplies
               ? "Masquer les réponses"
-              : `Voir les réponses (${commentData.replies.length})`}
+              : `Voir les réponses (${commentData?.sub_comments.length})`}
           </button>
         )}
       </Box>

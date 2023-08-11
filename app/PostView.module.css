@@ -4,6 +4,9 @@
   border-radius: 10px;
   display: flex;
   flex-direction: column;
+  height: auto;
+  margin-bottom: 20px;
+  max-width: 670px;
 }
 
 .userInfo {
@@ -41,6 +44,7 @@
 
 .postContent {
   margin-bottom: 16px;
+  width: 100%;
 }
 
 .postContent p {
@@ -222,8 +226,39 @@
   margin-bottom: 8px;
 }
 
-/* Styles pour les petits écrans (mobiles) */
-@media (max-width: 768px) {
+/* Ecrans larges extra larges*/
+@media (min-width: 1201px) {
+  .postViewContainer {
+    min-width: 650px;
+  }
+}
+
+/* Ecrans larges*/
+@media (min-width: 1025px) and (max-width: 1200px) {
+  .postViewContainer {
+    min-width: 500px;
+  }
+}
+
+/* Ecrans ordinateur portable*/
+@media (min-width: 769px) and (max-width: 1024px) {
+  .postViewContainer {
+    min-width: 500px;
+  }
+}
+
+/* Ecrans pour tablettes*/
+@media (min-width: 481px) and (max-width: 1024px) {
+  .postViewContainer {
+    width: 400px;
+  }
+}
+
+/* Ecrans pour mobiles*/
+@media (min-width: 320px) and (max-width: 480px) {
+  .postViewContainer {
+    width: 100%;
+  }
   .eventInfo {
     flex-direction: column;
     align-items: flex-start;

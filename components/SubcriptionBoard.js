@@ -118,7 +118,7 @@ const SubscriptionItem = ({ photo, username, userId }) => {
           </div>
         </div>
       </Link>
-      <div style={{ marginLeft: "18px" }}>
+      <div style={{ marginLeft: " " }}>
         <IconButton
           icon={<FontAwesomeIcon icon={faEyeSlash} />}
           label="Désabonner"

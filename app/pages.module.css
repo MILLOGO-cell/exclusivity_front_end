@@ -1,0 +1,255 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  align-content: centers;
+  height: 100vh;
+}
+
+.sideDiv {
+  flex: 1;
+  height: 100%;
+  background-color: #f2f2f2;
+}
+
+.centerDiv {
+  flex: 3;
+  height: 100%;
+  width: 100%;
+  background-color: #f4f4f4;
+  overflow-y: hidden; /* Masquer la barre de défilement */
+  overflow-x: hidden;
+}
+
+.scrollWrapper {
+  overflow-y: scroll; /* Activer le défilement interne */
+  height: 100%;
+  scrollbar-width: none; /* Masquer le niveau de défilement (fonctionne dans certains navigateurs) */
+  /* padding-right: 20px;  Ajouter un padding pour compenser l'espace occupé par la barre de défilement */
+  /* margin-right: -20px; /* Compenser le padding pour que le contenu ne soit pas décalé */
+}
+
+.scrollWrapper::-webkit-scrollbar {
+  /* Masquer le niveau de défilement pour les navigateurs basés sur WebKit (Chrome, Safari, etc.) */
+  display: none;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  margin-bottom: 50px;
+}
+
+.box {
+  margin: 10px;
+  width: 100%; /* Les boîtes occuperont toute la largeur disponible */
+  height: 150px;
+}
+
+.overlay-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 2px;
+}
+
+.overlay-link {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 30px;
+}
+
+.link-icon {
+  margin-right: 10px;
+  border-radius: 30px;
+}
+
+/* Ajouter un espace entre l'icône et le texte */
+.link-icon {
+  margin-right: 10px;
+}
+
+/* Styles pour les différentes couleurs de lien */
+.link-profile {
+  color: #000; /* Couleur pour le lien "Profil" */
+  border-radius: 30px;
+  margin-bottom: 10px;
+}
+
+.link-logout {
+  color: #f84403; /* Couleur pour le lien "Déconnexion" */
+  border-radius: 30px;
+  margin-bottom: 10px;
+}
+
+.link-new-event {
+  color: #f8f8f8; /* Couleur pour le lien "Nouvel événement" */
+  background-color: blue;
+  border-radius: 30px;
+  margin-bottom: 10px;
+}
+
+.link-subscriptions {
+  color: #33ffaa; /* Couleur pour le lien "Mes abonnements" */
+  border-radius: 30px;
+}
+
+/* Style du lien au survol (hover) */
+.overlay-link:hover {
+  background-color: #f2f2f2;
+  border-radius: 30px;
+}
+
+/* Style du lien lorsqu'il est cliqué (active) */
+.overlay-link:active {
+  background-color: #ddd;
+}
+
+/** style du composant CreatePost dans les page***/
+.create {
+  max-width: 450px;
+  height: auto;
+  padding-bottom: 30px;
+  /* background-color: rgb(3, 61, 81); */
+}
+
+.search-results {
+  position: absolute;
+  width: 100%;
+  max-height: 200px; /* Limitez la hauteur pour éviter un débordement */
+  overflow-y: auto; /* Ajoutez une barre de défilement si nécessaire */
+  background-color: white;
+  border: 1px solid #ccc;
+  z-index: 10; /* Assurez-vous que la liste s'affiche au-dessus du contenu */
+  padding: 8px;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  margin-top: 10px;
+  border-radius: 20px;
+}
+
+.search-results .user-item {
+  display: flex;
+  align-items: center;
+  padding: 6px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.search-results .user-item img {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.search-results .user-item span {
+  font-size: 14px;
+}
+
+.search-results .user-item:hover {
+  background-color: #f5f5f5;
+  cursor: pointer;
+  border-radius: 30px;
+}
+/* Ajoutez ces styles à votre feuille de style existante */
+.user-item {
+  display: flex;
+  align-items: center;
+  padding: 6px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.user-item img {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.user-item span {
+  font-size: 14px;
+}
+
+.user-item:hover {
+  background-color: #f5f5f5;
+  cursor: pointer;
+}
+
+/* Ecrans larges extra larges*/
+@media (min-width: 1201px) {
+  .create {
+    max-width: 653px;
+    padding-bottom: 30px;
+    /* background-color: rgb(1, 13, 1); */
+    display: flex;
+  }
+}
+
+/* Ecrans ordinateur portable*/
+@media (min-width: 769px) and (max-width: 1024px) {
+  .container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .sideDiv {
+    display: none;
+  }
+
+  .centerDiv {
+    flex: 1;
+    width: 100%;
+  }
+  .create {
+    max-width: 500px;
+    padding-bottom: 30px;
+    /* background-color: rgb(223, 18, 107); */
+  }
+}
+
+/* Ecrans pour tablettes*/
+@media (min-width: 481px) and (max-width: 768px) {
+  .container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .sideDiv {
+    display: none;
+  }
+
+  .centerDiv {
+    flex: 1;
+    width: 100%;
+  }
+  .create {
+    max-width: 400px;
+    padding-bottom: 30px;
+    /* background-color: rgb(206, 35, 13); */
+  }
+}
+/* Pour les petits écrans, masquez les divs latérales et centrez la div du milieu */
+/* Ecrans pour mobiles*/
+@media (min-width: 320px) and (max-width: 480px) {
+  .container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .sideDiv {
+    display: none;
+  }
+
+  .centerDiv {
+    flex: 1;
+    width: 100%;
+  }
+  .create {
+    max-width: 100%;
+    padding-bottom: 30px;
+    /* background-color: rgb(64, 33, 200); */
+  }
+}

@@ -30,9 +30,10 @@ const CreatePost = ({ userPhoto }) => {
     token,
     isAuthenticated,
     setIsAuthenticated,
+    updatePosts,
+    fetchPosts,
   } = useAppContext();
   const [userIdentity, setUserIdentity] = useState(null);
-
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     const storedToken = localStorage.getItem("token");
@@ -118,13 +119,27 @@ const CreatePost = ({ userPhoto }) => {
       // Vérifier si la création du post a réussi
       if (response.status === 201) {
         console.log("Post créé avec succès !");
+
+        const newPost = {
+          id: response.data.id,
+          content: postText,
+          media: selectedMedia,
+          user: {
+            id: userIdentity.id,
+            name: userIdentity.name,
+            // Ajoutez d'autres propriétés de l'utilisateur si nécessaire
+          },
+          // Ajoutez d'autres propriétés du post si nécessaire
+        };
+
+        updatePosts(newPost);
+        fetchPosts();
         // Réinitialiser les états pour vider le modal après la publication
         setPostText("");
         setSelectedIcon("");
         setSelectedMedia(null);
         setIsLoading(false);
         handleCloseModal();
-        window.location.reload();
       } else {
         console.log("Une erreur s'est produite lors de la création du post.");
       }
@@ -142,11 +157,15 @@ const CreatePost = ({ userPhoto }) => {
   return (
     <>
       <Box
-        padding={4}
+        padding={2}
         color="default"
         rounding={5}
         display="flex"
         alignItems="center"
+        width={"100%"}
+        justifyContent="center"
+        alignContent="center"
+        alignSelf="center"
       >
         <Box>
           <Avatar src={userPhoto} name="User Photo" size="md" />
@@ -160,13 +179,13 @@ const CreatePost = ({ userPhoto }) => {
                 width: "100%",
                 height: "100%",
                 padding: "12px",
-                border: "1px solid gray",
+                border: "1px solid #ccc",
                 borderRadius: "115px",
                 cursor: "pointer",
                 textAlign: "left",
               }}
             >
-              {postText || "Écrire un poste..."}
+              {postText || `Quoi de neuf ${userIdentity?.username} ?`}
             </button>
           </Box>
         </Flex>
@@ -195,7 +214,7 @@ const CreatePost = ({ userPhoto }) => {
             <Box padding={2}>
               <textarea
                 id="post-text"
-                placeholder="Écrire un post..."
+                placeholder="Écrire un quelque chose..."
                 value={postText}
                 onChange={handleInputChange}
                 style={{

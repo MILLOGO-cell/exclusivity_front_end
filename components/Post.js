@@ -12,7 +12,6 @@ const Post = ({ username, timestamp, content, mediaUrl, mediaType }) => {
       alignItems="center"
     >
       <Box
-        borderStyle="sm"
         height="100%"
         width={1000}
         alignSelf="center"
@@ -31,12 +30,12 @@ const Post = ({ username, timestamp, content, mediaUrl, mediaType }) => {
             </Text>
             <Text> @{username}</Text>
           </Box>
-          <Box>{timestamp}</Box>
+          <Box>il y'a {timestamp}</Box>
         </Box>
         <Box marginTop={12}>
           <Text>{content}</Text>
           {mediaType === "image" && mediaUrl && (
-            <Box borderStyle="sm" height={510} marginTop={2}>
+            <Box height={900} marginTop={2}>
               <Image
                 alt="Photo"
                 naturalWidth={1}
@@ -47,7 +46,7 @@ const Post = ({ username, timestamp, content, mediaUrl, mediaType }) => {
             </Box>
           )}
           {mediaType === "video" && mediaUrl && (
-            <Box borderStyle="sm" height={510} marginTop={2}>
+            <Box height={510} marginTop={2}>
               <Video src={mediaUrl} width="100%" height="100%" controls />
             </Box>
           )}

@@ -9,16 +9,157 @@ import Gallery from "@/components/Gallery";
 import About from "@/components/About";
 import styles from "../app/ProfilUser.module.css";
 import SideMenu from "@/components/SideMenu";
-import Navigation from "@/components/Navigation";
+import Navigation from "@/components/Nav1";
+import axios from "axios";
+import { API_URL, BASIC_URL } from "@/configs/api";
+import { useAppContext } from "@/context/AppContext";
 
 const ProfileArtisteImages = ({}) => {
   const router = useRouter();
-  const { artistId } = router.query; // Récupérer l'ID de l'artiste à partir des paramètres d'URL
+  const suggestionId = router.query?.id;
   const [artist, setArtist] = useState([]);
   const [artistInfo, setArtistInfo] = useState({});
   const [followersCount, setFollowersCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [showModal, setShowModal] = useState(false);
+  const {
+    user,
+    token,
+    isAuthenticated,
+    setUser,
+    setToken,
+    setIsAuthenticated,
+    posts,
+    isloading,
+    fetchPosts,
+    eventPosts,
+    userList,
+    setUserList,
+    userId,
+  } = useAppContext();
+  const [userImage, setUserImage] = useState("");
+  const [userProfilImage, setUserProfilImage] = useState("");
+  const [updatePosts, setUpdatePosts] = useState(false);
+  const [userIdentity, setUserIdentity] = useState(null);
+  const [userProfile, setuserProfile] = useState(null);
+  const [loadingDotsCount, setLoadingDotsCount] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      try {
+        if ((suggestionId, token)) {
+          const response = await axios.get(
+            `${API_URL}/utilisateurs/users/${suggestionId}/`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          if (response.status === 200) {
+            const data = response.data;
+
+            setuserProfile(data);
+          } else {
+            console.log("Une erreur s'est produite");
+          }
+        }
+      } catch (error) {
+        console.log(
+          "Une erreur s'est produite lors de la récupération du profil.",
+          error
+        );
+      }
+    };
+
+    fetchUserDetails();
+  }, [suggestionId, token]);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    const storedToken = localStorage.getItem("token");
+    const storedIsAuthenticated = localStorage.getItem("isAuthenticated");
+    setUserIdentity(JSON.parse(storedUser));
+    setToken(storedToken);
+  }, []);
+
+  useEffect(() => {
+    // Récupérer l'image de profil de l'utilisateur connecté
+    const getUserImage = async () => {
+      try {
+        if (userIdentity && token) {
+          const response = await axios.get(
+            `${API_URL}/utilisateurs/get_image_url/${userIdentity.id}/`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          if (response.status === 200) {
+            const data = response.data;
+            // Récupérer l'URL de l'image de profil de l'utilisateur connecté depuis la réponse
+            const imageUrl = `${BASIC_URL}${data.image_url}`;
+            // Mettre à jour l'état de l'URL de l'image de profil
+            setUserProfilImage(imageUrl);
+          } else {
+            console.log(
+              "Une erreur s'est produite lors de la récupération de l'URL de l'image de profil."
+            );
+          }
+        }
+      } catch (error) {
+        console.log(
+          "Une erreur s'est produite lors de la récupération de l'URL de l'image de profil.",
+          error
+        );
+      }
+    };
+
+    // Appeler la fonction pour récupérer l'image de profil lorsque le composant est monté
+    getUserImage();
+  }, [userIdentity, token]);
+  // console.log(userProfilImage);
+  useEffect(() => {
+    // Récupérer l'image de profil de l'utilisateur connecté
+    const getUserImage = async () => {
+      try {
+        if (userProfile && token) {
+          const response = await axios.get(
+            `${API_URL}/utilisateurs/get_image_url/${userProfile.id}/`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          if (response.status === 200) {
+            const data = response.data;
+            // Récupérer l'URL de l'image de profil de l'utilisateur connecté depuis la réponse
+            const imageUrl = `${BASIC_URL}${data.image_url}`;
+            // Mettre à jour l'état de l'URL de l'image de profil
+            setUserImage(imageUrl);
+          } else {
+            console.log(
+              "Une erreur s'est produite lors de la récupération de l'URL de l'image de profil."
+            );
+          }
+        }
+      } catch (error) {
+        console.log(
+          "Une erreur s'est produite lors de la récupération de l'URL de l'image de profil.",
+          error
+        );
+      }
+    };
+
+    // Appeler la fonction pour récupérer l'image de profil lorsque le composant est monté
+    getUserImage();
+  }, [userProfile, token]);
 
   const openModal = () => {
     setShowModal(true);
@@ -46,22 +187,7 @@ const ProfileArtisteImages = ({}) => {
 
   const [activeTab, setActiveTab] = useState("gallery");
 
-  const artistData = {
-    id: artistId,
-    username: "FLoby Officiel",
-    photo: "./Floby1.jpg",
-    followers: 1000,
-  };
-
-  useEffect(() => {
-    setArtist(artistData);
-  }, [artistId]);
-
-  if (!artist) {
-    return <div>Loading...</div>;
-  }
-
-  const formattedUsername = artistData.username
+  const formattedUsername = userProfile?.username
     .toLowerCase()
     .replace(/ /g, "_");
 
@@ -80,10 +206,11 @@ const ProfileArtisteImages = ({}) => {
     { id: 12, url: "/Floby1.jpg" },
   ];
   const userInfo = {
-    name: "John Doe",
-    bio: "Lorem ipsum dolor sit amet consectetur. Aliquet neque mauris proin lacus dignissim. Aliquam placerat velit tristique neque. Amet pharetra id a sit. Risus condimentum mi amet sit. Tellus non urna magna metus bibendum. Quis amet quam proin consequat ut sit interdum. Lacus in ipsum integer maecenas tortor nisl. Risus sit tincidunt id phasellus eu tempor urna sollicitudin viverra. Sit id lorem commodo arcu scelerisque facilisis quam.",
+    name: "",
+    bio: `La biographie de ${userIdentity?.username} est temporairement indisponible et sera rétabli dans un bref délai. Veuillez nous excuser pour la gêne occasionnée.`,
     // Add other properties as needed
   };
+
   // Fonction pour diviser les photos en groupes de deux
   const splitPhotosIntoPairs = (photos) => {
     const pairs = [];
@@ -112,8 +239,8 @@ const ProfileArtisteImages = ({}) => {
             }}
           >
             <img
-              src={artist.photo}
-              alt={artistData.username}
+              src={userImage}
+              alt={userIdentity?.username}
               style={{
                 width: "100px",
                 height: "100px",
@@ -124,14 +251,14 @@ const ProfileArtisteImages = ({}) => {
             <div className={styles.artistFollowersContainer}>
               <div>
                 <span className={styles.artistUsername}>
-                  {artistData.username}
+                  {userProfile?.username}
                 </span>
               </div>
               <div>
                 <span className={styles.artistLink}>@{formattedUsername}</span>
                 <span style={{ marginRight: "5px" }}>•</span>
                 <span className={styles.artistFollowers}>
-                  {formatFollowersCount(artistData.followers)} abonné(s)
+                  {formatFollowersCount(userProfile?.followers_count)} abonné(s)
                 </span>
               </div>
             </div>
@@ -238,50 +365,62 @@ const ProfileArtisteImages = ({}) => {
             </button>
           </div>
           {activeTab === "gallery" && (
-            <div className={`${styles.galleryContainer}`}>
-              {photoPairs.map((pair, index) => (
-                <>
-                  <div
-                    key={index}
-                    style={{
-                      display: "flex",
-                      marginBottom: "10px",
-                      marginTop: "2px",
-                    }}
-                  >
-                    {pair.map((photo) => (
-                      <img
-                        key={photo.id}
-                        src={photo.url}
-                        alt={`Photo ${photo.id}`}
-                        style={{
-                          width: "200px",
-                          height: "200px",
-                          marginRight: "10px",
-                        }}
-                      />
-                    ))}
-                  </div>
-                </>
-              ))}
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  marginTop: "10px",
-                }}
-              >
-                {currentPage > 1 && (
-                  <button onClick={() => setCurrentPage(currentPage - 1)}>
-                    Précédent
-                  </button>
-                )}
-                {userPhotos.length > currentPage * 6 && (
-                  <button onClick={() => setCurrentPage(currentPage + 1)}>
-                    Suivant
-                  </button>
-                )}
-              </div>
+            // <div className={`${styles.galleryContainer}`}>
+            //   {photoPairs.map((pair, index) => (
+            //     <>
+            //       <div
+            //         key={index}
+            //         style={{
+            //           display: "flex",
+            //           marginBottom: "10px",
+            //           marginTop: "2px",
+            //         }}
+            //       >
+            //         {pair.map((photo) => (
+            //           <img
+            //             key={photo.id}
+            //             src={photo.url}
+            //             alt={`Photo ${photo.id}`}
+            //             style={{
+            //               width: "200px",
+            //               height: "200px",
+            //               marginRight: "10px",
+            //             }}
+            //           />
+            //         ))}
+            //       </div>
+            //     </>
+            //   ))}
+            //   <div
+            //     style={{
+            //       display: "flex",
+            //       justifyContent: "center",
+            //       marginTop: "10px",
+            //     }}
+            //   >
+            //     {currentPage > 1 && (
+            //       <button onClick={() => setCurrentPage(currentPage - 1)}>
+            //         Précédent
+            //       </button>
+            //     )}
+            //     {userPhotos.length > currentPage * 6 && (
+            //       <button onClick={() => setCurrentPage(currentPage + 1)}>
+            //         Suivant
+            //       </button>
+            //     )}
+            //   </div>
+            // </div>
+            <div
+              style={{
+                textAlign: "center",
+                marginTop: "20px",
+                color: "red",
+              }}
+            >
+              <p>
+                Le contenu est temporairement indisponible et sera rétabli dans
+                un bref délai. Veuillez nous excuser pour la gêne occasionnée.
+              </p>
             </div>
           )}
           {activeTab === "about" ? <About userInfo={userInfo} /> : null}
@@ -289,9 +428,9 @@ const ProfileArtisteImages = ({}) => {
 
         <div className={styles.sidemenu}>
           <SideMenu
-            username="John Doe"
-            fansCount={5000}
-            userPhoto="user_photo.jpg"
+            username={userIdentity?.username}
+            fansCount={userIdentity?.followers_count}
+            userPhoto={userProfilImage}
           />
         </div>
       </div>

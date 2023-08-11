@@ -11,7 +11,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faSignOut, faUser } from "@fortawesome/free-solid-svg-icons";
 import "@/app/globals.css";
-import Navigation from "@/components/Navigation";
+import Navigation from "@/components/Nav1";
 import { useAppContext } from "../context/AppContext";
 import {
   UPDATE_USER,
@@ -87,13 +87,13 @@ const ProfilePage = () => {
       });
       if (response.status === 200) {
         const data = response.data;
-
         setUserDetails(data);
-        setUsername(data.username);
-        setLastName(data.last_name);
-        setFirstName(data.first_name);
-        setEmail(data.email);
-        setTelephone(data.telephone);
+        setUsername(data.user_details.username);
+
+        setLastName(data.user_details.last_name);
+        setFirstName(data.user_details.first_name);
+        setEmail(data.user_details.email);
+        setTelephone(data.user_details.telephone);
         // Appeler la fonction pour récupérer l'URL de l'image de profil de l'utilisateur connecté
         getUserImage();
       } else {
@@ -211,7 +211,7 @@ const ProfilePage = () => {
       }
     }
   };
-
+  // console.log(username);
   return (
     <div
       style={{

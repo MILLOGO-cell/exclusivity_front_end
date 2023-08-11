@@ -1,7 +1,8 @@
 // EventPost.jsx
-import React from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { formatMomentText } from "../utils/utils"; // Utilitaire pour formater le moment
-
+import axios from "axios";
+import { useAppContext } from "@/context/AppContext";
 const EventPost = ({
   profilePhoto,
   username,
@@ -17,6 +18,25 @@ const EventPost = ({
   eventLocation,
   // Autres propriétés spécifiques à l'événement
 }) => {
+  const {
+    user,
+    setUser,
+    setToken,
+    token,
+    isAuthenticated,
+    setIsAuthenticated,
+    fetchEventPosts,
+    updateEventPosts,
+    eventPosts,
+  } = useAppContext();
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    const storedToken = localStorage.getItem("token");
+    const storedIsAuthenticated = localStorage.getItem("isAuthenticated");
+    setUserIdentity(JSON.parse(storedUser));
+    setToken(storedToken);
+  }, [setToken]);
   return (
     <div className="event-post">
       <div className="post-header">

@@ -1,102 +1,16 @@
 import React, { useState, useEffect, useCallback } from "react";
 import "@/app/globals.css";
-import {
-  Box,
-  Modal,
-  Flex,
-  Image,
-  Sticky,
-  CompositeZIndex,
-  FixedZIndex,
-  SideNavigation,
-  Container,
-  Text,
-} from "gestalt";
-import Navigation from "@/components/Navigation";
-import SideMenu from "@/components/SideMenu";
-import EventBoard from "@/components/EventBoard";
-import SuggestionBoard from "@/components/SuggestionBoard";
+import styles from "../app/pages.module.css";
+import Navigation from "@/components/Nav1";
 import CreatePost from "@/components/CreatePost";
-import PostView from "@/components/PostView";
-import "intersection-observer";
-import SubscriptionBoard from "@/components/SubcriptionBoard";
 import { useAppContext } from "@/context/AppContext";
-import { requireAuth } from "@/utils/middleware";
+import EventBoard from "@/components/EventBoard";
+import SideMenu from "@/components/SideMenu";
 import axios from "axios";
-import { POSTS_REQUEST, API_URL, BASIC_URL } from "@/configs/api";
-
-const events = [
-  {
-    photo: "../logo.png",
-    date: "01/08/2023",
-    title: "Événement 1",
-  },
-  {
-    photo: "../logo.png",
-    date: "05/08/2023",
-    title: "Événement 2",
-  },
-  {
-    photo: "../logo.png",
-    date: "05/08/2023",
-    title: "Événement 3",
-  },
-  {
-    photo: "../logo.png",
-    date: "05/08/2023",
-    title: "Événement 4",
-  },
-  {
-    photo: "../logo.png",
-    date: "05/08/2023",
-    title: "Événement 5",
-  },
-  {
-    photo: "../logo.png",
-    date: "05/08/2023",
-    title: "Événement 6",
-  },
-];
-const suggestions = [
-  {
-    id: 1,
-    photo: "../logo.png",
-    username: "utilisateur1",
-  },
-  {
-    id: 2,
-    photo: "../logo.png",
-    username: "utilisateur2",
-  },
-  {
-    id: 3,
-    photo: "../logo.png",
-    username: "utilisateur3",
-  },
-  {
-    id: 4,
-    photo: "../logo.png",
-    username: "utilisateur4",
-  },
-  {
-    id: 5,
-    photo: "../logo.png",
-    username: "utilisateur5",
-  },
-  // {
-  //   photo: "lien_vers_photo2.jpg",
-  //   username: "utilisateur2",
-  // },
-  // {
-  //   photo: "lien_vers_photo2.jpg",
-  //   username: "utilisateur2",
-  // },
-];
-
-const Explorer = () => {
-  const [isSmallScreen, setIsSmallScreen] = useState(false);
-  const BOX_ZINDEX = new FixedZIndex(100);
-  const STICKY_ZINDEX = new CompositeZIndex([new FixedZIndex(1)]);
+import { API_URL, BASIC_URL } from "@/configs/api";
+import PostView from "@/components/PostView";
+import SuggestionBoard from "@/components/SuggestionBoard";
+const Home = () => {
   const {
     user,
     token,
@@ -104,15 +18,18 @@ const Explorer = () => {
     setUser,
     setToken,
     setIsAuthenticated,
+    posts,
+    isloading,
+    fetchPosts,
+    eventPosts,
+    userList,
+    setUserList,
   } = useAppContext();
-  const [posts, setPosts] = useState([]); // State to store fetched posts
-  const [isLoading, setIsLoading] = useState(true);
-  const [loadingDotsCount, setLoadingDotsCount] = useState(1);
-  const [userIdentity, setUserIdentity] = useState(null);
   const [userImage, setUserImage] = useState("");
-  const [reachedBottom, setReachedBottom] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [postsData, setPostsData] = useState([]);
+  const [updatePosts, setUpdatePosts] = useState(false);
+  const [userIdentity, setUserIdentity] = useState(null);
+  const [loadingDotsCount, setLoadingDotsCount] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -133,60 +50,6 @@ const Explorer = () => {
       clearInterval(intervalId); // Nettoyer l'intervalle lorsque le composant est démonté
     };
   }, [isAuthenticated, token]);
-
-  const handleScroll = useCallback(() => {
-    const { scrollHeight, scrollTop, clientHeight } = document.documentElement;
-    if (scrollTop + clientHeight >= scrollHeight - 100) {
-      setReachedBottom(true);
-    } else {
-      setReachedBottom(false);
-    }
-  }, []);
-  useEffect(() => {
-    const handleScroll = () => {
-      const { scrollHeight, scrollTop, clientHeight } =
-        document.documentElement;
-      if (scrollTop + clientHeight >= scrollHeight - 100) {
-        loadMorePosts(); // Charger de nouvelles données lorsque l'utilisateur atteint le bas de la page
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
-  const loadMorePosts = async () => {
-    try {
-      const headers = {
-        Authorization: `Bearer ${token}`,
-      };
-      const response = await axios.get(POSTS_REQUEST, {
-        headers,
-        params: {
-          page: currentPage + 1, // Charger la page suivante
-        },
-      });
-
-      if (!response.data || !Array.isArray(response.data)) {
-        throw new Error("Invalid response from the server.");
-      }
-
-      setPostsData((prevData) => [...prevData, ...response.data]);
-      setCurrentPage((prevPage) => prevPage + 1); // Mettre à jour le numéro de page actuel
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, [handleScroll]);
 
   useEffect(() => {
     // Récupérer l'image de profil de l'utilisateur connecté
@@ -226,123 +89,83 @@ const Explorer = () => {
     getUserImage();
   }, [userIdentity, token]);
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setIsSmallScreen(window.innerWidth < 600); // Mettre à jour la taille initiale
-
-      function handleResize() {
-        setIsSmallScreen(window.innerWidth < 600); // Mettre à jour la taille lors du redimensionnement de l'écran
-      }
-
-      window.addEventListener("resize", handleResize);
-
-      return () => {
-        window.removeEventListener("resize", handleResize);
-      };
+  const renderPostView = (post) => {
+    // Vérifier si post est valide et contient toutes les propriétés nécessaires
+    if (post && post.author_get && post.author_get.image && post.content) {
+      return (
+        <PostView
+          postId={post.id}
+          profilePhoto={post.author_get.image}
+          eventTitle={post.title}
+          eventDate={post.date}
+          eventTime={post.time}
+          eventLocation={post.location}
+          username={post.author_get.username}
+          moment={new Date(post.created_at)}
+          postText={post.content}
+          media={post.media}
+          lastLikeUser={post.lastLikeUser}
+          likesCount={post.likes_count}
+          recentComment={post.recentComment}
+          commentData={post.commentData}
+          commentsCount={post.comments_count}
+        />
+      );
+    } else {
+      // Retourner un message ou un composant de chargement si certaines données sont manquantes
+      return <div>Chargement...</div>;
     }
-  }, []);
-
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const headers = {
-          Authorization: `Bearer ${token}`,
-        };
-        const response = await axios.get(POSTS_REQUEST, { headers });
-
-        if (!response.data || !Array.isArray(response.data)) {
-          throw new Error("Invalid response from the server.");
-        }
-        setPosts(response.data);
-        setIsLoading(false);
-        console.log("post**", posts);
-      } catch (error) {
-        console.error(error);
-        setIsLoading(false);
-      }
-    };
-
-    fetchPosts();
-  }, [isAuthenticated, token]);
-  // const commentData = posts?.[0]?.comments;
-  // console.log(commentData[0].id);
-  const commentData = {
-    id: 33,
-    content: "Mon commentaire",
-    created_at: "2023-08-04T09:59:40.587796Z",
-    user: {
-      id: 9,
-      username: "Nico",
-      telephone: "65047513",
-      // Autres informations sur l'utilisateur
-    },
-    likes_count: 2,
-    liked_users: ["Nico", "Nicolas"],
-    replies: [
-      {
-        id: 34,
-        content: "Réponse 1",
-        created_at: "2023-08-04T10:00:00.000000Z",
-        user: {
-          id: 10,
-          username: "Nicolas",
-          telephone: "12345678",
-          // Autres informations sur l'utilisateur
-        },
-        // Autres informations sur la réponse
-      },
-      // Autres réponses...
-    ],
-    // Autres informations sur le commentaire
   };
-
-  const logoStyle = {
-    width: "100%",
-    height: "auto",
-    alignSelf: "flex-start",
+  // Définissez une fonction de comparaison pour trier les posts par date de création
+  const comparePostsByDate = (postA, postB) => {
+    const dateA = new Date(postA.created_at);
+    const dateB = new Date(postB.created_at);
+    return dateB - dateA;
   };
+  // Utilisez la fonction de comparaison pour trier les posts par date de création
+  const sortedPosts = posts.slice().sort(comparePostsByDate);
+  const sortedEvents = eventPosts.slice().sort(comparePostsByDate);
+
+  // Filtrer les suggestions pour les utilisateurs ayant is_creator=True
+  const creatorSuggestions = userList.filter(
+    (user) =>
+      user?.is_creator === true && user?.username !== userIdentity?.username
+  );
+  // console.log("****", sortedPosts);
   return (
-    <Box
-      dangerouslySetInlineStyle={{ __style: { isolation: "isolate" } }}
-      tabIndex={0}
-      height="auto"
-      column={12}
+    <div
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+      }}
     >
-      <Sticky top={0} zIndex={STICKY_ZINDEX}>
-        <Navigation />
-      </Sticky>
-      <Box
-        width="100%"
-        display="flex"
-        justifyContent="center"
-        paddingY={0}
-        paddingX={0}
-      >
-        <Box
-          overflow="visible"
-          paddingX={5}
-          paddingY={5}
-          smDisplay="none"
-          mdDisplay="none"
-          lgDisplay="flex"
-          height="100%"
-          width="40%"
-          display={isSmallScreen ? "none" : "flex"}
-        >
-          <EventBoard events={events} />
-        </Box>
-        <Box overflow="scrollY" width="100%" maxHeight="150vh" tabIndex={0}>
-          <Box
-            paddingY={5}
-            flex="grow"
-            mdMarginEnd={2}
-            mdMarginStart={2}
-            smPaddingX={2}
-            smMarginEnd={2}
-            smMarginStart={12}
-          >
-            <CreatePost userPhoto={userImage} />
-            <Box paddingY={0}>
+      {/* <div
+        style={{
+          paddingLeft: "100px",
+          paddingRight: "100px",
+        }}
+      > */}
+      <Navigation />
+      {/* </div> */}
+      <div className={styles.container}>
+        <div className={styles.sideDiv}>
+          <div className={styles.content} style={{ padding: "20px" }}>
+            <EventBoard events={sortedEvents} />
+          </div>
+        </div>
+        <div className={styles.centerDiv}>
+          {/* Utilisez une div supplémentaire pour masquer la barre de défilement */}
+          <div className={styles.scrollWrapper}>
+            <div className={styles.content}>
+              <div className={styles.create}>
+                <CreatePost
+                  userPhoto={userImage}
+                  updatePosts={setUpdatePosts}
+                />
+              </div>
               {isLoading ? (
                 <div
                   style={{
@@ -357,86 +180,38 @@ const Explorer = () => {
                   {".".repeat(loadingDotsCount)}
                 </div>
               ) : (
-                posts.map((post, index) => (
-                  <Box key={index} paddingY={3}>
-                    <PostView
-                      postId={post.id}
-                      profilePhoto={post.author_get.image}
-                      eventTitle={post.eventTitle}
-                      eventDate={post.eventDate}
-                      eventTime={post.eventTime}
-                      eventLocation={post.eventLocation}
-                      username={post.author.username}
-                      moment={new Date(post.created_at)}
-                      postText={post.content}
-                      media={post.media}
-                      lastLikeUser={post.lastLikeUser}
-                      likesCount={post.likes_count}
-                      recentComment={post.recentComment}
-                      commentData={commentData}
-                      commentsCount={post.commentsCount}
-                    />
-                  </Box>
+                sortedPosts.map((post, index) => (
+                  <div key={index} style={{ paddingBottom: "20px" }}>
+                    {renderPostView(post)}
+                  </div>
                 ))
               )}
-            </Box>
-          </Box>
-        </Box>
+            </div>
+          </div>
+        </div>
+        <div className={styles.sideDiv}>
+          <div className={styles.content} style={{ padding: "20px" }}>
+            <div style={{ paddingBottom: "20px" }}>
+              <SideMenu
+                username={userIdentity?.username}
+                fansCount={userIdentity?.followers_count}
+                userPhoto={userImage ? userImage : "../user1.png"}
+              />
+            </div>
+            <div style={{ paddingBottom: "20px" }}>
+              {userList?.length > 0 && creatorSuggestions.length > 0 && (
+                <SuggestionBoard suggestions={creatorSuggestions} />
+              )}
+            </div>
 
-        <Box
-          tabIndex={-1}
-          overflow="scroll"
-          paddingX={5}
-          width="40%"
-          paddingY={5}
-          smDisplay="none"
-          mdDisplay="none"
-          lgDisplay="flex"
-          display={isSmallScreen ? "none" : "flex"}
-        >
-          <Flex direction="column" gap={3}>
-            <SideMenu
-              username={userIdentity?.username}
-              fansCount={5000}
-              userPhoto={userImage ? userImage : "../user1.png"}
-            />
-            <SuggestionBoard suggestions={suggestions} />
-            {/* {subscriptions && (
-              <SubscriptionBoard subscriptions={subscriptions} />
-            )} */}
-            <Box
-              display="flex"
-              direction="row"
-              justifyContent="center"
-              alignContent="center"
-              alignItems="center"
-              alignSelf="center"
-            >
-              <Box
-                height={20}
-                width={110}
-                alignItems="center"
-                justifyContent="center"
-                alignContent="center"
-                style={logoStyle}
-                marginTop={1}
-              >
-                <Image
-                  alt="Logo"
-                  src="../logo.png"
-                  fit="contain"
-                  naturalHeight={1}
-                  naturalWidth={1}
-                />
-              </Box>
-              <div>© 2023. Tout droit réservé</div>
-            </Box>
-          </Flex>
-        </Box>
-      </Box>
-    </Box>
-    // </Box>
+            <div style={{ fontSize: "15px" }}>
+              {" "}
+              Exclusivity © 2023. Tout droit réservé
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
-
-export default Explorer;
+export default Home;
