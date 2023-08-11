@@ -12,7 +12,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import {
   Box,
-  Image,
   IconButton as GestaltIconButton,
   Modal,
   TextField,
@@ -31,6 +30,7 @@ import axios from "axios";
 import EventPage from "../components/EventPage";
 import ExplorerPage from "../components/ExplorerPage";
 import Image from "next/image";
+
 const UserItem = ({ user }) => (
   <div className={styles["user-item"]}>
     <Image
