@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
   Box,
-  Image,
+  // Image,
   IconButton as GestaltIconButton,
   Modal,
   TextField,
