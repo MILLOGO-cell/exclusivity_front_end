@@ -3,6 +3,7 @@ import { Box, Button, TextField, Text } from "gestalt";
 import axios from "axios";
 import { REQUEST_PASSWORD_RESET } from "@/configs/api";
 import { useRouter } from "next/router";
+import "@/app/globals.css";
 
 const ResetPasswordPage = () => {
   const [email, setEmail] = useState("");

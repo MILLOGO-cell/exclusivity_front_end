@@ -257,6 +257,8 @@ const Navigation = () => {
           alt="Logo"
           src="/logo.png"
           style={{ maxWidth: "100%", maxHeight: "100%" }}
+          width={150}
+          height={150}
         />
       </div>
 

@@ -378,6 +378,7 @@ const Home = () => {
           borderStyle="sm"
           width="100%"
           height={windowWidth < 350 ? 100 : 900}
+          justifyContent="center"
         >
           <Image
             alt="Logo"
@@ -386,14 +387,22 @@ const Home = () => {
             naturalHeight={751}
             naturalWidth={564}
           >
-            <Box height="100%" padding={12} justifyContent="center">
+            <Box
+              height="100%"
+              paddingTop={12}
+              justifyContent="center"
+              alignContent="center"
+              alignItems="center"
+              alignSelf="center"
+            >
               <Box
                 direction={windowWidth < 350 ? "row" : "column"}
-                justifyContent={windowWidth < 350 ? "around" : "between"}
+                justifyContent={windowWidth < 350 ? "around" : "around"}
                 display="flex"
                 alignItems="center"
                 lgDisplay="flex"
                 lgDirection="row"
+                paddingX={12}
               >
                 <Box
                   width={windowWidth < 600 ? 400 : 600}
@@ -408,6 +417,7 @@ const Home = () => {
                         color: "white",
                         fontSize: getTextSize(),
                         textAlign: "center",
+                        fontWeight: "bold",
                       }}
                     >
                       Abonnez-vous pour accéder à plus de contenus.

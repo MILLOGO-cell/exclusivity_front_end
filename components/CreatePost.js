@@ -233,6 +233,8 @@ const CreatePost = ({ userPhoto }) => {
                     src={URL.createObjectURL(selectedMedia)}
                     alt="Media"
                     style={{ maxWidth: "100%", marginTop: "10px" }}
+                    width={150}
+                    height={150}
                   />
                   <div
                     style={{
