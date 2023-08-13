@@ -161,7 +161,13 @@ const Item = ({
       <div className={styles.blockUserInfo}>
         <Link href={`/profil_utilisateur?id=${suggestionId}`} passHref>
           {/* <Link onClick={setUserId(suggestionId)} href={`/profil_utilisateur/ `}> */}
-          <Image src={photo} alt="Profile" className={styles.profilePhoto} />
+          <img
+            src={photo}
+            alt="Profile"
+            className={styles.profilePhoto}
+            width={64}
+            height={64}
+          />
         </Link>
         <div className={styles.usernameContainer}>
           <div className={styles.username}>{username}</div>

@@ -86,7 +86,7 @@ const Navbar = () => {
       smMarginTop={6}
       smPaddingX={6}
       color="white"
-      backgroundColor="darkGray"
+      // backgroundColor="darkGray"
       style={navbarStyle}
     >
       <Box flex="grow">
@@ -103,6 +103,8 @@ const Navbar = () => {
             fit="contain"
             naturalHeight={1}
             naturalWidth={1}
+            width={150}
+            height={150}
           />
         </Box>
       </Box>

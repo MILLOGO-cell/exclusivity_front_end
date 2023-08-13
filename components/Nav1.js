@@ -538,6 +538,8 @@ const Navigation = () => {
                                 src={URL.createObjectURL(selectedMedia)} // Utilisez l'URL.createObjectURL pour afficher l'aperçu de l'image
                                 alt="Media Preview"
                                 style={{ maxWidth: "100%", maxHeight: "100%" }}
+                                width={150}
+                                height={150}
                               />
                             ) : (
                               <div>

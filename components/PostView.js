@@ -304,10 +304,12 @@ const PostView = ({
   return (
     <div className={styles.postViewContainer}>
       <div className={styles.userInfo}>
-        <Image
+        <img
           src={profilePhoto}
           alt="Photo de profil"
           className={styles.profilePhoto}
+          width={40}
+          height={40}
         />
         <div className={styles.usernameMoment}>
           <span className={styles.username}>{username}</span>
@@ -341,7 +343,7 @@ const PostView = ({
       <div className={styles.postContent}>
         <p>{postText}</p>
         {media && !video && (
-          <Image src={media} alt="Photo" className={styles.media} />
+          <img src={media} alt="Photo" className={styles.media} />
         )}
         {video && (
           <video controls className={styles.video}>
@@ -587,7 +589,7 @@ const Comment = ({ commentData, token, userIdentity, postId, level = 0 }) => {
         observer.unobserve(commentRef.current);
       }
     };
-  }, [commentRef, setIsVisible, observer]);
+  }, [commentRef, setIsVisible]);
 
   // Fonction pour charger plus de réponses
   const handleLoadMoreReplies = () => {
@@ -653,7 +655,7 @@ const Comment = ({ commentData, token, userIdentity, postId, level = 0 }) => {
           }}
         >
           <div style={{ display: "flex", justifyContent: "center" }}>
-            <Image
+            <img
               src={
                 commentData?.user_details?.image.startsWith("http")
                   ? commentData?.user_details?.image
@@ -661,6 +663,8 @@ const Comment = ({ commentData, token, userIdentity, postId, level = 0 }) => {
               }
               alt="Photo"
               className={styles.commentProfilePhoto}
+              width={32}
+              height={32}
             />
             <span className={styles.commentUsername}>
               {commentData?.user_details?.username}

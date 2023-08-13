@@ -41,14 +41,7 @@ const SideMenu = ({ username, fansCount, userPhoto }) => {
     logout,
   } = useAppContext();
   const [userIdentity, setUserIdentity] = useState(null);
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    const storedToken = localStorage.getItem("token");
-    const storedIsAuthenticated = localStorage.getItem("isAuthenticated");
-    setUserIdentity(JSON.parse(storedUser));
-    setToken(storedToken);
-  }, [setToken]);
+  // console.log(user);
 
   const [eventData, setEventData] = useState({
     title: "",
@@ -64,6 +57,7 @@ const SideMenu = ({ username, fansCount, userPhoto }) => {
   const handleLogout = () => {
     router.push("/");
     logout();
+    console.log(isAuthenticated, token, user);
   };
   const handleMediaChange = (event) => {
     const file = event.target.files[0];
@@ -228,6 +222,8 @@ const SideMenu = ({ username, fansCount, userPhoto }) => {
                       src={URL.createObjectURL(selectedMedia)} // Utilisez l'URL.createObjectURL pour afficher l'aperçu de l'image
                       alt="Media Preview"
                       style={{ maxWidth: "100%", maxHeight: "100%" }}
+                      width={100}
+                      height={500}
                     />
                   ) : (
                     <div>

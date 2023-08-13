@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { Box, Button, IconButton as GestaltIconButton, Flex } from "gestalt";
+import {
+  Box,
+  Button,
+  Avatar,
+  IconButton as GestaltIconButton,
+  Flex,
+} from "gestalt";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import styles from "../app/EventBoard.module.css";
@@ -106,7 +112,13 @@ const EventBoard = ({ events }) => {
 const Item = ({ photo, date, title }) => {
   return (
     <div className={styles.itemContainer}>
-      <Image src={photo} alt="Event" className={styles.itemPhoto} />
+      <img
+        src={photo}
+        alt="Event"
+        className={styles.itemPhoto}
+        width={16}
+        height={16}
+      />
       <div>
         <div className={styles.itemDate}>{date}</div>
         <div className={styles.itemTitle}>{title}</div>

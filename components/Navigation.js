@@ -89,7 +89,7 @@ const Navigation = () => {
     display: "flex",
     alignItems: "center",
     borderRadius: "30px",
-    backgroundColor: "white",
+    // backgroundColor: "white",
     padding: "6px 12px",
   };
 
@@ -161,7 +161,7 @@ const Navigation = () => {
       paddingY={3}
       paddingX={6}
       color="default"
-      backgroundColor="darkGray"
+      // backgroundColor="darkGray"
       borderStyle="sm"
     >
       <Box
@@ -179,6 +179,8 @@ const Navigation = () => {
           fit="contain"
           naturalHeight={1}
           naturalWidth={1}
+          width={150}
+          height={150}
         />
       </Box>
 
@@ -307,6 +309,8 @@ const Navigation = () => {
                             src={URL.createObjectURL(selectedMedia)} // Utilisez l'URL.createObjectURL pour afficher l'aperçu de l'image
                             alt="Media Preview"
                             style={{ maxWidth: "100%", maxHeight: "100%" }}
+                            width={150}
+                            height={150}
                           />
                         ) : (
                           <div>

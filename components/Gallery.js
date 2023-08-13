@@ -6,7 +6,13 @@ const Gallery = ({ photos }) => {
   return (
     <div>
       {photos.map((photo, index) => (
-        <Image key={index} src={photo.url} alt={`Photo ${index + 1}`} />
+        <Image
+          key={index}
+          src={photo.url}
+          alt={`Photo ${index + 1}`}
+          width={150}
+          height={150}
+        />
       ))}
     </div>
   );

@@ -47,6 +47,8 @@ const EventPost = ({
           src={profilePhoto}
           alt="Photo de profil"
           className="profile-photo"
+          width={64}
+          height={64}
         />
         <span className="username">{username}</span>
         <span className="moment">{formatMomentText(moment)}</span>
@@ -58,7 +60,15 @@ const EventPost = ({
         <p className="event-location">{eventLocation}</p>
       </div>
       <p className="post-text">{postText}</p>
-      {media && <Image src={media} alt="Photo" className="post-media" />}
+      {media && (
+        <Image
+          src={media}
+          alt="Photo"
+          className="post-media"
+          width={650}
+          height={500}
+        />
+      )}
       <div className="likes-comments">
         <span>
           {lastLikeUser} et {likesCount - 1} autres personnes aiment ceci

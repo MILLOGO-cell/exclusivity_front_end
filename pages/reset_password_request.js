@@ -89,10 +89,10 @@ const ResetPasswordPage = () => {
       height="100vh"
     >
       <Box
-        smFlexDirection="column"
+        // smFlexDirection="column"
         smMargin="auto"
-        flexGrow={1}
-        smMaxWidth="500px"
+        // flexGrow={1}
+        // smMaxWidth="500px"
         padding={4}
       >
         <Text align="center" weight="bold" size="600">

@@ -1,13 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
-import {
-  POSTS_REQUEST,
-  POSTS_EVENT_REQUEST,
-  USER_DETAILS_URL,
-  SIMPLE_POST,
-  EVENT_POST,
-} from "@/configs/api";
+import { USER_DETAILS_URL, SIMPLE_POST, EVENT_POST } from "@/configs/api";
 import axios from "axios";
-
+import allowedRoutes from "@/components/allowedRoutes";
 const AppContext = createContext();
 
 export function useAppContext() {
@@ -133,9 +127,6 @@ export function AppProvider({ children }) {
       fetchUserList();
     }
   }, [token]);
-  //   const updateEventPosts = (newPost) => {
-  //     setEventPosts((prevPosts) => [newPost, ...prevPosts]);
-  //   };
 
   const logout = () => {
     setUser(null);

@@ -2,6 +2,7 @@
 import React from "react";
 import { formatMomentText } from "./utils"; // Utilitaire pour formater le moment
 import Image from "next/image";
+
 const SimplePost = ({
   profilePhoto,
   username,
@@ -20,12 +21,22 @@ const SimplePost = ({
           src={profilePhoto}
           alt="Photo de profil"
           className="profile-photo"
+          width={650}
+          height={500}
         />
         <span className="username">{username}</span>
         <span className="moment">{formatMomentText(moment)}</span>
       </div>
       <p className="post-text">{postText}</p>
-      {media && <Image src={media} alt="Photo" className="post-media" />}
+      {media && (
+        <Image
+          src={media}
+          alt="Photo"
+          className="post-media"
+          width={64}
+          height={64}
+        />
+      )}
       <div className="likes-comments">
         <span>
           {lastLikeUser} et {likesCount - 1} autres personnes aiment ceci

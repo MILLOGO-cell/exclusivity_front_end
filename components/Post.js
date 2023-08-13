@@ -42,6 +42,8 @@ const Post = ({ username, timestamp, content, mediaUrl, mediaType }) => {
                 naturalHeight={1}
                 src={mediaUrl}
                 fit="cover"
+                width={650}
+                height={500}
               />
             </Box>
           )}

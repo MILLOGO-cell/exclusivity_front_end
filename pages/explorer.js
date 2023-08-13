@@ -10,7 +10,7 @@ import axios from "axios";
 import { API_URL, BASIC_URL } from "@/configs/api";
 import PostView from "@/components/PostView";
 import SuggestionBoard from "@/components/SuggestionBoard";
-const Home = () => {
+const Explorer = () => {
   const {
     user,
     token,
@@ -35,10 +35,12 @@ const Home = () => {
     const storedUser = localStorage.getItem("user");
     const storedToken = localStorage.getItem("token");
     const storedIsAuthenticated = localStorage.getItem("isAuthenticated");
+    setUser(JSON.parse(storedUser));
+    setToken(storedToken);
     setUserIdentity(JSON.parse(storedUser));
     setToken(storedToken);
-  }, []);
-
+    setIsAuthenticated(storedIsAuthenticated);
+  }, [token]);
   useEffect(() => {
     const incrementLoadingDots = () => {
       setLoadingDotsCount((count) => (count === 3 ? 1 : count + 1));
@@ -88,7 +90,6 @@ const Home = () => {
     // Appeler la fonction pour récupérer l'image de profil lorsque le composant est monté
     getUserImage();
   }, [userIdentity, token]);
-
   const renderPostView = (post) => {
     // Vérifier si post est valide et contient toutes les propriétés nécessaires
     if (post && post.author_get && post.author_get.image && post.content) {
@@ -131,7 +132,6 @@ const Home = () => {
     (user) =>
       user?.is_creator === true && user?.username !== userIdentity?.username
   );
-  // console.log("****", sortedPosts);
   return (
     <div
       style={{
@@ -214,4 +214,4 @@ const Home = () => {
     </div>
   );
 };
-export default Home;
+export default Explorer;

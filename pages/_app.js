@@ -1,27 +1,20 @@
 import React, { useEffect } from "react";
-import { AppProvider, useAppContext } from "../context/AppContext";
 import App from "next/app";
 import { useRouter } from "next/router";
-import allowedRoutes from "@/components/allowedRoutes";
+import { AppProvider, useAppContext } from "@/context/AppContext";
+import NavigationMiddleware from "@/middleware/middleware";
 
-function MyApp({ Component, pageProps }) {
-  const router = useRouter();
-  const isAuthenticated = useAppContext();
+class MyApp extends App {
+  render() {
+    const { Component, pageProps } = this.props;
 
-  useEffect(() => {
-    const currentRoute = router.pathname;
-    const isAllowedRoute = allowedRoutes.includes(currentRoute);
-
-    if (!isAuthenticated && !isAllowedRoute) {
-      router.push("/");
-    }
-  }, [isAuthenticated, router]);
-
-  return (
-    <AppProvider>
-      <Component {...pageProps} />
-    </AppProvider>
-  );
+    return (
+      <AppProvider>
+        <NavigationMiddleware>
+          <Component {...pageProps} />
+        </NavigationMiddleware>
+      </AppProvider>
+    );
+  }
 }
-
 export default MyApp;

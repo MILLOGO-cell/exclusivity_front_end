@@ -108,7 +108,13 @@ const SubscriptionItem = ({ photo, username, userId }) => {
           }}
         >
           <div style={{}}>
-            <Image src={photo} alt="Profile" className={styles.profilePhoto} />
+            <Image
+              src={photo}
+              alt="Profile"
+              className={styles.profilePhoto}
+              width={64}
+              height={64}
+            />
           </div>
           <div className={styles.usernameContainer}>
             <div className={styles.username}>{username}</div>

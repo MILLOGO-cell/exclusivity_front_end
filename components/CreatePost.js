@@ -15,6 +15,7 @@ import { SIMPLE_POST } from "@/configs/api";
 import axios from "axios";
 import { useAppContext } from "@/context/AppContext";
 import Image from "next/image";
+
 const CreatePost = ({ userPhoto }) => {
   const [showModal, setShowModal] = useState(false);
   const [postText, setPostText] = useState("");
@@ -34,13 +35,14 @@ const CreatePost = ({ userPhoto }) => {
     fetchPosts,
   } = useAppContext();
   const [userIdentity, setUserIdentity] = useState(null);
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    const storedToken = localStorage.getItem("token");
-    const storedIsAuthenticated = localStorage.getItem("isAuthenticated");
-    setUserIdentity(JSON.parse(storedUser));
-    setToken(storedToken);
-  }, [setToken]);
+  // useEffect(() => {
+  //   const storedUser = localStorage.getItem("user");
+  //   const storedToken = localStorage.getItem("token");
+  //   const storedIsAuthenticated = localStorage.getItem("isAuthenticated");
+  //   setUserIdentity(JSON.parse(storedUser));
+  //   setToken(storedToken);
+  // }, [setToken]);
+  // console.log(user.username);
   const handleOpenGallery = (icon) => {
     setSelectedIcon(icon); // Mettre à jour l'icône sélectionnée
     fileInputRef.current.click();
@@ -118,15 +120,13 @@ const CreatePost = ({ userPhoto }) => {
 
       // Vérifier si la création du post a réussi
       if (response.status === 201) {
-        console.log("Post créé avec succès !");
-
         const newPost = {
           id: response.data.id,
           content: postText,
           media: selectedMedia,
           user: {
-            id: userIdentity.id,
-            name: userIdentity.name,
+            id: user.id,
+            name: user.username,
             // Ajoutez d'autres propriétés de l'utilisateur si nécessaire
           },
           // Ajoutez d'autres propriétés du post si nécessaire
@@ -185,7 +185,7 @@ const CreatePost = ({ userPhoto }) => {
                 textAlign: "left",
               }}
             >
-              {postText || `Quoi de neuf ${userIdentity?.username} ?`}
+              {postText || `Quoi de neuf ${user?.username} ?`}
             </button>
           </Box>
         </Flex>

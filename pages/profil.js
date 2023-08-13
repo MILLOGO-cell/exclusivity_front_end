@@ -27,7 +27,7 @@ import Image from "next/image";
 
 const ProfilePage = () => {
   const [selectedPhoto, setSelectedPhoto] = useState(null);
-  const { user, token, setToken } = useAppContext();
+  const { user, setUser, token, setToken, isAuthenticated } = useAppContext();
   const [username, setUsername] = useState("");
   const [last_name, setLastName] = useState("");
   const [first_name, setFirstName] = useState("");
@@ -38,17 +38,17 @@ const ProfilePage = () => {
   const [userImage, setUserImage] = useState("");
 
   useEffect(() => {
-    // Vérifier le contenu du localStorage
     const storedUser = localStorage.getItem("user");
     const storedToken = localStorage.getItem("token");
     const storedIsAuthenticated = localStorage.getItem("isAuthenticated");
+    setUser(JSON.parse(storedUser));
+    setToken(storedToken);
     setUserIdentity(JSON.parse(storedUser));
     setToken(storedToken);
-  }, [setToken]);
+  }, []);
 
   // Fonction pour récupérer les détails de l'utilisateur en fonction de l'ID dans le contexte
   const [userDetails, setUserDetails] = useState(null);
-
   const getUserImage = async () => {
     try {
       // Remplacez 'VOTRE_API_ENDPOINT' par l'URL de l'API Django pour récupérer l'URL de l'image de profil de l'utilisateur connecté
@@ -113,11 +113,11 @@ const ProfilePage = () => {
   };
 
   useEffect(() => {
-    if (userIdentity) {
+    if (user) {
       // Utiliser fetchUserDetails depuis le useEffect
       fetchUserDetails();
     }
-  }, [userIdentity, token, fetchUserDetails]);
+  }, [user, token]);
 
   const handlePhotoChange = (event) => {
     const file = event.target.files[0];
@@ -247,7 +247,7 @@ const ProfilePage = () => {
                   htmlFor="photoInput"
                   className={styles.profilePhotoLabel}
                 >
-                  <Image
+                  <img
                     src={
                       selectedPhoto
                         ? URL.createObjectURL(selectedPhoto)
@@ -257,6 +257,8 @@ const ProfilePage = () => {
                     }
                     alt="Photo de profil"
                     className={styles.profilePhoto}
+                    width={150}
+                    height={150}
                   />
                 </label>
                 <input

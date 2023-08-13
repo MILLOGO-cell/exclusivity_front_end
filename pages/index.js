@@ -17,6 +17,7 @@ import LoginForm from "@/components/LoginForm";
 import axios from "axios";
 import { POSTS_REQUEST } from "@/configs/api";
 import formatMomentText from "@/utils/utils";
+import { useAppContext } from "../context/AppContext";
 
 const Home = () => {
   const [windowWidth, setWindowWidth] = useState(0);
@@ -24,6 +25,16 @@ const Home = () => {
   const [showLoginForm, setShowLoginForm] = useState(false);
   const [posts, setPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const {
+    user,
+    setUser,
+    setToken,
+    token,
+    isAuthenticated,
+    setIsAuthenticated,
+    logout,
+  } = useAppContext();
+
   const handleOpenLoginForm = () => {
     setShowLoginForm(true);
   };
@@ -89,7 +100,6 @@ const Home = () => {
       behavior: "smooth", // Ajoutez cette option pour un défilement en douceur
     });
   };
-
   const fetchPosts = async () => {
     try {
       // const headers = {
@@ -111,17 +121,15 @@ const Home = () => {
         // Return an object that includes the original post data and the comments data
         return {
           ...post,
-          commentData: post.comments,
+          // commentData: post.comments,
         };
       });
 
       setPosts(processedPosts);
       setIsLoading(false);
-      if (processedPosts.length > 0) {
-        setCommentData(processedPosts[0].commentData);
-      }
-
-      console.log("post**", processedPosts);
+      // if (processedPosts.length > 0) {
+      //   setCommentData(processedPosts[0].commentData);
+      // }
     } catch (error) {
       console.error(error);
       setIsLoading(false);
@@ -131,6 +139,7 @@ const Home = () => {
   useEffect(() => {
     fetchPosts(); // Appel de la fonction fetchPosts au chargement de la page
   }, []);
+
   return (
     <Box
       // borderStyle="sm"
@@ -389,7 +398,7 @@ const Home = () => {
           >
             <Box
               height="100%"
-              paddingTop={12}
+              padding={12}
               justifyContent="center"
               alignContent="center"
               alignItems="center"
@@ -408,7 +417,6 @@ const Home = () => {
                   width={windowWidth < 600 ? 400 : 600}
                   marginTop={12}
                   paddingY={12}
-                  // borderStyle="sm"
                   justifyContent="center"
                 >
                   <Flex>
@@ -424,13 +432,7 @@ const Home = () => {
                     </span>
                   </Flex>
                 </Box>
-                <Box
-                  marginY={4}
-                  color="default"
-                  paddingX={5}
-                  paddingY={5}
-                  rounding={8}
-                >
+                <Box color="default" paddingX={5} paddingY={5} rounding={8}>
                   <RegisterForm showCloseButton={false} />
                   <Text align="center">
                     Déjà membre ?{" "}

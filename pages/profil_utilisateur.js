@@ -81,6 +81,8 @@ const ProfileArtisteImages = ({}) => {
     const storedUser = localStorage.getItem("user");
     const storedToken = localStorage.getItem("token");
     const storedIsAuthenticated = localStorage.getItem("isAuthenticated");
+    setUser(JSON.parse(storedUser));
+    setToken(storedToken);
     setUserIdentity(JSON.parse(storedUser));
     setToken(storedToken);
   }, []);
@@ -172,7 +174,7 @@ const ProfileArtisteImages = ({}) => {
   const handleTabChange = (tab) => {
     setActiveTab(tab);
   };
-
+  console.log("profil user", isAuthenticated);
   const formatFollowersCount = (followersCount) => {
     if (followersCount >= 1000000000) {
       return `${(followersCount / 1000000000).toFixed(1)}B`;
@@ -247,6 +249,8 @@ const ProfileArtisteImages = ({}) => {
                 borderRadius: "50%",
                 marginRight: "15px",
               }}
+              width={100}
+              height={100}
             />
             <div className={styles.artistFollowersContainer}>
               <div>
