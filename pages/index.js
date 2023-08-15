@@ -18,13 +18,14 @@ import axios from "axios";
 import { POSTS_REQUEST } from "@/configs/api";
 import formatMomentText from "@/utils/utils";
 import { useAppContext } from "../context/AppContext";
-
+import { useRouter } from "next/router";
 const Home = () => {
   const [windowWidth, setWindowWidth] = useState(0);
   const [showRegisterForm, setShowRegisterForm] = useState(false);
   const [showLoginForm, setShowLoginForm] = useState(false);
   const [posts, setPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
   const {
     user,
     setUser,
@@ -34,7 +35,6 @@ const Home = () => {
     setIsAuthenticated,
     logout,
   } = useAppContext();
-
   const handleOpenLoginForm = () => {
     setShowLoginForm(true);
   };
@@ -218,7 +218,7 @@ const Home = () => {
             >
               <Box
                 display="block"
-                borderStyle="sm"
+                // borderStyle="sm"
                 // marginTop={12}
                 marginTop={windowWidth < 600 ? 0 : -12}
                 mdMarginTop={-12}
@@ -243,7 +243,7 @@ const Home = () => {
               </Box>
               <Box
                 display="block"
-                borderStyle="sm"
+                // borderStyle="sm"
                 marginTop={12}
                 mdMarginTop={6}
                 smMarginTop={3}
@@ -268,7 +268,7 @@ const Home = () => {
 
               <Box
                 display="block"
-                borderStyle="sm"
+                // borderStyle="sm"
                 marginTop={12}
                 mdMarginTop={6}
                 smMarginTop={3}
@@ -293,7 +293,7 @@ const Home = () => {
 
               <Box
                 display="block"
-                borderStyle="sm"
+                // borderStyle="sm"
                 marginTop={12}
                 mdMarginTop={6}
                 smMarginTop={3}
@@ -318,7 +318,7 @@ const Home = () => {
 
               <Box
                 display="block"
-                borderStyle="sm"
+                // borderStyle="sm"
                 // marginTop={12}
                 mdMarginTop={-12}
                 smMarginTop={-10}
@@ -384,7 +384,7 @@ const Home = () => {
           />
         ))}
         <Box
-          borderStyle="sm"
+          // borderStyle="sm"
           width="100%"
           height={windowWidth < 350 ? 100 : 900}
           justifyContent="center"

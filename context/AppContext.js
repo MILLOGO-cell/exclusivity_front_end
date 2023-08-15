@@ -143,6 +143,9 @@ export function AppProvider({ children }) {
     setCommentEventData([]);
     setIsLoading(false);
     setError(null);
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    localStorage.removeItem("isAuthenticated");
   };
 
   return (

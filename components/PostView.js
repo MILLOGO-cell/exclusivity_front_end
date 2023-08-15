@@ -365,17 +365,22 @@ const PostView = ({
             ) : (
               ""
             )}
-            {commentsCount > 0 ? (
-              <span>
-                {" "}
-                {formatCount(commentsCount)} commentaire
-                {commentsCount !== 1 ? "s" : ""}
-              </span>
-            ) : (
-              <div className={styles.noCommentsText}>
-                Soyez la première personne à commenter ce poste.
-              </div>
-            )}
+            {
+              commentsCount > 0 ? (
+                <span>
+                  {" "}
+                  {formatCount(commentsCount)} commentaire
+                  {commentsCount !== 1 ? "s" : ""}
+                </span>
+              ) : (
+                ""
+              )
+              // (
+              //   <div className={styles.noCommentsText}>
+              //     Soyez la première personne à commenter ce poste.
+              //   </div>
+              // )
+            }
           </div>
         </div>
         <Box display="flex" direction="row">

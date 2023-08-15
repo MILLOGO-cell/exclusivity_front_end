@@ -1,8 +1,3 @@
-const allowedRoutes = [
-  "/",
-  "/change_password",
-  "/reset_password_request",
-  "/event",
-];
+const allowedRoutes = ["/", "/change_password", "/reset_password_request"];
 
 export default allowedRoutes;

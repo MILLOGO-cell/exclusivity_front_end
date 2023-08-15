@@ -10,9 +10,9 @@ class MyApp extends App {
 
     return (
       <AppProvider>
-        <NavigationMiddleware>
-          <Component {...pageProps} />
-        </NavigationMiddleware>
+        {/* <NavigationMiddleware> */}
+        <Component {...pageProps} />
+        {/* </NavigationMiddleware> */}
       </AppProvider>
     );
   }

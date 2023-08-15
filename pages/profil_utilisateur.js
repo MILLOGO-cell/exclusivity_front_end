@@ -14,6 +14,8 @@ import axios from "axios";
 import { API_URL, BASIC_URL } from "@/configs/api";
 import { useAppContext } from "@/context/AppContext";
 import Image from "next/image";
+import allowedRoutes from "@/components/allowedRoutes";
+
 const ProfileArtisteImages = ({}) => {
   const router = useRouter();
   const suggestionId = router.query?.id;
@@ -81,12 +83,21 @@ const ProfileArtisteImages = ({}) => {
     const storedUser = localStorage.getItem("user");
     const storedToken = localStorage.getItem("token");
     const storedIsAuthenticated = localStorage.getItem("isAuthenticated");
+
     setUser(JSON.parse(storedUser));
     setToken(storedToken);
     setUserIdentity(JSON.parse(storedUser));
     setToken(storedToken);
-  }, []);
 
+    // Mettre à jour le statut d'authentification dans le contexte
+    setIsAuthenticated(storedIsAuthenticated);
+
+    // Maintenant que le statut d'authentification est mis à jour dans le contexte,
+    // vous pouvez exécuter la vérification de l'authentification dans votre middleware
+    if (!storedIsAuthenticated && !allowedRoutes.includes(router.pathname)) {
+      router.push("/");
+    }
+  }, [token]);
   useEffect(() => {
     // Récupérer l'image de profil de l'utilisateur connecté
     const getUserImage = async () => {
@@ -240,7 +251,7 @@ const ProfileArtisteImages = ({}) => {
               justifyContent: "center",
             }}
           >
-            <Image
+            <img
               src={userImage}
               alt={userIdentity?.username}
               style={{

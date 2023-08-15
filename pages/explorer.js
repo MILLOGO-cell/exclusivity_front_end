@@ -10,6 +10,9 @@ import axios from "axios";
 import { API_URL, BASIC_URL } from "@/configs/api";
 import PostView from "@/components/PostView";
 import SuggestionBoard from "@/components/SuggestionBoard";
+import allowedRoutes from "@/components/allowedRoutes";
+import { useRouter } from "next/router";
+
 const Explorer = () => {
   const {
     user,
@@ -30,17 +33,27 @@ const Explorer = () => {
   const [userIdentity, setUserIdentity] = useState(null);
   const [loadingDotsCount, setLoadingDotsCount] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-
+  const router = useRouter();
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     const storedToken = localStorage.getItem("token");
     const storedIsAuthenticated = localStorage.getItem("isAuthenticated");
+
     setUser(JSON.parse(storedUser));
     setToken(storedToken);
     setUserIdentity(JSON.parse(storedUser));
     setToken(storedToken);
+
+    // Mettre à jour le statut d'authentification dans le contexte
     setIsAuthenticated(storedIsAuthenticated);
+
+    // Maintenant que le statut d'authentification est mis à jour dans le contexte,
+    // vous pouvez exécuter la vérification de l'authentification dans votre middleware
+    if (!storedIsAuthenticated && !allowedRoutes.includes(router.pathname)) {
+      router.push("/");
+    }
   }, [token]);
+
   useEffect(() => {
     const incrementLoadingDots = () => {
       setLoadingDotsCount((count) => (count === 3 ? 1 : count + 1));
@@ -90,6 +103,9 @@ const Explorer = () => {
     // Appeler la fonction pour récupérer l'image de profil lorsque le composant est monté
     getUserImage();
   }, [userIdentity, token]);
+  // if (!authLoaded) {
+  //   return <div>Chargement...</div>;
+  // }
   const renderPostView = (post) => {
     // Vérifier si post est valide et contient toutes les propriétés nécessaires
     if (post && post.author_get && post.author_get.image && post.content) {

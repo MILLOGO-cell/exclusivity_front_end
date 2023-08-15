@@ -15,6 +15,8 @@ import { SIMPLE_POST } from "@/configs/api";
 import axios from "axios";
 import { useAppContext } from "@/context/AppContext";
 import Image from "next/image";
+import { useRouter } from "next/router";
+import allowedRoutes from "./allowedRoutes";
 
 const CreatePost = ({ userPhoto }) => {
   const [showModal, setShowModal] = useState(false);
@@ -35,14 +37,27 @@ const CreatePost = ({ userPhoto }) => {
     fetchPosts,
   } = useAppContext();
   const [userIdentity, setUserIdentity] = useState(null);
-  // useEffect(() => {
-  //   const storedUser = localStorage.getItem("user");
-  //   const storedToken = localStorage.getItem("token");
-  //   const storedIsAuthenticated = localStorage.getItem("isAuthenticated");
-  //   setUserIdentity(JSON.parse(storedUser));
-  //   setToken(storedToken);
-  // }, [setToken]);
-  // console.log(user.username);
+  const router = useRouter();
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    const storedToken = localStorage.getItem("token");
+    const storedIsAuthenticated = localStorage.getItem("isAuthenticated");
+
+    setUser(JSON.parse(storedUser));
+    setToken(storedToken);
+    setUserIdentity(JSON.parse(storedUser));
+    setToken(storedToken);
+
+    // Mettre à jour le statut d'authentification dans le contexte
+    setIsAuthenticated(storedIsAuthenticated);
+
+    // Maintenant que le statut d'authentification est mis à jour dans le contexte,
+    // vous pouvez exécuter la vérification de l'authentification dans votre middleware
+    if (!storedIsAuthenticated && !allowedRoutes.includes(router.pathname)) {
+      router.push("/");
+    }
+  }, [token]);
   const handleOpenGallery = (icon) => {
     setSelectedIcon(icon); // Mettre à jour l'icône sélectionnée
     fileInputRef.current.click();
@@ -153,7 +168,7 @@ const CreatePost = ({ userPhoto }) => {
       setIsLoading(false);
     }
   };
-
+  // console.log(userIdentity);
   return (
     <>
       <Box
@@ -185,7 +200,7 @@ const CreatePost = ({ userPhoto }) => {
                 textAlign: "left",
               }}
             >
-              {postText || `Quoi de neuf ${user?.username} ?`}
+              {postText || `Quoi de neuf ${userIdentity?.username} ?`}
             </button>
           </Box>
         </Flex>

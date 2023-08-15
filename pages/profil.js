@@ -24,10 +24,18 @@ import {
 } from "@/configs/api";
 import axios from "axios";
 import Image from "next/image";
-
+import allowedRoutes from "@/components/allowedRoutes";
+import { useRouter } from "next/router";
 const ProfilePage = () => {
   const [selectedPhoto, setSelectedPhoto] = useState(null);
-  const { user, setUser, token, setToken, isAuthenticated } = useAppContext();
+  const {
+    user,
+    setUser,
+    token,
+    setToken,
+    isAuthenticated,
+    setIsAuthenticated,
+  } = useAppContext();
   const [username, setUsername] = useState("");
   const [last_name, setLastName] = useState("");
   const [first_name, setFirstName] = useState("");
@@ -36,16 +44,26 @@ const ProfilePage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [userIdentity, setUserIdentity] = useState(null);
   const [userImage, setUserImage] = useState("");
-
+  const router = useRouter();
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     const storedToken = localStorage.getItem("token");
     const storedIsAuthenticated = localStorage.getItem("isAuthenticated");
+
     setUser(JSON.parse(storedUser));
     setToken(storedToken);
     setUserIdentity(JSON.parse(storedUser));
     setToken(storedToken);
-  }, []);
+
+    // Mettre à jour le statut d'authentification dans le contexte
+    setIsAuthenticated(storedIsAuthenticated);
+
+    // Maintenant que le statut d'authentification est mis à jour dans le contexte,
+    // vous pouvez exécuter la vérification de l'authentification dans votre middleware
+    if (!storedIsAuthenticated && !allowedRoutes.includes(router.pathname)) {
+      router.push("/");
+    }
+  }, [token]);
 
   // Fonction pour récupérer les détails de l'utilisateur en fonction de l'ID dans le contexte
   const [userDetails, setUserDetails] = useState(null);
