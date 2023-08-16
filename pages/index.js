@@ -432,7 +432,13 @@ const Home = () => {
                     </span>
                   </Flex>
                 </Box>
-                <Box color="default" paddingX={5} paddingY={5} rounding={8}>
+                <Box
+                  color="default"
+                  paddingX={5}
+                  paddingY={5}
+                  rounding={8}
+                  minWidth={300}
+                >
                   <RegisterForm showCloseButton={false} />
                   <Text align="center">
                     Déjà membre ?{" "}
