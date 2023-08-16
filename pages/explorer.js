@@ -169,7 +169,7 @@ const Explorer = () => {
       <div className={styles.container}>
         <div className={styles.sideDiv}>
           <div className={styles.content} style={{ padding: "20px" }}>
-            <EventBoard events={sortedEvents} />
+            {sortedEvents.length > 0 && <EventBoard events={sortedEvents} />}
           </div>
         </div>
         <div className={styles.centerDiv}>

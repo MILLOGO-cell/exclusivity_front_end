@@ -141,6 +141,7 @@ const Evenement = () => {
     (user) =>
       user?.is_creator === true && user?.username !== userIdentity?.username
   );
+  const sortedEvents = eventPosts.slice().sort(comparePostsByDate);
   // if (!authLoaded) {
   //   return <div>Chargement...</div>;
   // }
@@ -158,7 +159,7 @@ const Evenement = () => {
       <div className={styles.container}>
         <div className={styles.sideDiv}>
           <div className={styles.content} style={{ padding: "20px" }}>
-            <EventBoard events={sortedPosts} />
+            {sortedEvents.length > 0 && <EventBoard events={sortedEvents} />}
           </div>
         </div>
         <div className={styles.centerDiv}>
