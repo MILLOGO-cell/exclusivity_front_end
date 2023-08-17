@@ -42,7 +42,25 @@ const SideMenu = ({ username, fansCount, userPhoto }) => {
   } = useAppContext();
   const [userIdentity, setUserIdentity] = useState(null);
   // console.log(user);
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    const storedToken = localStorage.getItem("token");
+    const storedIsAuthenticated = localStorage.getItem("isAuthenticated");
 
+    setUser(JSON.parse(storedUser));
+    setToken(storedToken);
+    setUserIdentity(JSON.parse(storedUser));
+    setToken(storedToken);
+
+    // Mettre à jour le statut d'authentification dans le contexte
+    setIsAuthenticated(storedIsAuthenticated);
+
+    // Maintenant que le statut d'authentification est mis à jour dans le contexte,
+    // vous pouvez exécuter la vérification de l'authentification dans votre middleware
+    if (!storedIsAuthenticated && !allowedRoutes.includes(router.pathname)) {
+      router.push("/");
+    }
+  }, [token]);
   const [eventData, setEventData] = useState({
     title: "",
     date: "",
@@ -149,7 +167,7 @@ const SideMenu = ({ username, fansCount, userPhoto }) => {
   const handlePublishEvent = () => {
     createEvent();
   };
-
+  // console.log(userIdentity?.is_creator);
   return (
     <Box padding={4} width={250} rounding={5} color="default">
       <Box marginBottom={4} display="flex" alignItems="center">

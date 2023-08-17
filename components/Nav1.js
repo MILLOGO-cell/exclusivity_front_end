@@ -34,9 +34,9 @@ import Image from "next/image";
 
 const UserItem = ({ user }) => (
   <div className={styles["user-item"]}>
-    <Image
+    <img
       className={styles["user-item-img"]}
-      src={`${BASIC_URL}${user.image}`}
+      src={user.image ? `${BASIC_URL}${user.image}` : "../user1.png"}
       alt={user.username}
     />
     <span className={styles["user-item-username"]}>{user.username}</span>
