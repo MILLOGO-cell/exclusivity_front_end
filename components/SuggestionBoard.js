@@ -162,7 +162,7 @@ const Item = ({
         <Link href={`/profil_utilisateur?id=${suggestionId}`} passHref>
           {/* <Link onClick={setUserId(suggestionId)} href={`/profil_utilisateur/ `}> */}
           <img
-            src={photo}
+            src={photo ? photo : "../user1.png"}
             alt="Profile"
             className={styles.profilePhoto}
             width={64}
