@@ -17,15 +17,13 @@ import {
   UPDATE_USER,
   UPDATE_USER_PHOTO,
   USER_DETAILS,
-  BASE_URL,
-  IMAGE_URL,
   API_URL,
   BASIC_URL,
 } from "@/configs/api";
 import axios from "axios";
-import Image from "next/image";
 import allowedRoutes from "@/components/allowedRoutes";
 import { useRouter } from "next/router";
+
 const ProfilePage = () => {
   const [selectedPhoto, setSelectedPhoto] = useState(null);
   const {
@@ -56,11 +54,8 @@ const ProfilePage = () => {
     setUserIdentity(JSON.parse(storedUser));
     setToken(storedToken);
 
-    // Mettre à jour le statut d'authentification dans le contexte
     setIsAuthenticated(storedIsAuthenticated);
 
-    // Maintenant que le statut d'authentification est mis à jour dans le contexte,
-    // vous pouvez exécuter la vérification de l'authentification dans votre middleware
     if (!storedIsAuthenticated && !allowedRoutes.includes(router.pathname)) {
       router.push("/");
     }
@@ -70,9 +65,8 @@ const ProfilePage = () => {
 
   const getUserImage = async () => {
     try {
-      console.log("identité:", userIdentity);
       const response = await axios.get(
-        `${API_URL}/utilisateurs/get_image_url/${userIdentity?.id}/`,
+        `${API_URL}/utilisateurs/get_image_url/${userIdentity.id}/`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -80,9 +74,13 @@ const ProfilePage = () => {
         }
       );
 
-      const data = response.data;
-      const imageUrl = `${BASIC_URL}${data.image_url}`;
-      setUserImage(imageUrl);
+      if (response.status === 200) {
+        const data = response.data;
+        const imageUrl = `${BASIC_URL}${data.image_url}`;
+        setUserImage(imageUrl);
+      } else {
+        console.log("Nous n'avons pas pu recuperer l'url de l'image");
+      }
     } catch (error) {
       console.log(
         "Une erreur s'est produite lors de la récupération de l'URL de l'image de profil.",
@@ -107,7 +105,6 @@ const ProfilePage = () => {
         setFirstName(data.user_details.first_name);
         setEmail(data.user_details.email);
         setTelephone(data.user_details.telephone);
-        // Appeler la fonction pour récupérer l'URL de l'image de profil de l'utilisateur connecté
         getUserImage();
       } else {
         console.log(
@@ -125,10 +122,9 @@ const ProfilePage = () => {
 
   useEffect(() => {
     if (user) {
-      // Utiliser fetchUserDetails depuis le useEffect
       fetchUserDetails();
     }
-  }, [user, token]);
+  }, [user, token, userIdentity?.id]);
 
   const handlePhotoChange = (event) => {
     const file = event.target.files[0];
@@ -139,9 +135,8 @@ const ProfilePage = () => {
   };
 
   const handleSubmit = async (event) => {
-    event.preventDefault(); // Empêcher le comportement de soumission par défaut du formulaire
+    event.preventDefault();
 
-    // Construire les données à envoyer dans la requête PUT
     const userData = {
       username,
       last_name,
@@ -149,11 +144,9 @@ const ProfilePage = () => {
       email,
       telephone,
     };
-    console.log(userData);
     try {
-      setIsLoading(true); // Définir isLoading à true pour afficher un indicateur de chargement pendant la requête
+      setIsLoading(true);
 
-      // Envoyer la requête PUT avec Axios pour mettre à jour les informations de l'utilisateur
       const response = await axios.put(UPDATE_USER, userData, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -161,29 +154,23 @@ const ProfilePage = () => {
       });
 
       if (response.status === 200) {
-        // Les informations de l'utilisateur ont été mises à jour avec succès
         console.log(
           "Informations de l'utilisateur mises à jour:",
           response.data
         );
         fetchUserDetails();
-        // Vous pouvez également mettre à jour l'état de l'utilisateur avec les nouvelles informations
-        // setUserDetails(response.data);
-        // Remarque : Vous pouvez également ajouter une notification ou un message de succès ici si vous le souhaitez.
       } else {
         console.log(
           "Une erreur s'est produite lors de la mise à jour des informations de l'utilisateur."
         );
-        // Vous pouvez afficher un message d'erreur ici si nécessaire.
       }
     } catch (error) {
       console.log(
         "Une erreur s'est produite lors de la mise à jour des informations de l'utilisateur:",
         error
       );
-      // Vous pouvez afficher un message d'erreur ici si nécessaire.
     } finally {
-      setIsLoading(false); // Définir isLoading à false après la requête (que ce soit réussi ou échoué).
+      setIsLoading(false);
     }
   };
   const handleChange = () => {};
@@ -195,19 +182,16 @@ const ProfilePage = () => {
         const formData = new FormData();
         formData.append("image", selectedPhoto);
 
-        // Remplacez 'VOTRE_API_ENDPOINT' par l'URL de l'API Django pour mettre à jour la photo de profil
         const response = await fetch(UPDATE_USER_PHOTO, {
-          method: "PATCH", // Utilisez "POST" si votre API utilise une requête POST pour mettre à jour la photo de profil
+          method: "PATCH",
           headers: {
-            Authorization: `Bearer ${token}`, // Ajoutez l'en-tête d'autorisation si nécessaire
+            Authorization: `Bearer ${token}`,
           },
           body: formData,
         });
 
         if (response.status === 200) {
-          // La photo de profil a été mise à jour avec succès
-          console.log("La photo de profil a été mise à jour !");
-          setSelectedPhoto(null); // Réinitialisez l'état de la photo sélectionnée après la mise à jour réussie
+          setSelectedPhoto(null);
           fetchUserDetails();
         } else {
           console.log(
@@ -224,7 +208,7 @@ const ProfilePage = () => {
       }
     }
   };
-  // console.log(username);
+
   return (
     <div
       style={{
