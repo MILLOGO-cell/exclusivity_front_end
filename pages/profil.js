@@ -45,6 +45,7 @@ const ProfilePage = () => {
   const [userIdentity, setUserIdentity] = useState(null);
   const [userImage, setUserImage] = useState("");
   const router = useRouter();
+
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     const storedToken = localStorage.getItem("token");
@@ -65,13 +66,13 @@ const ProfilePage = () => {
     }
   }, [token]);
 
-  // Fonction pour récupérer les détails de l'utilisateur en fonction de l'ID dans le contexte
   const [userDetails, setUserDetails] = useState(null);
+
   const getUserImage = async () => {
     try {
-      // Remplacez 'VOTRE_API_ENDPOINT' par l'URL de l'API Django pour récupérer l'URL de l'image de profil de l'utilisateur connecté
+      console.log("identité:", userIdentity);
       const response = await axios.get(
-        `${API_URL}/utilisateurs/get_image_url/${userIdentity.id}/`,
+        `${API_URL}/utilisateurs/get_image_url/${userIdentity?.id}/`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -79,17 +80,9 @@ const ProfilePage = () => {
         }
       );
 
-      if (response.status === 200) {
-        const data = response.data;
-        // Récupérer l'URL de l'image de profil de l'utilisateur connecté depuis la réponse
-        const imageUrl = `${BASIC_URL}${data.image_url}`;
-        // Mettre à jour l'état de l'URL de l'image de profil
-        setUserImage(imageUrl);
-      } else {
-        console.log(
-          "Une erreur s'est produite lors de la récupération de l'URL de l'image de profil."
-        );
-      }
+      const data = response.data;
+      const imageUrl = `${BASIC_URL}${data.image_url}`;
+      setUserImage(imageUrl);
     } catch (error) {
       console.log(
         "Une erreur s'est produite lors de la récupération de l'URL de l'image de profil.",
