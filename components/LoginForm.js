@@ -39,7 +39,7 @@ const LoginForm = ({ handleCloseLoginForm }) => {
         setResponseMessage(`Statut de réponse inattendu: ${response.status}`);
       }
     } catch (error) {
-      setResponseMessage(error?.response?.data?.error);
+      setResponseMessage(`status:${error?.response?.data?.error}`);
     } finally {
       setLoading(false);
     }
