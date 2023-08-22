@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Box, Button, TextField, Text, IconButton } from "gestalt";
 import Link from "next/link";
 import axios from "axios";
-import { LOGIN_URL } from "@/configs/api";
+import { LOGIN_URL } from "../configs/api";
 import { useRouter } from "next/router";
 import { useAppContext } from "../context/AppContext";
 
