@@ -38,15 +38,15 @@ const Navbar = () => {
   const modalStyle = {
     zIndex: 9999, // Valeur de zIndex de votre choix
   };
-  const [buttonSize, setButtonSize] = useState("lg"); // Taille par défaut pour le serveur
+  const [buttonSize, setButtonSize] = useState("lg");
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       // Exécution côté client uniquement
-      setButtonSize(getButtonSize()); // Mettre à jour la taille initiale
+      setButtonSize(getButtonSize());
 
       function handleResize() {
-        setButtonSize(getButtonSize()); // Mettre à jour la taille lors du redimensionnement de l'écran
+        setButtonSize(getButtonSize());
       }
 
       window.addEventListener("resize", handleResize);
@@ -55,7 +55,7 @@ const Navbar = () => {
         window.removeEventListener("resize", handleResize);
       };
     }
-  }, []); // Tableau de dépendances vide pour exécuter useEffect une seule fois côté client
+  }, []);
 
   function getButtonSize() {
     const screenWidth = window.innerWidth;
@@ -108,7 +108,7 @@ const Navbar = () => {
           />
         </Box>
       </Box>
-      <Box display="flex">
+      <Box display="flex" width={230} justifyContent="between">
         <Button
           text="Se connecter"
           color="red"

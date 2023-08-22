@@ -3,56 +3,70 @@ import { useState, useEffect } from "react";
 import { Modal, Box, Button, Text } from "gestalt";
 import IconButton from "@/components/IconButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faWarning } from "@fortawesome/free-solid-svg-icons";
+import { faWarning, faAdd } from "@fortawesome/free-solid-svg-icons";
 import "@/app/globals.css";
 import Gallery from "@/components/Gallery";
 import About from "@/components/About";
 import styles from "../app/ProfilUser.module.css";
 import SideMenu from "@/components/SideMenu";
-import Navigation from "@/components/Nav1";
+import Navigation from "@/components/Navigation";
 import axios from "axios";
 import { API_URL, BASIC_URL } from "@/configs/api";
 import { useAppContext } from "@/context/AppContext";
-import Image from "next/image";
 import allowedRoutes from "@/components/allowedRoutes";
+import jwtDecode from "jwt-decode";
+import { SUBSCRIBE_URL, UNSUBSCRIBE_URL, USER_DETAILS } from "@/configs/api";
 
 const ProfileArtisteImages = ({}) => {
   const router = useRouter();
-  const suggestionId = router.query?.id;
-  const [artist, setArtist] = useState([]);
-  const [artistInfo, setArtistInfo] = useState({});
-  const [followersCount, setFollowersCount] = useState(0);
+  const id = router.query?.id;
   const [currentPage, setCurrentPage] = useState(1);
   const [showModal, setShowModal] = useState(false);
   const {
-    user,
     token,
     isAuthenticated,
     setUser,
     setToken,
     setIsAuthenticated,
-    posts,
-    isloading,
-    fetchPosts,
-    eventPosts,
-    userList,
-    setUserList,
-    userId,
+    userDetails,
+    setUserDetails,
   } = useAppContext();
   const [userImage, setUserImage] = useState("");
   const [userProfilImage, setUserProfilImage] = useState("");
-  const [updatePosts, setUpdatePosts] = useState(false);
   const [userIdentity, setUserIdentity] = useState(null);
   const [userProfile, setuserProfile] = useState(null);
-  const [loadingDotsCount, setLoadingDotsCount] = useState(1);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(null);
+
+  const fetchMyDetails = async () => {
+    try {
+      const response = await axios.get(USER_DETAILS, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.status === 200) {
+        const data = response.data;
+        setUserDetails(data.user_details);
+      } else {
+        // console.log(
+        //   "Erreur lors de la récupération des détails de l'utilisateur:",
+        //   response.data
+        // );
+      }
+    } catch (error) {
+      // console.log(
+      //   "Une erreur s'est produite lors de la récupération des détails de l'utilisateur:",
+      //   error
+      // );
+    }
+  };
 
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
-        if ((suggestionId, token)) {
+        if ((id, token)) {
           const response = await axios.get(
-            `${API_URL}/utilisateurs/users/${suggestionId}/`,
+            `${API_URL}/utilisateurs/users/${id}/`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -69,15 +83,23 @@ const ProfileArtisteImages = ({}) => {
           }
         }
       } catch (error) {
-        console.log(
-          "Une erreur s'est produite lors de la récupération du profil.",
-          error
-        );
+        // console.log(
+        //   "Une erreur s'est produite lors de la récupération du profil.",
+        //   error
+        // );
       }
     };
 
     fetchUserDetails();
-  }, [suggestionId, token]);
+  }, [id, token, userIdentity]);
+
+  const isUserFollowingCreator = (creatorId) => {
+    if (userDetails && userDetails?.subscribed_creators) {
+      return userDetails?.subscribed_creators.includes(creatorId);
+    }
+    return false;
+  };
+  const isUserSubscribed = isUserFollowingCreator(parseInt(id));
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -89,22 +111,32 @@ const ProfileArtisteImages = ({}) => {
     setUserIdentity(JSON.parse(storedUser));
     setToken(storedToken);
 
-    // Mettre à jour le statut d'authentification dans le contexte
     setIsAuthenticated(storedIsAuthenticated);
 
-    // Maintenant que le statut d'authentification est mis à jour dans le contexte,
-    // vous pouvez exécuter la vérification de l'authentification dans votre middleware
     if (!storedIsAuthenticated && !allowedRoutes.includes(router.pathname)) {
       router.push("/");
     }
+    try {
+      const tokenData = jwtDecode(storedToken);
+      const currentTime = Date.now() / 1000;
+
+      if (tokenData.exp < currentTime) {
+        // Token expiré
+        // Afficher un message de toast et rediriger vers la page d'accueil
+        // toast.error("Votre session a expiré. Veuillez vous reconnecter.");
+        router.push("/");
+      }
+    } catch (error) {
+      console.error("Erreur lors de la vérification du token :", error);
+    }
   }, [token]);
+
   useEffect(() => {
-    // Récupérer l'image de profil de l'utilisateur connecté
     const getUserImage = async () => {
       try {
         if (userIdentity && token) {
           const response = await axios.get(
-            `${API_URL}/utilisateurs/get_image_url/${userIdentity.id}/`,
+            `${API_URL}/utilisateurs/get_image_url/${userIdentity?.id}/`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -114,9 +146,7 @@ const ProfileArtisteImages = ({}) => {
 
           if (response.status === 200) {
             const data = response.data;
-            // Récupérer l'URL de l'image de profil de l'utilisateur connecté depuis la réponse
             const imageUrl = `${BASIC_URL}${data.image_url}`;
-            // Mettre à jour l'état de l'URL de l'image de profil
             setUserProfilImage(imageUrl);
           } else {
             console.log(
@@ -135,14 +165,13 @@ const ProfileArtisteImages = ({}) => {
     // Appeler la fonction pour récupérer l'image de profil lorsque le composant est monté
     getUserImage();
   }, [userIdentity, token]);
-  // console.log(userProfilImage);
+
   useEffect(() => {
-    // Récupérer l'image de profil de l'utilisateur connecté
     const getUserImage = async () => {
       try {
         if (userProfile && token) {
           const response = await axios.get(
-            `${API_URL}/utilisateurs/get_image_url/${userProfile.id}/`,
+            `${API_URL}/utilisateurs/get_image_url/${userProfile?.id}/`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -152,9 +181,7 @@ const ProfileArtisteImages = ({}) => {
 
           if (response.status === 200) {
             const data = response.data;
-            // Récupérer l'URL de l'image de profil de l'utilisateur connecté depuis la réponse
             const imageUrl = `${BASIC_URL}${data.image_url}`;
-            // Mettre à jour l'état de l'URL de l'image de profil
             setUserImage(imageUrl);
           } else {
             console.log(
@@ -175,17 +202,11 @@ const ProfileArtisteImages = ({}) => {
   }, [userProfile, token]);
 
   const openModal = () => {
-    setShowModal(true);
+    if (isSubscribed) {
+      setShowModal(true);
+    } else {
+    }
   };
-
-  const closeModal = () => {
-    setShowModal(false);
-  };
-
-  const handleTabChange = (tab) => {
-    setActiveTab(tab);
-  };
-  console.log("profil user", isAuthenticated);
   const formatFollowersCount = (followersCount) => {
     if (followersCount >= 1000000000) {
       return `${(followersCount / 1000000000).toFixed(1)}B`;
@@ -196,6 +217,35 @@ const ProfileArtisteImages = ({}) => {
     } else {
       return `${followersCount}`;
     }
+  };
+  const handleFollow = (id) => {
+    const isFollowing = isUserSubscribed;
+    const action = isFollowing ? "unsubscribe" : "subscribe";
+
+    const requestBody = {
+      creator: id,
+      subscriber: userIdentity?.id,
+    };
+
+    const apiUrl = action === "subscribe" ? SUBSCRIBE_URL : UNSUBSCRIBE_URL;
+
+    axios
+      .post(apiUrl, requestBody, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((response) => {
+        if (response.status === 200 || response.status === 201) {
+          fetchMyDetails();
+        } else {
+          throw new Error("Erreur lors de la requête");
+        }
+      })
+      .catch((error) => {
+        console.error("Erreur lors de l'abonnement/désabonnement :", error);
+      });
   };
 
   const [activeTab, setActiveTab] = useState("gallery");
@@ -221,10 +271,8 @@ const ProfileArtisteImages = ({}) => {
   const userInfo = {
     name: "",
     bio: `La biographie de ${userIdentity?.username} est temporairement indisponible et sera rétabli dans un bref délai. Veuillez nous excuser pour la gêne occasionnée.`,
-    // Add other properties as needed
   };
 
-  // Fonction pour diviser les photos en groupes de deux
   const splitPhotosIntoPairs = (photos) => {
     const pairs = [];
     const itemsPerPage = 6;
@@ -236,7 +284,6 @@ const ProfileArtisteImages = ({}) => {
     return pairs;
   };
 
-  // Diviser les photos en paires
   const photoPairs = splitPhotosIntoPairs(userPhotos);
   return (
     <>
@@ -279,17 +326,29 @@ const ProfileArtisteImages = ({}) => {
             </div>
           </div>
           <div className={`${styles.artistButtonContainer}`}>
-            <IconButton
-              icon={<FontAwesomeIcon icon={faWarning} />}
-              label="Se désabonner"
-              buttonColor="white"
-              textColor="red"
-              iconColor="red"
-              iconPosition="left"
-              borderColor="red"
-              border
-              onClick={openModal}
-            />
+            {userProfile?.is_creator && (
+              <IconButton
+                icon={
+                  <FontAwesomeIcon
+                    icon={isUserSubscribed ? faWarning : faAdd}
+                  />
+                }
+                label={isUserSubscribed ? "Se désabonner" : "S'abonner"}
+                buttonColor={isUserSubscribed ? "white" : "blue"}
+                textColor={isUserSubscribed ? "red" : "white"}
+                iconColor={isUserSubscribed ? "red" : "white"}
+                iconPosition="left"
+                borderColor={isUserSubscribed ? "red" : "blue"}
+                border
+                onClick={() => {
+                  if (isUserSubscribed) {
+                    setShowModal(true);
+                  } else {
+                    handleFollow(id);
+                  }
+                }}
+              />
+            )}
           </div>
           {showModal && (
             <Modal
@@ -304,8 +363,8 @@ const ProfileArtisteImages = ({}) => {
                       inline
                       color="red"
                       onClick={() => {
-                        // Placez ici le code à exécuter lorsque l'utilisateur confirme le désabonnement
-                        setShowModal(false); // Ferme la modal après la confirmation
+                        handleFollow(id);
+                        setShowModal(false);
                       }}
                     />
                   </Box>
@@ -338,7 +397,6 @@ const ProfileArtisteImages = ({}) => {
 
         <div
           style={{
-            // marginTop: "12px",
             backgroundColor: "white",
             padding: "12px",
             width: "435px",

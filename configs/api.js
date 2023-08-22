@@ -1,11 +1,11 @@
-// const BASE_URL = "http://localhost:8000";
-// export const BASIC_URL = "http://localhost:8000";
-// export const IMAGE_URL = `${BASE_URL}/media/user_images`;
-// export const API_URL = "http://localhost:8000/api";
-const BASE_URL = "https://web-production-abe3.up.railway.app";
-export const BASIC_URL = "https://web-production-abe3.up.railway.app";
+const BASE_URL = "http://localhost:8000";
+export const BASIC_URL = "http://localhost:8000";
 export const IMAGE_URL = `${BASE_URL}/media/user_images`;
-export const API_URL = "https://web-production-abe3.up.railway.app/api";
+export const API_URL = "http://localhost:8000/api";
+// const BASE_URL = "https://web-production-abe3.up.railway.app";
+// export const BASIC_URL = "https://web-production-abe3.up.railway.app";
+// export const IMAGE_URL = `${BASE_URL}/media/user_images`;
+// export const API_URL = "https://web-production-abe3.up.railway.app/api";
 
 export const LOGIN_URL = `${BASE_URL}/api/utilisateurs/login/`;
 export const USER_DETAILS_URL = `${BASE_URL}/api/utilisateurs/user-list/`;

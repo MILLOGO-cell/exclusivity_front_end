@@ -1,14 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  PageHeader,
-  Image,
-  Button,
-  Box,
-  Text,
-  Flex,
-  IconButton,
-  Modal,
-} from "gestalt";
+import { Image, Button, Box, Text, Flex, IconButton, Modal } from "gestalt";
 import Navbar from "@/components/Navbar";
 import "../app/globals.css";
 import Post from "@/components/Post";
@@ -17,24 +8,14 @@ import LoginForm from "@/components/LoginForm";
 import axios from "axios";
 import { POSTS_REQUEST } from "@/configs/api";
 import formatMomentText from "@/utils/utils";
-import { useAppContext } from "../context/AppContext";
-import { useRouter } from "next/router";
+
 const Home = () => {
   const [windowWidth, setWindowWidth] = useState(0);
   const [showRegisterForm, setShowRegisterForm] = useState(false);
   const [showLoginForm, setShowLoginForm] = useState(false);
   const [posts, setPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
-  const {
-    user,
-    setUser,
-    setToken,
-    token,
-    isAuthenticated,
-    setIsAuthenticated,
-    logout,
-  } = useAppContext();
+
   const handleOpenLoginForm = () => {
     setShowLoginForm(true);
   };
@@ -47,6 +28,7 @@ const Home = () => {
   const handleCloseRegisterForm = () => {
     setShowRegisterForm(false);
   };
+
   useEffect(() => {
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
@@ -61,7 +43,6 @@ const Home = () => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
-
   // Fonction pour déterminer la taille et la hauteur de la boîte en fonction de la largeur de l'écran
   const getBoxSize = () => {
     if (windowWidth < 600) {
@@ -91,45 +72,35 @@ const Home = () => {
     }
   };
   const modalStyle = {
-    zIndex: 9999, // Valeur de zIndex de votre choix
+    zIndex: 9999,
   };
   const boxSize = getBoxSize();
   const handleScrollToPublications = () => {
     window.scrollTo({
-      top: window.innerHeight, // Définir ici la position à laquelle vous souhaitez que la page défile
-      behavior: "smooth", // Ajoutez cette option pour un défilement en douceur
+      top: window.innerHeight,
+      behavior: "smooth",
     });
   };
+
   const fetchPosts = async () => {
     try {
-      // const headers = {
-      //   Authorization: `Bearer ${token}`, // Assurez-vous d'avoir le token approprié ici
-      // };
       const response = await axios.get(POSTS_REQUEST);
 
       if (!response.data || !Array.isArray(response.data)) {
         throw new Error("Invalid response from the server.");
       }
 
-      // Filter posts where is_public is true
       const publicPosts = response.data.filter((post) => post.is_public);
 
-      // Process each post in the response to extract comments data
       const processedPosts = publicPosts.map((post) => {
-        // Extract comments data from the response for each post
         const commentData = post.comments;
-        // Return an object that includes the original post data and the comments data
         return {
           ...post,
-          // commentData: post.comments,
         };
       });
 
       setPosts(processedPosts);
       setIsLoading(false);
-      // if (processedPosts.length > 0) {
-      //   setCommentData(processedPosts[0].commentData);
-      // }
     } catch (error) {
       console.error(error);
       setIsLoading(false);
@@ -137,15 +108,11 @@ const Home = () => {
   };
 
   useEffect(() => {
-    fetchPosts(); // Appel de la fonction fetchPosts au chargement de la page
+    fetchPosts();
   }, []);
 
   return (
-    <Box
-      // borderStyle="sm"
-      // width={windowWidth < 768 ? "100%" : "1024px"}
-      justifyContent="center"
-    >
+    <Box justifyContent="center">
       <Navbar />
       <Box
         display="flex"

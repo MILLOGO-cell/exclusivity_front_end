@@ -1,5 +1,5 @@
 import React from "react";
-import Navigation from "@/components/Nav1";
+import Navigation from "@/components/Navigation";
 import EventPage from "./EventPage"; // Importez le composant EventPage
 import ExplorerPage from "./ExplorerPage"; // Importez le composant ExplorerPage
 

@@ -4,6 +4,7 @@ import axios from "axios";
 import { REQUEST_PASSWORD_RESET } from "@/configs/api";
 import { useRouter } from "next/router";
 import "@/app/globals.css";
+import Navbar from "@/components/Navbar";
 
 const ResetPasswordPage = () => {
   const [email, setEmail] = useState("");
@@ -24,11 +25,12 @@ const ResetPasswordPage = () => {
         setWaitingTime((prevTime) => prevTime - 1);
       }, 1000);
     } else {
-      setCanResend(true); // Enable the resend button when waiting time is over
+      setCanResend(true);
     }
 
     return () => clearInterval(interval);
   }, [waitingTime]);
+
   const resetFormValues = () => {
     setSuccessMessage("");
     setErrorMessage("");
@@ -36,10 +38,10 @@ const ResetPasswordPage = () => {
     setEmailConfirmed(false);
     setWaitingTime(0);
   };
+
   const handleResetPassword = async () => {
     resetFormValues();
     if (email.trim() === "") {
-      // Check if email is empty or contains only whitespace characters
       setErrorMessage("Veuillez entrer une adresse e-mail valide.");
       return;
     }
@@ -54,7 +56,6 @@ const ResetPasswordPage = () => {
           "Un e-mail de réinitialisation de mot de passe a été envoyé."
         );
         setEmailSent(true);
-        // router.push("/change_password");
         setWaitingTime(60);
         setCanResend(false);
       } else {
@@ -72,81 +73,78 @@ const ResetPasswordPage = () => {
   };
 
   useEffect(() => {
-    // If the email is sent successfully and confirmed, redirect after a delay
     if (emailSent && emailConfirmed) {
       const timer = setTimeout(() => {
         router.push("/change_password");
-      }, 3000); // Redirect after 3 seconds (adjust the time as needed)
+      }, 3000);
 
       return () => clearTimeout(timer);
     }
   }, [emailSent, emailConfirmed, router]);
+
   return (
-    <Box
-      display="flex"
-      alignItems="center"
-      justifyContent="center"
-      height="100vh"
-    >
+    <>
+      {/* <Navbar /> */}
       <Box
-        // smFlexDirection="column"
-        smMargin="auto"
-        // flexGrow={1}
-        // smMaxWidth="500px"
-        padding={4}
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        height="100vh"
       >
-        <Text align="center" weight="bold" size="600">
-          Réinitialiser le mot de passe
-        </Text>
-        <Box marginTop={12}>
-          <TextField
-            id="email"
-            type="email"
-            placeholder="Adresse e-mail"
-            value={email}
-            onChange={({ value }) => setEmail(value)}
-          />
-        </Box>
-        <Box marginTop={3}>
-          <Button
-            text={loading ? "Envoi en cours..." : "Envoyer"}
-            color="red"
-            fullWidth
-            onClick={handleResetPassword}
-          />
-        </Box>
-        {errorMessage && (
-          <Box marginTop={3}>
-            <Text align="center" color="error">
-              {errorMessage}
-            </Text>
+        <Box smMargin="auto" padding={4}>
+          <Text align="center" weight="bold" size="600">
+            Réinitialiser le mot de passe
+          </Text>
+          <Box marginTop={12}>
+            <TextField
+              id="email"
+              type="email"
+              placeholder="Adresse e-mail"
+              value={email}
+              onChange={({ value }) => setEmail(value)}
+            />
           </Box>
-        )}
-        {successMessage && !emailConfirmed && (
           <Box marginTop={3}>
-            <Text align="center" color="success">
-              {successMessage}
-            </Text>
-            <Box marginTop={2}>
-              <Button
-                text="J'ai reçu l'e-mail"
-                color="blue"
-                fullWidth
-                onClick={handleConfirmEmail}
-              />
+            <Button
+              text={loading ? "Envoi en cours..." : "Envoyer"}
+              color="red"
+              fullWidth
+              onClick={handleResetPassword}
+            />
+          </Box>
+          {errorMessage && (
+            <Box marginTop={3}>
+              <Text align="center" color="error">
+                {errorMessage}
+              </Text>
             </Box>
-          </Box>
-        )}
-        {waitingTime > 0 && (
-          <Box marginTop={3}>
-            <Text align="center">
-              Veuillez patienter {waitingTime} seconde(s) avant de pouvoir
-              renvoyer un nouveau code.
-            </Text>
-          </Box>
-        )}
+          )}
+          {successMessage && !emailConfirmed && (
+            <Box marginTop={3}>
+              <Text align="center" color="success">
+                {successMessage}
+              </Text>
+              <Box marginTop={2}>
+                <Button
+                  text="J'ai reçu l'e-mail"
+                  color="blue"
+                  fullWidth
+                  onClick={handleConfirmEmail}
+                />
+              </Box>
+            </Box>
+          )}
+          {waitingTime > 0 && (
+            <Box marginTop={3}>
+              <Text align="center">
+                Veuillez patienter {waitingTime} seconde(s) avant de pouvoir
+                renvoyer un nouveau code.
+              </Text>
+            </Box>
+          )}
+        </Box>
       </Box>
-    </Box>
+    </>
   );
 };
 

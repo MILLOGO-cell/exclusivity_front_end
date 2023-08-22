@@ -22,12 +22,10 @@ const RegisterForm = ({ handleCloseRegisterForm, showCloseButton }) => {
       return;
     }
     if (password !== confirmPassword) {
-      // console.error("Les mots de passe ne correspondent pas");
       setErrorMessage("Les mots de passe ne correspondent pas");
       return;
     }
     if (password.length < 8) {
-      // console.error("Le mot de passe doit contenir au moins 8 caractères");
       setErrorMessage("Le mot de passe doit contenir au moins 8 caractères");
       return;
     }
@@ -42,30 +40,25 @@ const RegisterForm = ({ handleCloseRegisterForm, showCloseButton }) => {
       if (response.status === 201) {
         setShowSuccessMessage(true);
       } else {
-        console.error("Erreur lors de la création du compte");
         setErrorMessage("Erreur lors de la création du compte");
       }
     } catch (error) {
-      // Gérer les erreurs d'Axios ou autres erreurs liées à la requête
       if (error.response) {
-        // Le serveur a répondu avec un code d'état différent de 2xx
         if (error.response.status === 400) {
           if (error.response.data.email) {
-            // Afficher le message d'erreur lié au champ "email" renvoyé par le backend
             setErrorMessage(error.response.data.email[0]);
           } else {
-            // Afficher le message d'erreur général renvoyé par le backend
             setErrorMessage(error.response.data.message);
           }
         } else {
-          console.error("Erreur de serveur :", error.response.data);
+          setResponseMessage(`Erreur de serveur : ${error.response.data}`);
         }
       } else if (error.request) {
-        // La requête a été faite mais il n'y a pas de réponse du serveur
-        console.error("Pas de réponse du serveur :", error.request);
+        setResponseMessage(`Pas de réponse du serveur : ${error.request}`);
       } else {
-        // Une erreur s'est produite lors de la configuration de la requête
-        console.error("Erreur de configuration de la requête :", error.message);
+        setResponseMessage(
+          `Erreur de configuration de la requête : ${error.message}`
+        );
       }
     } finally {
       setLoading(false);
@@ -74,7 +67,7 @@ const RegisterForm = ({ handleCloseRegisterForm, showCloseButton }) => {
 
   const formStyle = {
     position: "relative",
-    zIndex: 9999, // Valeur de zIndex de votre choix
+    zIndex: 9999,
   };
 
   const closeButtonStyle = {
@@ -149,12 +142,6 @@ const RegisterForm = ({ handleCloseRegisterForm, showCloseButton }) => {
             onClick={handleSubmit}
           />
         </Box>
-        {/* <Text align="center">
-          Déjà membre ?{" "}
-          <a href="#" className="link-style" onClick={handleOpenLoginForm}>
-            Se connecter
-          </a>
-        </Text> */}
         {errorMessage && (
           <Box
             display="flex"

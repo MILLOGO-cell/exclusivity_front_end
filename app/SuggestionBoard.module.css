@@ -84,3 +84,10 @@
   width: 120px;
   flex-wrap: wrap;
 }
+
+.pagination {
+  height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}

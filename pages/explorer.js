@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import "@/app/globals.css";
 import styles from "../app/pages.module.css";
-import Navigation from "@/components/Nav1";
+import Navigation from "@/components/Navigation";
 import CreatePost from "@/components/CreatePost";
 import { useAppContext } from "@/context/AppContext";
 import EventBoard from "@/components/EventBoard";
@@ -34,6 +34,7 @@ const Explorer = () => {
   const [loadingDotsCount, setLoadingDotsCount] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  // console.log(userIdentity);
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     const storedToken = localStorage.getItem("token");
@@ -117,6 +118,7 @@ const Explorer = () => {
           eventDate={post.date}
           eventTime={post.time}
           eventLocation={post.location}
+          id={post.author_get?.id}
           username={post.author_get.username}
           moment={new Date(post.created_at)}
           postText={post.content}

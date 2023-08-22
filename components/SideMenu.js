@@ -5,9 +5,9 @@ import {
   Button,
   Modal,
   TextField,
-  Column,
   TextArea,
   Spinner,
+  Toast,
 } from "gestalt";
 import "@/app/globals.css";
 import IconButton from "./IconButton";
@@ -18,7 +18,8 @@ import { useAppContext } from "../context/AppContext";
 import { useRouter } from "next/router";
 import { EVENT_POST, API_URL } from "@/configs/api";
 import axios from "axios";
-import Image from "next/image";
+import allowedRoutes from "./allowedRoutes";
+import jwtDecode from "jwt-decode";
 
 const SideMenu = ({ username, fansCount, userPhoto }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -26,22 +27,20 @@ const SideMenu = ({ username, fansCount, userPhoto }) => {
   const [selectedMedia, setSelectedMedia] = useState(null);
   const inputFileRef = useRef(null);
   const router = useRouter();
+  const [modalErrorMessage, setModalErrorMessage] = useState("");
   const {
-    user,
     setUser,
     setToken,
     token,
-    isAuthenticated,
     setIsAuthenticated,
     fetchEventPosts,
     updateEventPosts,
     eventPosts,
-    setPosts,
-    setEventPosts,
     logout,
   } = useAppContext();
+
   const [userIdentity, setUserIdentity] = useState(null);
-  // console.log(user);
+
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     const storedToken = localStorage.getItem("token");
@@ -51,41 +50,52 @@ const SideMenu = ({ username, fansCount, userPhoto }) => {
     setToken(storedToken);
     setUserIdentity(JSON.parse(storedUser));
     setToken(storedToken);
-
-    // Mettre à jour le statut d'authentification dans le contexte
     setIsAuthenticated(storedIsAuthenticated);
 
-    // Maintenant que le statut d'authentification est mis à jour dans le contexte,
-    // vous pouvez exécuter la vérification de l'authentification dans votre middleware
     if (!storedIsAuthenticated && !allowedRoutes.includes(router.pathname)) {
       router.push("/");
     }
+    try {
+      const tokenData = jwtDecode(storedToken);
+      const currentTime = Date.now() / 1000;
+
+      if (tokenData.exp < currentTime) {
+        // Token expiré
+        // Afficher un message de toast et rediriger vers la page d'accueil
+        // toast.error("Votre session a expiré. Veuillez vous reconnecter.");
+        router.push("/");
+      }
+    } catch (error) {
+      // console.error("Erreur lors de la vérification du token :", error);
+    }
   }, [token]);
+
   const [eventData, setEventData] = useState({
     title: "",
     date: "",
     time: "",
     location: "",
     description: "",
-    media: "", // You can store the selected media URL here
+    media: "",
   });
+
   const handleOpenFileSelector = () => {
     inputFileRef.current.click();
   };
+
   const handleLogout = () => {
     router.push("/");
     logout();
-    console.log(isAuthenticated, token, user);
   };
+
   const handleMediaChange = (event) => {
     const file = event.target.files[0];
     if (file) {
-      // Mettez en œuvre ici la logique pour afficher l'aperçu du média sélectionné
       setSelectedMedia(file);
     }
   };
+
   useEffect(() => {
-    // Mettre à jour la date et l'heure actuelles comme placeholder lorsque le composant est monté
     const currentDate = new Date().toISOString().split("T")[0];
     const currentTime = new Date().toLocaleTimeString([], {
       hour: "2-digit",
@@ -97,7 +107,7 @@ const SideMenu = ({ username, fansCount, userPhoto }) => {
       date: currentDate,
       time: currentTime,
     }));
-  }, []); // Utiliser un tableau vide pour exécuter cette mise à jour une seule fois lors du montage
+  }, []);
 
   const handleModalClose = () => {
     setIsModalOpen(false);
@@ -115,10 +125,20 @@ const SideMenu = ({ username, fansCount, userPhoto }) => {
   };
 
   const createEvent = async () => {
+    if (
+      !eventData.title ||
+      !eventData.date ||
+      !eventData.time ||
+      !eventData.location ||
+      !eventData.description ||
+      !selectedMedia
+    ) {
+      setModalErrorMessage("Veuillez remplir tous les champs du formulaire !");
+      return;
+    }
     setIsLoading(true);
     try {
       if (!token) {
-        console.error("Utilisateur non authentifié.");
         return;
       }
 
@@ -128,20 +148,17 @@ const SideMenu = ({ username, fansCount, userPhoto }) => {
         },
       };
 
-      // Créer un objet FormData pour envoyer les données de l'événement, y compris le média sélectionné
       const formData = new FormData();
       formData.append("title", eventData.title);
       formData.append("date", eventData.date);
       formData.append("time", eventData.time);
       formData.append("location", eventData.location);
       formData.append("content", eventData.description);
-      formData.append("media", selectedMedia); // Ajouter le média sélectionné ici
+      formData.append("media", selectedMedia);
 
-      // Envoyer la requête POST avec les données de l'événement
       const response = await axios.post(EVENT_POST, formData, config);
-      // Récupérer les informations du nouvel événement depuis la réponse du serveur
       const newEvent = response.data;
-      // Réinitialiser l'état des données de l'événement et du média après la création réussie de l'événement
+
       setEventData({
         title: "",
         date: "",
@@ -152,13 +169,11 @@ const SideMenu = ({ username, fansCount, userPhoto }) => {
       });
       setSelectedMedia(null);
 
-      // Fermer le modal après la création réussie de l'événement
       setIsModalOpen(false);
       updateEventPosts([...eventPosts, newEvent]);
-      // Mise à jour des publications d'événements
       fetchEventPosts();
     } catch (error) {
-      console.error("Erreur lors de la création de l'événement :", error);
+      // console.error("Erreur lors de la création de l'événement :", error);
     } finally {
       setIsLoading(false);
     }
@@ -167,7 +182,7 @@ const SideMenu = ({ username, fansCount, userPhoto }) => {
   const handlePublishEvent = () => {
     createEvent();
   };
-  // console.log(userIdentity?.is_creator);
+
   return (
     <Box padding={4} width={250} rounding={5} color="default">
       <Box marginBottom={4} display="flex" alignItems="center">
@@ -204,9 +219,9 @@ const SideMenu = ({ username, fansCount, userPhoto }) => {
       {isModalOpen && (
         <Modal
           accessibilityCloseLabel="Fermer"
-          accessibilityModalLabel="Créer un événement"
-          heading="Créer un événement"
-          size="sm"
+          accessibilityModalLabel="Créer un évènement"
+          heading="Créer un évènement"
+          size={400}
           onDismiss={handleModalClose}
           footer={
             <Box display="flex" justifyContent="end">
@@ -220,28 +235,41 @@ const SideMenu = ({ username, fansCount, userPhoto }) => {
         >
           {!isLoading ? (
             <>
-              <Box marginTop={4} marginBottom={4}>
-                {/* Media preview */}
+              {modalErrorMessage && (
+                <p
+                  style={{
+                    color: "red",
+                    display: "flex",
+                    textAlign: "center",
+                    justifyContent: "center",
+                    paddingBottom: "2px",
+                    fontSize: 18,
+                  }}
+                >
+                  {modalErrorMessage}
+                </p>
+              )}
+              <Box justifyContent="center" alignItems="center" display="flex">
                 <div
                   style={{
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     height: "150px",
+                    width: "350px",
                     border: "1px dashed #000",
-                    marginBottom: "2px",
                     cursor: "pointer",
                     position: "relative",
                   }}
                   onClick={handleOpenFileSelector}
                 >
                   {selectedMedia ? (
-                    <Image
-                      src={URL.createObjectURL(selectedMedia)} // Utilisez l'URL.createObjectURL pour afficher l'aperçu de l'image
+                    <img
+                      src={URL.createObjectURL(selectedMedia)}
                       alt="Media Preview"
-                      style={{ maxWidth: "100%", maxHeight: "100%" }}
-                      width={100}
-                      height={500}
+                      style={{ maxWidth: "400px", maxHeight: "100%" }}
+                      width="100%"
+                      height="100%"
                     />
                   ) : (
                     <div>
@@ -249,12 +277,13 @@ const SideMenu = ({ username, fansCount, userPhoto }) => {
                     </div>
                   )}
                 </div>
+
                 {/* Sélecteur de fichiers caché */}
                 <input
                   type="file"
                   ref={inputFileRef}
                   style={{ display: "none" }}
-                  accept="image/*, video/*" // Acceptez à la fois les images et les vidéos
+                  accept="image/*, video/*"
                   onChange={handleMediaChange}
                 />
               </Box>
@@ -281,7 +310,7 @@ const SideMenu = ({ username, fansCount, userPhoto }) => {
                       value={eventData.date}
                     />
                   </Box>
-                  <Box marginL={4}>
+                  <Box>
                     <TextField
                       id="eventTime"
                       name="eventTime"

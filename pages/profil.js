@@ -11,7 +11,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faSignOut, faUser } from "@fortawesome/free-solid-svg-icons";
 import "@/app/globals.css";
-import Navigation from "@/components/Nav1";
+import Navigation from "@/components/Navigation";
 import { useAppContext } from "../context/AppContext";
 import {
   UPDATE_USER,

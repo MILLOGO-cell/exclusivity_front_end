@@ -5,10 +5,11 @@ import formatMomentText from "../utils/utils";
 import { API_URL, BASIC_URL } from "@/configs/api";
 import axios from "axios";
 import { useAppContext } from "@/context/AppContext";
-import Image from "next/image";
+import Link from "next/link";
 
 const PostView = ({
   profilePhoto,
+  id,
   username,
   moment,
   postText,
@@ -39,16 +40,7 @@ const PostView = ({
   const [isVisible, setIsVisible] = useState(false);
   const isEvent = !!eventTitle;
   const [likedUsers, setLikedUsers] = useState([]);
-  const {
-    user,
-    token,
-    isAuthenticated,
-    setUser,
-    setToken,
-    setIsAuthenticated,
-    fetchPosts,
-    fetchEventPosts,
-  } = useAppContext();
+  const { token, setToken, fetchPosts, fetchEventPosts } = useAppContext();
   const [userIdentity, setUserIdentity] = useState(null);
 
   useEffect(() => {
@@ -79,16 +71,12 @@ const PostView = ({
           config
         );
 
-        // Extraire les ID des utilisateurs qui ont liké le poste
         const likedUserIds = response.data.map((like) => like.user);
-        // console.log(likedUserIds);
-        // Mettre à jour l'état des utilisateurs qui ont liké le poste
         setLikedUsers(likedUserIds);
 
-        // Vérifier si l'utilisateur actuellement connecté a déjà liké le poste
         setLiked(likedUserIds.includes(userIdentity?.username));
       } catch (error) {
-        console.error("Erreur lors de la récupération des likes :", error);
+        // console.error("Erreur lors de la récupération des likes :", error);
       }
     };
 
@@ -114,13 +102,9 @@ const PostView = ({
         config
       );
 
-      // Extraire les ID des utilisateurs qui ont liké le poste
       const likedUserIds = response.data.map((like) => like.user);
-      // console.log(likedUserIds);
-      // Mettre à jour l'état des utilisateurs qui ont liké le poste
       setLikedUsers(likedUserIds);
 
-      // Vérifier si l'utilisateur actuellement connecté a déjà liké le poste
       setLiked(likedUserIds.includes(userIdentity.username));
     } catch (error) {
       console.error("Erreur lors de la récupération des likes :", error);
@@ -128,7 +112,6 @@ const PostView = ({
   };
 
   useEffect(() => {
-    // Fonction pour récupérer les commentaires et les réponses associées au poste
     const fetchPostDetails = async () => {
       try {
         if (!token) {
@@ -145,14 +128,8 @@ const PostView = ({
           `${API_URL}/postes/posts/${postId}/comments`,
           config
         );
-        // console.log(response.data);
-        // Extraire les données des commentaires et des réponses de la réponse
         const commentsWithRepliesData = response.data.comments;
-        // Mettre à jour l'état des commentaires et des réponses
         setComments(commentsWithRepliesData);
-        // console.log("--", comments);
-
-        // ... autres mises à jour de l'état comme les likes, etc.
       } catch (error) {
         console.error(
           "Erreur lors de la récupération des détails du poste :",
@@ -169,6 +146,7 @@ const PostView = ({
       setAreRepliesLoaded(true);
     }
   }, [isVisible, areRepliesLoaded]);
+
   const handleLike = async () => {
     try {
       if (!token) {
@@ -196,10 +174,8 @@ const PostView = ({
       );
 
       if (response.status === 201 || response.status === 200) {
-        // Mettre à jour l'état du like dans le frontend
         setLiked(!liked);
 
-        // Mettre à jour la liste des utilisateurs aimés
         if (!liked) {
           setLikedUsers((prevLikedUsers) => [
             ...prevLikedUsers,
@@ -211,10 +187,7 @@ const PostView = ({
           );
         }
 
-        // Actualiser les données si nécessaire
         Refresh();
-
-        // console.log("Opération de like/dislike réussie!");
       } else {
         console.error("La requête de like/dislike a échoué.");
       }
@@ -301,24 +274,32 @@ const PostView = ({
   const rootComments = commentData?.filter(
     (comment) => comment.parent_comment === null
   );
+  // console.log(userIdentity);
   return (
     <div className={styles.postViewContainer}>
-      <div className={styles.userInfo}>
-        <img
-          src={profilePhoto}
-          alt="Photo de profil"
-          className={styles.profilePhoto}
-          width={40}
-          height={40}
-        />
-        <div className={styles.usernameMoment}>
-          <span className={styles.username}>{username}</span>
-          <span className={styles.separator}>|</span>
-          <span className={styles.moment}>
-            il y&apos;a {formatMomentText(moment)}
-          </span>
+      <Link
+        href={
+          id === userIdentity?.id ? "/profil" : `/profil_utilisateur?id=${id}`
+        }
+        passHref
+      >
+        <div className={styles.userInfo}>
+          <img
+            src={profilePhoto}
+            alt="Photo de profil"
+            className={styles.profilePhoto}
+            width={40}
+            height={40}
+          />
+          <div className={styles.usernameMoment}>
+            <span className={styles.username}>{username}</span>
+            <span className={styles.separator}>|</span>
+            <span className={styles.moment}>
+              il y&apos;a {formatMomentText(moment)}
+            </span>
+          </div>
         </div>
-      </div>
+      </Link>
       <div className={styles.postInfo}>
         {isEvent && (
           <div className={styles.eventInfo}>
@@ -476,21 +457,13 @@ const Comment = ({ commentData, token, userIdentity, postId, level = 0 }) => {
   const [showReplyInput, setShowReplyInput] = useState(false);
   const [replyText, setReplyText] = useState("");
   const [liked, setLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(commentData.likeCount);
   const [commentCount, setCommentCount] = useState(commentData?.comment_count);
   const [showReplies, setShowReplies] = useState(false);
   const [visibleReplies, setVisibleReplies] = useState(3);
   const [isVisible, setIsVisible] = useState(false);
-  const [areRepliesLoadedMap, setAreRepliesLoadedMap] = useState({});
   const commentRef = useRef(null);
   const { fetchPosts, fetchEventPosts } = useAppContext();
   const [likedUsers, setLikedUsers] = useState([]);
-  // const handleLike = () => {
-  //   setLiked((prevLiked) => !prevLiked);
-  //   setLikeCount((prevLikeCount) =>
-  //     liked ? prevLikeCount - 1 : prevLikeCount + 1
-  //   );
-  // };
 
   const Refresh = async () => {
     try {
@@ -508,12 +481,8 @@ const Comment = ({ commentData, token, userIdentity, postId, level = 0 }) => {
         `${API_URL}/postes/postes/comment/${commentData?.id}/likes/`,
         config
       );
-      // Extraire les ID des utilisateurs qui ont liké le commentaire
       const likedUserIds = response.data.map((like) => like.user);
-      // console.log(likedUserIds);
-      // Mettre à jour l'état des utilisateurs qui ont liké le commentaire
       setLikedUsers(likedUserIds);
-      // Vérifier si l'utilisateur actuellement connecté a déjà liké le commentaire
       setLiked(likedUserIds.includes(userIdentity.username));
     } catch (error) {
       console.error("Erreur lors de la récupération des likes :", error);
@@ -571,6 +540,7 @@ const Comment = ({ commentData, token, userIdentity, postId, level = 0 }) => {
       console.error("Erreur lors de la requête de like/dislike :", error);
     }
   };
+
   useEffect(() => {
     const options = {
       root: null,
@@ -583,12 +553,10 @@ const Comment = ({ commentData, token, userIdentity, postId, level = 0 }) => {
       setIsVisible(entry.isIntersecting);
     }, options);
 
-    // Commencez à observer le commentaire
     if (commentRef.current) {
       observer.observe(commentRef.current);
     }
 
-    // Nettoyez l'observer lorsque le composant est démonté
     return () => {
       if (commentRef.current) {
         observer.unobserve(commentRef.current);
@@ -596,9 +564,7 @@ const Comment = ({ commentData, token, userIdentity, postId, level = 0 }) => {
     };
   }, [commentRef, setIsVisible]);
 
-  // Fonction pour charger plus de réponses
   const handleLoadMoreReplies = () => {
-    // Augmenter le nombre de réponses visibles
     setVisibleReplies((prevVisibleReplies) => prevVisibleReplies + 3);
   };
 
@@ -649,6 +615,7 @@ const Comment = ({ commentData, token, userIdentity, postId, level = 0 }) => {
       console.error("Erreur lors de l'envoi du commentaire :", error);
     }
   };
+
   return (
     <div className={styles.comment} ref={commentRef}>
       <Box marginLeft={`${level * 30}px`}>
@@ -659,22 +626,31 @@ const Comment = ({ commentData, token, userIdentity, postId, level = 0 }) => {
             justifyContent: "space-between",
           }}
         >
-          <div style={{ display: "flex", justifyContent: "center" }}>
-            <img
-              src={
-                commentData?.user_details?.image.startsWith("http")
-                  ? commentData?.user_details?.image
-                  : `${BASIC_URL}${commentData?.user_details?.image}`
-              }
-              alt="Photo"
-              className={styles.commentProfilePhoto}
-              width={32}
-              height={32}
-            />
-            <span className={styles.commentUsername}>
-              {commentData?.user_details?.username}
-            </span>
-          </div>
+          <Link
+            href={
+              commentData?.user_details?.id === userIdentity?.id
+                ? "/profil"
+                : `/profil_utilisateur?id=${commentData?.user_details?.id}`
+            }
+            passHref
+          >
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <img
+                src={
+                  commentData?.user_details?.image.startsWith("http")
+                    ? commentData?.user_details?.image
+                    : `${BASIC_URL}${commentData?.user_details?.image}`
+                }
+                alt="Photo"
+                className={styles.commentProfilePhoto}
+                width={32}
+                height={32}
+              />
+              <span className={styles.commentUsername}>
+                {commentData?.user_details?.username}
+              </span>
+            </div>
+          </Link>
           <span className={styles.commentMoment}>
             {formatMomentText(new Date(commentData?.created_at))}
           </span>

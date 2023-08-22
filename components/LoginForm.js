@@ -11,14 +11,7 @@ const LoginForm = ({ handleCloseLoginForm }) => {
   const [password, setPassword] = useState("");
   const [responseMessage, setResponseMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const {
-    setUser,
-    setToken,
-    user,
-    token,
-    setIsAuthenticated,
-    isAuthenticated,
-  } = useAppContext();
+  const { setUser, setToken, setIsAuthenticated } = useAppContext();
   const router = useRouter();
 
   const handleSubmit = async () => {
@@ -38,19 +31,14 @@ const LoginForm = ({ handleCloseLoginForm }) => {
         setUser(response.data.user);
         setToken(response.data.access);
         setIsAuthenticated(true);
-        // Stocker les données dans le localStorage après la connexion réussie
         localStorage.setItem("user", JSON.stringify(response.data.user));
         localStorage.setItem("token", response.data.access);
         localStorage.setItem("isAuthenticated", true);
-
-        // Rediriger vers la page "Explorer" ici si nécessaire
         router.push("/explorer");
       } else {
-        console.log("Statut de réponse inattendu:", response.status);
-        // Traiter l'erreur ici si nécessaire
+        setResponseMessage(`Statut de réponse inattendu: ${response.status}`);
       }
     } catch (error) {
-      console.error("Erreur de connexion:", error?.response?.data?.error);
       setResponseMessage(error?.response?.data?.error);
     } finally {
       setLoading(false);
@@ -59,7 +47,7 @@ const LoginForm = ({ handleCloseLoginForm }) => {
 
   const formStyle = {
     position: "relative",
-    zIndex: 9999, // Valeur de zIndex de votre choix
+    zIndex: 9999,
   };
 
   const closeButtonStyle = {

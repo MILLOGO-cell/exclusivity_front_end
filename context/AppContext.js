@@ -20,7 +20,7 @@ export function AppProvider({ children }) {
   const [error, setError] = useState(null);
   const [userList, setUserList] = useState([]);
   const [userId, setUserId] = useState(null);
-
+  const [userDetails, setUserDetails] = useState("");
   const fetchPosts = async () => {
     setIsLoading(true);
     try {
@@ -135,7 +135,6 @@ export function AppProvider({ children }) {
     clearContext();
   };
 
-  // Fonction pour réinitialiser complètement le contexte à ses valeurs initiales
   const clearContext = () => {
     setPosts([]);
     setEventPosts([]);
@@ -179,6 +178,8 @@ export function AppProvider({ children }) {
         fetchPosts,
         userId,
         setUserId,
+        userDetails,
+        setUserDetails,
       }}
     >
       {children}

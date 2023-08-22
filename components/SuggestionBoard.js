@@ -1,9 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Box, Button } from "gestalt";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAppContext } from "@/context/AppContext";
-import Image from "next/image";
-
 import {
   faPlus,
   faArrowRight,
@@ -14,7 +11,12 @@ import styles from "../app/SuggestionBoard.module.css";
 import IconButton from "./IconButton";
 import Link from "next/link";
 const ITEMS_PER_PAGE = 3;
-import { BASIC_URL, SUBSCRIBE_URL, UNSUBSCRIBE_URL } from "@/configs/api";
+import {
+  BASIC_URL,
+  SUBSCRIBE_URL,
+  UNSUBSCRIBE_URL,
+  USER_DETAILS,
+} from "@/configs/api";
 import axios from "axios";
 
 const SuggestionBoard = ({ suggestions }) => {
@@ -22,8 +24,39 @@ const SuggestionBoard = ({ suggestions }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
-  const { token, setUser, setToken, userId, setUserId } = useAppContext();
+  const { token, setUser, setToken, userDetails, setUserDetails } =
+    useAppContext();
   const [userIdentity, setUserIdentity] = useState(null);
+  // const [userDetails, setUserDetails] = useState(null);
+
+  const fetchUserDetails = async () => {
+    try {
+      const response = await axios.get(USER_DETAILS, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.status === 200) {
+        const data = response.data;
+        setUserDetails(data.user_details);
+      } else {
+        // console.log(
+        //   "Erreur lors de la récupération des détails de l'utilisateur:",
+        //   response.data
+        // );
+      }
+    } catch (error) {
+      // console.log(
+      //   "Une erreur s'est produite lors de la récupération des détails de l'utilisateur:",
+      //   error
+      // );
+    }
+  };
+  // console.log(userDetails);
+
+  useEffect(() => {
+    fetchUserDetails();
+  }, []);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -33,29 +66,24 @@ const SuggestionBoard = ({ suggestions }) => {
     setToken(storedToken);
   }, []);
 
-  // Utiliser le localStorage pour initialiser l'état local des abonnements
-  const [followingStates, setFollowingStates] = useState(
-    suggestions.reduce((map, suggestion) => {
-      const storedFollowingState = localStorage.getItem(
-        `followingState_${suggestion.id}`
-      );
-      map[suggestion.id] = storedFollowingState === "true";
-      return map;
-    }, {})
-  );
-  const displayedSuggestions = showAll
-    ? suggestions
-    : suggestions.slice(startIndex, endIndex);
-
-  const handleFollow = (suggestionId, isFollowing) => {
+  const isUserFollowingCreator = (creatorId) => {
+    if (userDetails && userDetails?.subscribed_creators) {
+      return userDetails?.subscribed_creators.includes(creatorId);
+    }
+    return false;
+  };
+  // console.log(userDetails.subscribed_creators);
+  const handleFollow = (suggestionId) => {
+    const isFollowing = isUserFollowingCreator(suggestionId);
     const action = isFollowing ? "unsubscribe" : "subscribe";
+
     const requestBody = {
       creator: suggestionId,
       subscriber: userIdentity?.id,
     };
-    // Sélectionnez l'URL appropriée en fonction de l'action
+
     const apiUrl = action === "subscribe" ? SUBSCRIBE_URL : UNSUBSCRIBE_URL;
-    // Effectuez la requête appropriée pour abonner ou désabonner l'utilisateur
+
     axios
       .post(apiUrl, requestBody, {
         headers: {
@@ -64,21 +92,8 @@ const SuggestionBoard = ({ suggestions }) => {
         },
       })
       .then((response) => {
-        // Vérifiez la réponse de l'API ici
         if (response.status === 200 || response.status === 201) {
-          // Mettez à jour l'état de suivi ici en fonction de la réponse de l'API
-          setFollowingStates((prevStates) => {
-            const newFollowingStates = {
-              ...prevStates,
-              [suggestionId]: !prevStates[suggestionId],
-            };
-            // Sauvegarde de l'état d'abonnement dans le localStorage
-            localStorage.setItem(
-              `followingState_${suggestionId}`,
-              newFollowingStates[suggestionId]
-            );
-            return newFollowingStates;
-          });
+          fetchUserDetails();
         } else {
           throw new Error("Erreur lors de la requête");
         }
@@ -87,6 +102,9 @@ const SuggestionBoard = ({ suggestions }) => {
         console.error("Erreur lors de l'abonnement/désabonnement :", error);
       });
   };
+  const displayedSuggestions = showAll
+    ? suggestions
+    : suggestions.slice(startIndex, endIndex);
 
   const handleNextPage = () => {
     setCurrentPage((prevPage) => prevPage + 1);
@@ -100,17 +118,15 @@ const SuggestionBoard = ({ suggestions }) => {
       <h2 className={styles.suggestionBoardTitle}>Des suggestions</h2>
       <hr className={styles.suggestionBoardDivider} />
       {displayedSuggestions.map((suggestion, index) => {
+        const isUserSubscribed = isUserFollowingCreator(suggestion.id);
         return (
           <div key={index} className={styles.suggestionItemWrapper}>
             <Item
               photo={`${BASIC_URL}${suggestion.image}`}
               suggestionId={suggestion.id}
               username={suggestion.username}
-              following={followingStates[suggestion.id] || false}
-              onFollow={() =>
-                handleFollow(suggestion.id, followingStates[suggestion.id])
-              }
-              setUserId={setUserId}
+              isUserFollowing={isUserSubscribed}
+              onFollow={() => handleFollow(suggestion.id)}
             />
           </div>
         );
@@ -148,19 +164,11 @@ const SuggestionBoard = ({ suggestions }) => {
   );
 };
 
-const Item = ({
-  photo,
-  username,
-  suggestionId,
-  following,
-  onFollow,
-  setUserId,
-}) => {
+const Item = ({ photo, username, suggestionId, onFollow, isUserFollowing }) => {
   return (
     <div className={styles.suggestionItemContainer}>
       <div className={styles.blockUserInfo}>
         <Link href={`/profil_utilisateur?id=${suggestionId}`} passHref>
-          {/* <Link onClick={setUserId(suggestionId)} href={`/profil_utilisateur/ `}> */}
           <img
             src={photo ? photo : "../user1.png"}
             alt="Profile"
@@ -179,20 +187,20 @@ const Item = ({
       <div style={{ marginLeft: "20px" }}>
         <IconButton
           icon={
-            following ? (
+            isUserFollowing ? (
               <FontAwesomeIcon icon={faEye} />
             ) : (
               <FontAwesomeIcon icon={faPlus} />
             )
           }
-          label={following ? "Suivi" : "Suivre"}
-          buttonColor={following ? "blue" : "white"}
-          textColor={following ? "white" : "black"}
-          iconColor={following ? "white" : "blue"}
+          label={isUserFollowing ? "Suivi" : "Suivre"}
+          buttonColor={isUserFollowing ? "blue" : "white"}
+          textColor={isUserFollowing ? "white" : "black"}
+          iconColor={isUserFollowing ? "white" : "blue"}
           iconPosition="right"
           border
-          borderColor={following ? "blue" : "#ccc"}
-          onClick={() => onFollow(suggestionId, following)}
+          borderColor={isUserFollowing ? "blue" : "#ccc"}
+          onClick={() => onFollow()}
         />
       </div>
     </div>

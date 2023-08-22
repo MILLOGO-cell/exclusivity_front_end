@@ -46,3 +46,10 @@
   border: 1px solid #ccc;
   /* Ajoutez d'autres styles de bordure si nécessaire */
 }
+
+.pagination {
+  height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
