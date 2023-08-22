@@ -20,6 +20,7 @@ const LoginForm = ({ handleCloseLoginForm }) => {
       setResponseMessage("Veuillez remplir tous les champs du formulaire");
       return;
     }
+    console.log("first");
     setLoading(true);
     try {
       const response = await axios.post(LOGIN_URL, {
