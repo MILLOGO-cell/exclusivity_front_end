@@ -42,6 +42,7 @@ const LoginForm = ({ handleCloseLoginForm }) => {
       setResponseMessage(`status:${error?.response?.data?.error}`);
     } finally {
       setLoading(false);
+      console.log(response.status);
     }
   };
 
