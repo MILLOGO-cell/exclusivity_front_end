@@ -4,7 +4,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faSearch,
   faBars,
-  faTimes,
   faUser,
   faSignOut,
   faPlus,
@@ -24,19 +23,7 @@ import { useRouter } from "next/router";
 import { useAppContext } from "@/context/AppContext";
 import { API_URL, BASIC_URL } from "@/configs/api";
 import axios from "axios";
-import EventPage from "./EventPage";
 import Image from "next/image";
-
-const UserItem = ({ user }) => (
-  <div className={styles["user-item"]}>
-    <img
-      className={styles["user-item-img"]}
-      src={user.image ? `${BASIC_URL}${user.image}` : "../user1.png"}
-      alt={user.username}
-    />
-    <span className={styles["user-item-username"]}>{user.username}</span>
-  </div>
-);
 
 const Navigation = ({ onTabChange, userPhoto, user }) => {
   const [isSmallScreen, setIsSmallScreen] = useState(false);
@@ -52,6 +39,34 @@ const Navigation = ({ onTabChange, userPhoto, user }) => {
   const { token, logout, userList } = useAppContext();
   const [activeTab, setActiveTab] = useState(null);
 
+  const handleItemClick = (id) => {
+    if (user) {
+      router.push(`/profil_utilisateur?id=${id}`);
+    }
+  };
+
+  const imageStyle = {
+    width: "24px",
+    height: "24px",
+    borderRadius: "60px",
+    marginRight: 12,
+  };
+  const UserItem = ({ user }) => (
+    <div
+      className={styles["user-item"]}
+      onClick={() => handleItemClick(user?.id)}
+    >
+      <Image
+        style={imageStyle}
+        src={user.image ? `${BASIC_URL}${user.image}` : "/user1.png"}
+        alt={user.username}
+        width={24}
+        height={24}
+        unoptimized
+      />
+      <span className={styles["user-item-username"]}>{user.email}</span>
+    </div>
+  );
   const handleTabChange = (tabName) => {
     if (router.pathname !== "/explorer") {
       router.push(`/explorer?tab=${tabName}`);
@@ -80,10 +95,8 @@ const Navigation = ({ onTabChange, userPhoto, user }) => {
     handleResize();
     window.addEventListener("resize", handleResize);
 
-    // Initialisez activeTab en fonction du chemin d'accès de l'URL
-    setActiveTab(router.query.tab || "explorer"); // Définissez "explorer" si le chemin d'accès ne contient pas de tab
+    setActiveTab(router.query.tab || "explorer");
 
-    // Nettoyez l'écouteur d'événement lorsqu'il n'est plus nécessaire
     return () => {
       window.removeEventListener("resize", handleResize);
     };
@@ -230,7 +243,12 @@ const Navigation = ({ onTabChange, userPhoto, user }) => {
       document.removeEventListener("click", handleOutsideClick);
     };
   }, [showOverlayPanel]);
-
+  const imageUserStyle = {
+    width: "40px",
+    height: "40px",
+    borderRadius: "60px",
+    marginRight: 12,
+  };
   return (
     <>
       <nav
@@ -480,15 +498,13 @@ const Navigation = ({ onTabChange, userPhoto, user }) => {
                     cursor: "pointer",
                   }}
                 >
-                  <img
-                    style={{
-                      width: "40px",
-                      height: "40px",
-                      borderRadius: "60px",
-                      marginRight: 12,
-                    }}
+                  <Image
+                    style={imageUserStyle}
                     src={userPhoto}
                     alt="User Avatar"
+                    width={40}
+                    height={40}
+                    unoptimized
                   />
                   <span style={{ fontSize: 18, color: "white" }}>
                     {user?.username}
@@ -537,16 +553,19 @@ const Navigation = ({ onTabChange, userPhoto, user }) => {
                     />
                     Déconnexion
                   </div>
-                  <div
-                    className={`${styles["overlay-link-event"]} ${styles["link-new-event"]}`}
-                    onClick={handleModalOpen}
-                  >
-                    <FontAwesomeIcon
-                      icon={faPlus}
-                      className={styles["link-icon"]}
-                    />
-                    Nouvel événement
-                  </div>
+
+                  {user?.is_creator && (
+                    <div
+                      className={`${styles["overlay-link-event"]} ${styles["link-new-event"]}`}
+                      onClick={handleModalOpen}
+                    >
+                      <FontAwesomeIcon
+                        icon={faPlus}
+                        className={styles["link-icon"]}
+                      />
+                      Nouvel événement
+                    </div>
+                  )}
                   <div
                     style={{
                       fontSize: "12px",

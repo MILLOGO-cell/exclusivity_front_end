@@ -51,7 +51,7 @@ const Home = () => {
     if (!storedIsAuthenticated && !allowedRoutes.includes(router.pathname)) {
       router.push("/");
     }
-  }, [token]);
+  }, [token, router, setIsAuthenticated, setToken, setUser]);
 
   useEffect(() => {
     const getUserImage = async () => {
@@ -77,10 +77,10 @@ const Home = () => {
           }
         }
       } catch (error) {
-        console.log(
-          "Une erreur s'est produite lors de la récupération de l'URL de l'image de profil.",
-          error
-        );
+        // console.log(
+        //   "Une erreur s'est produite lors de la récupération de l'URL de l'image de profil.",
+        //   error
+        // );
       }
     };
 
@@ -109,7 +109,10 @@ const Home = () => {
         <Navigation
           activeTab={activeTab}
           onTabChange={setActiveTab}
-          userPhoto={userImage}
+          src={userImage !== `${BASIC_URL}null` ? userImage : "/user1.png"}
+          userPhoto={
+            userImage !== `${BASIC_URL}null` ? userImage : "/user1.png"
+          }
           user={userIdentity}
         />
 
@@ -123,7 +126,13 @@ const Home = () => {
             <div className={styles.scrollWrapper}>
               <div className={styles.content}>
                 <div className={styles.create}>
-                  <CreatePost userPhoto={userImage} />
+                  <CreatePost
+                    userPhoto={
+                      userImage !== `${BASIC_URL}null` && userImage !== null
+                        ? userImage
+                        : "/user1.png"
+                    }
+                  />
                 </div>
 
                 {renderTabContent()}
@@ -136,7 +145,11 @@ const Home = () => {
                 <SideMenu
                   username={userIdentity?.username}
                   fansCount={userIdentity?.followers_count}
-                  userPhoto={userImage ? userImage : "../user1.png"}
+                  userPhoto={
+                    userImage !== `${BASIC_URL}null` && userImage !== null
+                      ? userImage
+                      : "/user1.png"
+                  }
                 />
               </div>
               <div style={{ paddingBottom: "20px" }}>

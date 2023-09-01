@@ -1,11 +1,5 @@
 import React, { useState } from "react";
-import {
-  Box,
-  Button,
-  Avatar,
-  IconButton as GestaltIconButton,
-  Flex,
-} from "gestalt";
+import { IconButton as GestaltIconButton, Flex } from "gestalt";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import styles from "../app/EventBoard.module.css";
@@ -41,8 +35,6 @@ const EventBoard = ({ events }) => {
     setShowAll(false);
   };
 
-  // Formater la date
-
   return (
     <div className={styles.eventBoardContainer}>
       <Flex
@@ -58,9 +50,7 @@ const EventBoard = ({ events }) => {
             border: "2px solid white",
             borderRadius: "20px",
           }}
-        >
-          {/* <GestaltIconButton icon="add" iconColor="white" size="sm" /> */}
-        </div>
+        ></div>
       </Flex>
       <hr className={styles.eventBoardDivider} />
       {displayedEvents.map((event, index) => (
@@ -111,6 +101,12 @@ const EventBoard = ({ events }) => {
 
 const Item = ({ photo, date, title }) => {
   const isVideo = photo && photo.includes(".mp4");
+  const imageStyle = {
+    width: "64px",
+    height: "64px",
+    marginRight: "10px",
+    borderRadius: "10px",
+  };
 
   return (
     <div className={styles.itemContainer}>
@@ -120,12 +116,13 @@ const Item = ({ photo, date, title }) => {
           Votre navigateur ne prend pas en charge la lecture de vidéos.
         </video>
       ) : (
-        <img
-          src={photo}
+        <Image
+          src={photo || ""}
           alt="Event"
-          className={styles.itemPhoto}
+          style={imageStyle}
           width={16}
           height={16}
+          unoptimized
         />
       )}
       <div>

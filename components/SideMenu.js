@@ -1,13 +1,11 @@
 import {
   Box,
-  Avatar,
   Text,
   Button,
   Modal,
   TextField,
   TextArea,
   Spinner,
-  Toast,
 } from "gestalt";
 import "@/app/globals.css";
 import IconButton from "./IconButton";
@@ -20,6 +18,7 @@ import { EVENT_POST, API_URL } from "@/configs/api";
 import axios from "axios";
 import allowedRoutes from "./allowedRoutes";
 import jwtDecode from "jwt-decode";
+import Image from "next/image";
 
 const SideMenu = ({ username, fansCount, userPhoto }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -60,14 +59,9 @@ const SideMenu = ({ username, fansCount, userPhoto }) => {
       const currentTime = Date.now() / 1000;
 
       if (tokenData.exp < currentTime) {
-        // Token expiré
-        // Afficher un message de toast et rediriger vers la page d'accueil
-        // toast.error("Votre session a expiré. Veuillez vous reconnecter.");
         router.push("/");
       }
-    } catch (error) {
-      // console.error("Erreur lors de la vérification du token :", error);
-    }
+    } catch (error) {}
   }, [token]);
 
   const [eventData, setEventData] = useState({
@@ -182,19 +176,22 @@ const SideMenu = ({ username, fansCount, userPhoto }) => {
   const handlePublishEvent = () => {
     createEvent();
   };
-
+  const imageStyle = {
+    width: "50px",
+    height: "50px",
+    borderRadius: "60px",
+    marginRight: 12,
+  };
   return (
     <Box padding={4} width={300} rounding={5} color="default">
       <Box marginBottom={4} display="flex" alignItems="center">
-        <img
-          style={{
-            width: "50px",
-            height: "50px",
-            borderRadius: "60px",
-            marginRight: 12,
-          }}
-          src={userPhoto}
+        <Image
+          style={imageStyle}
+          src={userPhoto || "/user1.png"}
           alt="image"
+          width={50}
+          height={50}
+          unoptimized
         />
         <Box marginLeft={2} paddingX={2}>
           <Text bold>{username}</Text>
@@ -273,12 +270,12 @@ const SideMenu = ({ username, fansCount, userPhoto }) => {
                   onClick={handleOpenFileSelector}
                 >
                   {selectedMedia ? (
-                    <img
+                    <Image
                       src={URL.createObjectURL(selectedMedia)}
                       alt="Media Preview"
-                      style={{ maxWidth: "400px", maxHeight: "100%" }}
-                      width="100%"
-                      height="100%"
+                      style={{ width: "400px", height: "100%" }}
+                      width={200}
+                      height={90}
                     />
                   ) : (
                     <div>

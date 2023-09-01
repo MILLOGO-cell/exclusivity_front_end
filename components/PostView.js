@@ -6,6 +6,7 @@ import { API_URL, BASIC_URL } from "@/configs/api";
 import axios from "axios";
 import { useAppContext } from "@/context/AppContext";
 import Link from "next/link";
+import Image from "next/image";
 
 const PostView = ({
   profilePhoto,
@@ -14,11 +15,8 @@ const PostView = ({
   moment,
   postText,
   media,
-  video,
-  lastLikeUser,
   likesCount,
   commentsCount,
-  recentComment,
   commentData,
   eventTitle,
   eventDate,
@@ -49,7 +47,7 @@ const PostView = ({
     const storedIsAuthenticated = localStorage.getItem("isAuthenticated");
     setUserIdentity(JSON.parse(storedUser));
     setToken(storedToken);
-  }, []);
+  }, [token]);
 
   useEffect(() => {
     const fetchLikedUsers = async () => {
@@ -275,6 +273,18 @@ const PostView = ({
     (comment) => comment.parent_comment === null
   );
 
+  const imageStyle = {
+    width: "40px",
+    height: "40px",
+    borderRadius: "50%",
+    marginRight: "8px",
+  };
+  const mediaStyle = {
+    maxWidth: "100%",
+    width: "100%",
+    height: "auto",
+    marginBottom: "8px",
+  };
   return (
     <div className={styles.postViewContainer}>
       <Link
@@ -284,12 +294,13 @@ const PostView = ({
         passHref
       >
         <div className={styles.userInfo}>
-          <img
+          <Image
             src={profilePhoto}
             alt="Photo de profil"
-            className={styles.profilePhoto}
+            style={imageStyle}
             width={40}
             height={40}
+            unoptimized
           />
           <div className={styles.usernameMoment}>
             <span className={styles.username}>{username}</span>
@@ -331,7 +342,14 @@ const PostView = ({
                 Votre navigateur ne prend pas en charge la lecture de vidéos.
               </video>
             ) : (
-              <img src={media} alt="Media" className={styles.media} />
+              <Image
+                src={media}
+                alt="Media"
+                style={mediaStyle}
+                width={500}
+                height={700}
+                unoptimized
+              />
             )}
           </div>
         )}
@@ -552,18 +570,21 @@ const Comment = ({ commentData, token, userIdentity, postId, level = 0 }) => {
       threshold: 0.5,
     };
 
+    // Copiez la valeur de commentRef.current dans une variable locale
+    const currentCommentRef = commentRef.current;
+
     const observer = new IntersectionObserver((entries) => {
       const entry = entries[0];
       setIsVisible(entry.isIntersecting);
     }, options);
 
-    if (commentRef.current) {
-      observer.observe(commentRef.current);
+    if (currentCommentRef) {
+      observer.observe(currentCommentRef);
     }
 
     return () => {
-      if (commentRef.current) {
-        observer.unobserve(commentRef.current);
+      if (currentCommentRef) {
+        observer.unobserve(currentCommentRef);
       }
     };
   }, [commentRef, setIsVisible]);
@@ -619,7 +640,12 @@ const Comment = ({ commentData, token, userIdentity, postId, level = 0 }) => {
       console.error("Erreur lors de l'envoi du commentaire :", error);
     }
   };
-
+  const commentProfilePhotoStyle = {
+    width: " 32px",
+    height: "32px",
+    borderRadius: "50%",
+    marginRight: "8px",
+  };
   return (
     <div className={styles.comment} ref={commentRef}>
       <Box marginLeft={`${level * 30}px`}>
@@ -639,16 +665,17 @@ const Comment = ({ commentData, token, userIdentity, postId, level = 0 }) => {
             passHref
           >
             <div style={{ display: "flex", justifyContent: "center" }}>
-              <img
+              <Image
                 src={
                   commentData?.user_details?.image.startsWith("http")
                     ? commentData?.user_details?.image
                     : `${BASIC_URL}${commentData?.user_details?.image}`
                 }
                 alt="Photo"
-                className={styles.commentProfilePhoto}
+                style={commentProfilePhotoStyle}
                 width={32}
                 height={32}
+                unoptimized
               />
               <span className={styles.commentUsername}>
                 {commentData?.user_details?.username}

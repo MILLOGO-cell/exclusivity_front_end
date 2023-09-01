@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { API_URL } from "@/configs/api";
 import Link from "next/link";
+import Image from "next/image";
 
 const Conditions = () => {
   const [conditionsContent, setConditionsContent] = useState("");
@@ -20,11 +21,9 @@ const Conditions = () => {
   return (
     <div className="conditions-page">
       <nav className="navbar">
-        {/* <Link href="/"> */}
         <div className="logo">
-          <img src="/logo.png" alt="Logo" />
+          <Image src="/logo.png" width={150} height={50} alt="Logo" />
         </div>
-        {/* </Link> */}
       </nav>
       <div className="content-wrapper">
         <h1 className="title">Conditions d&apos;utilisation</h1>

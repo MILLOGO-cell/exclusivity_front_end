@@ -11,13 +11,13 @@ import {
 } from "gestalt";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faImage, faVideo } from "@fortawesome/free-solid-svg-icons";
-import { SIMPLE_POST } from "@/configs/api";
+import { SIMPLE_POST, BASIC_URL } from "@/configs/api";
 import axios from "axios";
 import { useAppContext } from "@/context/AppContext";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import allowedRoutes from "./allowedRoutes";
-import styles from "../app/EventBoard.module.css";
+
 const CreatePost = ({ userPhoto }) => {
   const [showModal, setShowModal] = useState(false);
   const [postText, setPostText] = useState("");
@@ -31,7 +31,6 @@ const CreatePost = ({ userPhoto }) => {
     setUser,
     setToken,
     token,
-    isAuthenticated,
     setIsAuthenticated,
     updatePosts,
     fetchPosts,
@@ -57,35 +56,28 @@ const CreatePost = ({ userPhoto }) => {
     if (!storedIsAuthenticated && !allowedRoutes.includes(router.pathname)) {
       router.push("/");
     }
-  }, [token]);
+  }, [setIsAuthenticated, setToken, setUser, setUserIdentity]);
+
   const handleOpenGallery = (icon) => {
-    setSelectedIcon(icon); // Mettre à jour l'icône sélectionnée
+    setSelectedIcon(icon);
     fileInputRef.current.click();
   };
 
   const handleFileSelect = (event) => {
     const selectedFile = event.target.files[0];
-    // Vérifier si une icône a été sélectionnée
     if (selectedIcon === "camera") {
-      // Icône de la caméra sélectionnée : autoriser uniquement les images (image/*)
       if (selectedFile.type.startsWith("image/")) {
-        // L'utilisateur a sélectionné une image
         console.log("Image sélectionnée :", selectedFile);
       } else {
-        // L'utilisateur a sélectionné autre chose qu'une image
         console.log("Veuillez sélectionner une image.");
       }
     } else if (selectedIcon === "video") {
-      // Icône de la vidéo sélectionnée : autoriser uniquement les vidéos (video/*)
       if (selectedFile.type.startsWith("video/")) {
-        // L'utilisateur a sélectionné une vidéo
         console.log("Vidéo sélectionnée :", selectedFile);
       } else {
-        // L'utilisateur a sélectionné autre chose qu'une vidéo
         console.log("Veuillez sélectionner une vidéo.");
       }
     }
-    // Enregistrez le media sélectionné dans l'état
     setSelectedMedia(selectedFile);
   };
   const handleShowModal = () => {
@@ -168,6 +160,12 @@ const CreatePost = ({ userPhoto }) => {
       setIsLoading(false);
     }
   };
+  const imageStyle = {
+    width: "50px",
+    height: "50px",
+    borderRadius: "60px",
+    marginRight: 12,
+  };
   return (
     <>
       <div
@@ -180,27 +178,14 @@ const CreatePost = ({ userPhoto }) => {
           width: "100%",
         }}
       >
-        {/* <div className={styles["user-avatar"]}> */}
-        {/* <div
-          style={{
-            justifyContent: "center",
-            marginRight: 12,
-            border: "1px solid",
-            width: "60px",
-            height: "60px",
-          }}
-        > */}
-        <img
-          style={{
-            width: "50px",
-            height: "50px",
-            borderRadius: "60px",
-            marginRight: 12,
-          }}
-          src={userPhoto}
+        <Image
+          style={imageStyle}
+          src={userPhoto || "/user1.png"}
           alt="User Avatar"
+          width={50}
+          height={50}
+          unoptimized
         />
-        {/* </div> */}
         <div style={{ width: "100%" }}>
           {userIdentity?.username && (
             <button

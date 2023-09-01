@@ -16,6 +16,7 @@ import { useAppContext } from "@/context/AppContext";
 import allowedRoutes from "@/components/allowedRoutes";
 import jwtDecode from "jwt-decode";
 import { SUBSCRIBE_URL, UNSUBSCRIBE_URL, USER_DETAILS } from "@/configs/api";
+import Image from "next/image";
 
 const ProfileArtisteImages = ({}) => {
   const router = useRouter();
@@ -24,14 +25,13 @@ const ProfileArtisteImages = ({}) => {
   const [showModal, setShowModal] = useState(false);
   const {
     token,
-    isAuthenticated,
     setUser,
     setToken,
     setIsAuthenticated,
     userDetails,
     setUserDetails,
   } = useAppContext();
-  const [userImage, setUserImage] = useState("");
+  const [userImage, setUserImage] = useState(null);
   const [userProfilImage, setUserProfilImage] = useState("");
   const [userIdentity, setUserIdentity] = useState(null);
   const [userProfile, setuserProfile] = useState(null);
@@ -47,6 +47,7 @@ const ProfileArtisteImages = ({}) => {
       if (response.status === 200) {
         const data = response.data;
         setUserDetails(data.user_details);
+        setID(id);
       } else {
         // console.log(
         //   "Erreur lors de la récupération des détails de l'utilisateur:",
@@ -121,15 +122,12 @@ const ProfileArtisteImages = ({}) => {
       const currentTime = Date.now() / 1000;
 
       if (tokenData.exp < currentTime) {
-        // Token expiré
-        // Afficher un message de toast et rediriger vers la page d'accueil
-        // toast.error("Votre session a expiré. Veuillez vous reconnecter.");
         router.push("/");
       }
     } catch (error) {
       console.error("Erreur lors de la vérification du token :", error);
     }
-  }, [token]);
+  }, [setIsAuthenticated, setToken, setUser, setUserIdentity]);
 
   useEffect(() => {
     const getUserImage = async () => {
@@ -146,8 +144,14 @@ const ProfileArtisteImages = ({}) => {
 
           if (response.status === 200) {
             const data = response.data;
-            const imageUrl = `${BASIC_URL}${data.image_url}`;
-            setUserProfilImage(imageUrl);
+            console.log("img:", data.image_url);
+            if (data.image_url !== null) {
+              const imageUrl = `${BASIC_URL}${data.image_url}`;
+              setUserProfilImage(imageUrl);
+            } else {
+              // Aucune image de profil disponible, utilisez l'image par défaut ici
+              setUserProfilImage("/user1.png");
+            }
           } else {
             console.log(
               "Une erreur s'est produite lors de la récupération de l'URL de l'image de profil."
@@ -285,6 +289,14 @@ const ProfileArtisteImages = ({}) => {
   };
 
   const photoPairs = splitPhotosIntoPairs(userPhotos);
+  const imageStyle = {
+    width: "100px",
+    height: "100px",
+    borderRadius: "50%",
+    marginRight: "15px",
+  };
+  console.log("userImage:", userImage);
+
   return (
     <>
       <Navigation />
@@ -305,18 +317,19 @@ const ProfileArtisteImages = ({}) => {
                 justifyContent: "center",
               }}
             >
-              <img
-                src={userImage}
-                alt={userIdentity?.username}
-                style={{
-                  width: "100px",
-                  height: "100px",
-                  borderRadius: "50%",
-                  marginRight: "15px",
-                }}
+              <Image
+                src={
+                  userImage === `${BASIC_URL}null` || userImage === null
+                    ? "/user1.png"
+                    : userImage
+                }
+                alt={userIdentity?.username || "user"}
+                style={imageStyle}
                 width={100}
                 height={100}
+                unoptimized
               />
+
               <div className={styles.artistFollowersContainer}>
                 <div>
                   <span className={styles.artistUsername}>

@@ -18,6 +18,7 @@ import {
   USER_DETAILS,
 } from "@/configs/api";
 import axios from "axios";
+import Image from "next/image";
 
 const SuggestionBoard = ({ suggestions }) => {
   const [showAll, setShowAll] = useState(false);
@@ -27,7 +28,6 @@ const SuggestionBoard = ({ suggestions }) => {
   const { token, setUser, setToken, userDetails, setUserDetails } =
     useAppContext();
   const [userIdentity, setUserIdentity] = useState(null);
-  // const [userDetails, setUserDetails] = useState(null);
 
   const fetchUserDetails = async () => {
     try {
@@ -52,7 +52,6 @@ const SuggestionBoard = ({ suggestions }) => {
       // );
     }
   };
-  // console.log(userDetails);
 
   useEffect(() => {
     fetchUserDetails();
@@ -122,7 +121,11 @@ const SuggestionBoard = ({ suggestions }) => {
         return (
           <div key={index} className={styles.suggestionItemWrapper}>
             <Item
-              photo={`${BASIC_URL}${suggestion.image}`}
+              photo={
+                suggestion.image !== `${BASIC_URL}null`
+                  ? `${BASIC_URL}${suggestion.image}`
+                  : "/user1.png"
+              }
               suggestionId={suggestion.id}
               username={suggestion.username}
               isUserFollowing={isUserSubscribed}
@@ -165,16 +168,23 @@ const SuggestionBoard = ({ suggestions }) => {
 };
 
 const Item = ({ photo, username, suggestionId, onFollow, isUserFollowing }) => {
+  const imageStyle = {
+    width: "48px",
+    height: "48px",
+    marginRight: "10px",
+    borderRadius: "24px",
+  };
   return (
     <div className={styles.suggestionItemContainer}>
       <div className={styles.blockUserInfo}>
         <Link href={`/profil_utilisateur?id=${suggestionId}`} passHref>
-          <img
+          <Image
             src={photo ? photo : "../user1.png"}
             alt="Profile"
-            className={styles.profilePhoto}
+            style={imageStyle}
             width={64}
             height={64}
+            unoptimized
           />
         </Link>
         <div className={styles.usernameContainer}>

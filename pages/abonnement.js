@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import styles from "../app/pages.module.css";
 import { faSignOut, faPlus } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
+import Image from "next/image";
 
 const Abonnement = () => {
   const { user, token, setUser, setToken, setIsAuthenticated } =
@@ -17,6 +18,23 @@ const Abonnement = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    const storedToken = localStorage.getItem("token");
+    const storedIsAuthenticated = localStorage.getItem("isAuthenticated");
+
+    setUser(JSON.parse(storedUser));
+    setToken(storedToken);
+    setUserIdentity(JSON.parse(storedUser));
+    setToken(storedToken);
+
+    setIsAuthenticated(storedIsAuthenticated);
+
+    if (!storedIsAuthenticated && !allowedRoutes.includes(router.pathname)) {
+      router.push("/");
+    }
+  }, [setIsAuthenticated, setToken, setUser, setUserIdentity]);
 
   const handleResize = () => {
     setIsSmallScreen(window.innerWidth < 1200);
@@ -51,27 +69,10 @@ const Abonnement = () => {
     };
   }, [showOverlayPanel]);
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    const storedToken = localStorage.getItem("token");
-    const storedIsAuthenticated = localStorage.getItem("isAuthenticated");
-
-    setUser(JSON.parse(storedUser));
-    setToken(storedToken);
-    setUserIdentity(JSON.parse(storedUser));
-    setToken(storedToken);
-
-    setIsAuthenticated(storedIsAuthenticated);
-
-    if (!storedIsAuthenticated && !allowedRoutes.includes(router.pathname)) {
-      router.push("/");
-    }
-  }, [token]);
-
   const getUserImage = async () => {
     try {
       const response = await axios.get(
-        `${API_URL}/utilisateurs/get_image_url/${userIdentity?.id}/`,
+        `${API_URL}/utilisateurs/get_image_url/${userIdentity.id}/`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -96,21 +97,22 @@ const Abonnement = () => {
 
   useEffect(() => {
     getUserImage();
-  }, [userIdentity]);
+  }, [userIdentity, getUserImage]);
 
   const handleLogout = () => {
     router.push("/");
     logout();
   };
+  const imageStyle = {
+    borderRadius: "50%",
+  };
 
   return (
     <div>
       <nav className="navbar">
-        {/* <a href="/"> */}
         <div className="logo">
           <img src="/logo.png" alt="Logo" />
         </div>
-        {/* </a> */}
 
         <div className="user-info">
           <span onClick={toggleOverlayPanel} className="user-initial">
@@ -158,17 +160,19 @@ const Abonnement = () => {
                   cursor: "pointer",
                 }}
               >
-                <img
-                  style={{
-                    width: "40px",
-                    height: "40px",
-                    borderRadius: "60px",
-                    marginRight: 12,
-                  }}
-                  src={userPhoto}
+                <Image
+                  src={
+                    userPhoto !== `${BASIC_URL}null` && userPhoto !== null
+                      ? userPhoto
+                      : "/user1.png"
+                  }
                   alt="User Avatar"
+                  width={40}
+                  height={40}
+                  unoptimized
+                  style={imageStyle}
                 />
-                <span style={{ fontSize: 18, color: "black" }}>
+                <span style={{ fontSize: 18, color: "black", paddingLeft: 12 }}>
                   {user?.username}
                 </span>
                 <span />

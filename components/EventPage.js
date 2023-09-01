@@ -1,15 +1,10 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import "@/app/globals.css";
 import styles from "../app/pages.module.css";
-import Navigation from "@/components/Navigation";
-import CreatePost from "@/components/CreatePost";
 import { useAppContext } from "../context/AppContext";
-import EventBoard from "@/components/EventBoard";
-import SideMenu from "@/components/SideMenu";
 import axios from "axios";
 import { API_URL, BASIC_URL } from "@/configs/api";
 import PostView from "@/components/PostView";
-import SuggestionBoard from "@/components/SuggestionBoard";
 import allowedRoutes from "@/components/allowedRoutes";
 import { useRouter } from "next/router";
 
@@ -22,16 +17,11 @@ const EventPage = () => {
     setToken,
     setIsAuthenticated,
     eventPosts,
-    isloading,
-    fetchPosts,
-    userList,
   } = useAppContext();
   const [userImage, setUserImage] = useState("");
-  const [updatePosts, setUpdatePosts] = useState(false);
   const [userIdentity, setUserIdentity] = useState(null);
   const [loadingDotsCount, setLoadingDotsCount] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-  const [authLoaded, setAuthLoaded] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -44,25 +34,22 @@ const EventPage = () => {
     setUserIdentity(JSON.parse(storedUser));
     setToken(storedToken);
 
-    // Mettre à jour le statut d'authentification dans le contexte
     setIsAuthenticated(storedIsAuthenticated);
 
-    // Maintenant que le statut d'authentification est mis à jour dans le contexte,
-    // vous pouvez exécuter la vérification de l'authentification dans votre middleware
     if (!storedIsAuthenticated && !allowedRoutes.includes(router.pathname)) {
       router.push("/");
     }
-  }, [token]);
+  }, [setIsAuthenticated, setToken, setUser, setUserIdentity]);
 
   useEffect(() => {
     const incrementLoadingDots = () => {
       setLoadingDotsCount((count) => (count === 3 ? 1 : count + 1));
     };
 
-    const intervalId = setInterval(incrementLoadingDots, 500); // Incrémenter toutes les 500 millisecondes
+    const intervalId = setInterval(incrementLoadingDots, 500);
 
     return () => {
-      clearInterval(intervalId); // Nettoyer l'intervalle lorsque le composant est démonté
+      clearInterval(intervalId);
     };
   }, [isAuthenticated, token]);
 
@@ -100,9 +87,8 @@ const EventPage = () => {
     // Appeler la fonction pour récupérer l'image de profil lorsque le composant est monté
     getUserImage();
   }, [userIdentity, token]);
+
   const renderPostView = (post) => {
-    // console.log(post);
-    // Vérifier si post est valide et contient toutes les propriétés nécessaires
     if (post && post.author_get && post.author_get.image && post.content) {
       return (
         <PostView
@@ -125,40 +111,21 @@ const EventPage = () => {
         />
       );
     } else {
-      // Retourner un message ou un composant de chargement si certaines données sont manquantes
       return <div>Chargement...</div>;
     }
   };
-  // Définissez une fonction de comparaison pour trier les posts par date de création
   const comparePostsByDate = (postA, postB) => {
     const dateA = new Date(postA.created_at);
     const dateB = new Date(postB.created_at);
-    return dateB - dateA; // Triez en ordre décroissant (les posts les plus récents en premier)
+    return dateB - dateA;
   };
-  // Utilisez la fonction de comparaison pour trier les posts par date de création
   const sortedPosts = eventPosts.slice().sort(comparePostsByDate);
-  const creatorSuggestions = userList.filter(
-    (user) =>
-      user?.is_creator === true && user?.username !== userIdentity?.username
-  );
-  const sortedEvents = eventPosts.slice().sort(comparePostsByDate);
-  // if (!authLoaded) {
-  //   return <div>Chargement...</div>;
-  // }
+
   return (
     <div className={styles.container}>
-      {/* <div className={styles.sideDiv}>
-        <div className={styles.content} style={{ padding: "20px" }}>
-          {sortedEvents.length > 0 && <EventBoard events={sortedEvents} />}
-        </div>
-      </div> */}
       <div className={styles.centerDiv}>
-        {/* Utilisez une div supplémentaire pour masquer la barre de défilement */}
         <div className={styles.scrollWrapper}>
           <div className={styles.content}>
-            {/* <div className={styles.create}>
-              <CreatePost userPhoto={userImage} updatePosts={setUpdatePosts} />
-            </div> */}
             {isLoading ? (
               <div
                 style={{
@@ -182,28 +149,6 @@ const EventPage = () => {
           </div>
         </div>
       </div>
-      {/* <div className={styles.sideDiv}>
-        <div className={styles.content} style={{ padding: "20px" }}>
-          <div style={{ paddingBottom: "20px" }}>
-            <SideMenu
-              username={userIdentity?.username}
-              fansCount={userIdentity?.followers_count}
-              userPhoto={userImage ? userImage : "../user1.png"}
-            />
-          </div>
-          <div style={{ paddingBottom: "20px" }}>
-            {userList?.length > 0 && creatorSuggestions.length > 0 && (
-              <SuggestionBoard suggestions={creatorSuggestions} />
-            )}
-          </div>
-
-          <div style={{ fontSize: "15px" }}>
-            Exclusivity © 2023. Tout droit réservé
-            <br />
-            <a href="/conditions_d_utilisation">Politique de confidentialité</a>
-          </div>
-        </div>
-      </div> */}
     </div>
   );
 };

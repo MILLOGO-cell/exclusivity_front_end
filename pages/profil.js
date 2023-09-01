@@ -24,17 +24,12 @@ import {
 import axios from "axios";
 import allowedRoutes from "@/components/allowedRoutes";
 import { useRouter } from "next/router";
+import Image from "next/image";
 
 const ProfilePage = () => {
   const [selectedPhoto, setSelectedPhoto] = useState(null);
-  const {
-    user,
-    setUser,
-    token,
-    setToken,
-    isAuthenticated,
-    setIsAuthenticated,
-  } = useAppContext();
+  const { user, setUser, token, setToken, setIsAuthenticated } =
+    useAppContext();
   const [username, setUsername] = useState("");
   const [last_name, setLastName] = useState("");
   const [first_name, setFirstName] = useState("");
@@ -61,7 +56,7 @@ const ProfilePage = () => {
     if (!storedIsAuthenticated && !allowedRoutes.includes(router.pathname)) {
       router.push("/");
     }
-  }, [token]);
+  }, [token, router, setIsAuthenticated, setToken, setUser]);
 
   const [userDetails, setUserDetails] = useState(null);
 
@@ -123,15 +118,16 @@ const ProfilePage = () => {
   };
 
   useEffect(() => {
-    if (user) {
+    if (user && userIdentity) {
       fetchUserDetails();
     }
-  }, [user, token, userIdentity?.id]);
+  }, [user, token, userIdentity]);
 
   const handlePhotoChange = (event) => {
     const file = event.target.files[0];
     setSelectedPhoto(file);
   };
+
   const handleRemovePhoto = () => {
     setSelectedPhoto(null);
   };
@@ -210,7 +206,9 @@ const ProfilePage = () => {
       }
     }
   };
-
+  const imageStyle = {
+    borderRadius: "50%",
+  };
   return (
     <div
       style={{
@@ -244,18 +242,19 @@ const ProfilePage = () => {
                   htmlFor="photoInput"
                   className={styles.profilePhotoLabel}
                 >
-                  <img
+                  <Image
                     src={
                       selectedPhoto
                         ? URL.createObjectURL(selectedPhoto)
+                        : userImage === `${BASIC_URL}null` || userImage === null
+                        ? "/user1.png"
                         : userImage
-                        ? userImage
-                        : "../user1.png"
                     }
                     alt="Photo de profil"
-                    className={styles.profilePhoto}
+                    style={imageStyle}
                     width={150}
                     height={150}
+                    unoptimized
                   />
                 </label>
                 <input
