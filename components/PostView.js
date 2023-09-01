@@ -679,8 +679,14 @@ const Comment = ({ commentData, token, userIdentity, postId, level = 0 }) => {
                   unoptimized
                 />
               ) : (
-                // Vous pouvez également afficher une image par défaut ici si nécessaire
-                <div>Aucune image</div>
+                <Image
+                  src="/user1.png"
+                  alt="Default"
+                  style={commentProfilePhotoStyle}
+                  width={32}
+                  height={32}
+                  unoptimized
+                />
               )}
               <span className={styles.commentUsername}>
                 {commentData?.user_details?.username}
