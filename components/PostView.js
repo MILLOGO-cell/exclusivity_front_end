@@ -665,18 +665,23 @@ const Comment = ({ commentData, token, userIdentity, postId, level = 0 }) => {
             passHref
           >
             <div style={{ display: "flex", justifyContent: "center" }}>
-              <Image
-                src={
-                  commentData?.user_details?.image.startsWith("http")
-                    ? commentData?.user_details?.image
-                    : `${BASIC_URL}${commentData?.user_details?.image}`
-                }
-                alt="Photo"
-                style={commentProfilePhotoStyle}
-                width={32}
-                height={32}
-                unoptimized
-              />
+              {commentData?.user_details?.image ? (
+                <Image
+                  src={
+                    commentData.user_details.image.startsWith("http")
+                      ? commentData.user_details.image
+                      : `${BASIC_URL}${commentData.user_details.image}`
+                  }
+                  alt="Photo"
+                  style={commentProfilePhotoStyle}
+                  width={32}
+                  height={32}
+                  unoptimized
+                />
+              ) : (
+                // Vous pouvez également afficher une image par défaut ici si nécessaire
+                <div>Aucune image</div>
+              )}
               <span className={styles.commentUsername}>
                 {commentData?.user_details?.username}
               </span>
