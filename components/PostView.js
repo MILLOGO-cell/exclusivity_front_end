@@ -274,7 +274,7 @@ const PostView = ({
   const rootComments = commentData?.filter(
     (comment) => comment.parent_comment === null
   );
-  // console.log(userIdentity);
+
   return (
     <div className={styles.postViewContainer}>
       <Link
@@ -323,14 +323,17 @@ const PostView = ({
       </div>
       <div className={styles.postContent}>
         <p>{postText}</p>
-        {media && !video && (
-          <img src={media} alt="Photo" className={styles.media} />
-        )}
-        {video && (
-          <video controls className={styles.video}>
-            <source src={video} type="video/mp4" />
-            Votre navigateur ne prend pas en charge la lecture de vidéos.
-          </video>
+        {media && (
+          <div className={styles.mediaContainer}>
+            {media.includes(".mp4") ? (
+              <video controls className={styles.media}>
+                <source src={media} type="video/mp4" />
+                Votre navigateur ne prend pas en charge la lecture de vidéos.
+              </video>
+            ) : (
+              <img src={media} alt="Media" className={styles.media} />
+            )}
+          </div>
         )}
         <div className={styles.likes}>
           <div
@@ -370,10 +373,11 @@ const PostView = ({
               className={`${styles.likeButton} ${liked ? styles.liked : ""}`}
               onClick={handleLike}
             >
-              👍
-              <span className={liked ? styles.likedText : styles.likeText}>
-                {liked ? "Vous aimez " : "J'aime"}
-              </span>
+              {liked ? (
+                <span style={{ color: "black" }}>J'aime ·👍 </span>
+              ) : (
+                <span style={{ color: "blue" }}>Vous aimez ·👍 </span>
+              )}
             </button>
           </div>
           <div style={{ marginLeft: "10px" }}>

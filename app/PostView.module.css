@@ -7,6 +7,7 @@
   height: auto;
   margin-bottom: 20px;
   max-width: 670px;
+  width: 500px;
 }
 
 .userInfo {
@@ -229,21 +230,21 @@
 /* Ecrans larges extra larges*/
 @media (min-width: 1201px) {
   .postViewContainer {
-    min-width: 650px;
+    min-width: 500px;
   }
 }
 
 /* Ecrans larges*/
 @media (min-width: 1025px) and (max-width: 1200px) {
   .postViewContainer {
-    min-width: 500px;
+    min-width: 350px;
   }
 }
 
 /* Ecrans ordinateur portable*/
 @media (min-width: 769px) and (max-width: 1024px) {
   .postViewContainer {
-    min-width: 500px;
+    min-width: 300px;
   }
 }
 

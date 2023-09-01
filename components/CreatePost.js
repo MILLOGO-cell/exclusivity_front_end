@@ -17,7 +17,7 @@ import { useAppContext } from "@/context/AppContext";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import allowedRoutes from "./allowedRoutes";
-
+import styles from "../app/EventBoard.module.css";
 const CreatePost = ({ userPhoto }) => {
   const [showModal, setShowModal] = useState(false);
   const [postText, setPostText] = useState("");
@@ -168,25 +168,41 @@ const CreatePost = ({ userPhoto }) => {
       setIsLoading(false);
     }
   };
-  // console.log(userIdentity);
   return (
     <>
-      <Box
-        padding={2}
-        color="default"
-        rounding={5}
-        display="flex"
-        alignItems="center"
-        width={"100%"}
-        justifyContent="center"
-        alignContent="center"
-        alignSelf="center"
+      <div
+        style={{
+          display: "flex",
+          backgroundColor: "white",
+          padding: 10,
+          borderRadius: 15,
+          justifyContent: "space-between",
+          width: "100%",
+        }}
       >
-        <Box>
-          <Avatar src={userPhoto} name="User Photo" size="md" />
-        </Box>
-        <Flex flex="grow" justifyContent="center" alignItems="center">
-          <Box width={800} minWidth={10} paddingX={3}>
+        {/* <div className={styles["user-avatar"]}> */}
+        {/* <div
+          style={{
+            justifyContent: "center",
+            marginRight: 12,
+            border: "1px solid",
+            width: "60px",
+            height: "60px",
+          }}
+        > */}
+        <img
+          style={{
+            width: "50px",
+            height: "50px",
+            borderRadius: "60px",
+            marginRight: 12,
+          }}
+          src={userPhoto}
+          alt="User Avatar"
+        />
+        {/* </div> */}
+        <div style={{ width: "100%" }}>
+          {userIdentity?.username && (
             <button
               type="button"
               onClick={handleShowModal}
@@ -202,9 +218,9 @@ const CreatePost = ({ userPhoto }) => {
             >
               {postText || `Quoi de neuf ${userIdentity?.username} ?`}
             </button>
-          </Box>
-        </Flex>
-      </Box>
+          )}
+        </div>
+      </div>
 
       {showModal && (
         <Modal

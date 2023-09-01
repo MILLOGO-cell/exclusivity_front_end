@@ -184,9 +184,18 @@ const SideMenu = ({ username, fansCount, userPhoto }) => {
   };
 
   return (
-    <Box padding={4} width={250} rounding={5} color="default">
+    <Box padding={4} width={300} rounding={5} color="default">
       <Box marginBottom={4} display="flex" alignItems="center">
-        <Avatar src={userPhoto} name="User Photo" size="md" />
+        <img
+          style={{
+            width: "50px",
+            height: "50px",
+            borderRadius: "60px",
+            marginRight: 12,
+          }}
+          src={userPhoto}
+          alt="image"
+        />
         <Box marginLeft={2} paddingX={2}>
           <Text bold>{username}</Text>
           <Text color="gray" size="sm">

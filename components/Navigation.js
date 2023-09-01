@@ -8,16 +8,12 @@ import {
   faUser,
   faSignOut,
   faPlus,
-  faPeople,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   Box,
   IconButton as GestaltIconButton,
   Modal,
   TextField,
-  SearchField,
-  OverlayPanel,
-  SideNavigation,
   Button,
   TextArea,
   Spinner,
@@ -29,7 +25,6 @@ import { useAppContext } from "@/context/AppContext";
 import { API_URL, BASIC_URL } from "@/configs/api";
 import axios from "axios";
 import EventPage from "./EventPage";
-import ExplorerPage from "./ExplorerPage";
 import Image from "next/image";
 
 const UserItem = ({ user }) => (
@@ -43,7 +38,7 @@ const UserItem = ({ user }) => (
   </div>
 );
 
-const Navigation = () => {
+const Navigation = ({ onTabChange, userPhoto, user }) => {
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [showSearchField, setShowSearchField] = useState(false);
   const [showOverlayPanel, setShowOverlayPanel] = useState(false);
@@ -55,6 +50,19 @@ const Navigation = () => {
   const [searchValue, setSearchValue] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const { token, logout, userList } = useAppContext();
+  const [activeTab, setActiveTab] = useState(null);
+
+  const handleTabChange = (tabName) => {
+    if (router.pathname !== "/explorer") {
+      router.push(`/explorer?tab=${tabName}`);
+      setActiveTab(tabName);
+    } else {
+      setActiveTab(tabName);
+      if (onTabChange) {
+        onTabChange(tabName);
+      }
+    }
+  };
 
   const toggleSearchField = () => {
     setShowSearchField((prev) => !prev);
@@ -65,23 +73,21 @@ const Navigation = () => {
   };
 
   const handleResize = () => {
-    setIsSmallScreen(window.innerWidth < 768); // Mettre à jour la taille lors du redimensionnement de l'écran
+    setIsSmallScreen(window.innerWidth < 1200);
   };
 
-  // Écoutez l'événement de redimensionnement de l'écran pour déterminer si c'est un petit écran
-  React.useEffect(() => {
+  useEffect(() => {
     handleResize(); // Vérifiez la taille initiale
     window.addEventListener("resize", handleResize);
+
+    // Initialisez activeTab en fonction du chemin d'accès de l'URL
+    setActiveTab(router.query.tab || "explorer"); // Définissez "explorer" si le chemin d'accès ne contient pas de tab
 
     // Nettoyez l'écouteur d'événement lorsqu'il n'est plus nécessaire
     return () => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
-
-  const isActive = (pathname) => {
-    return router.pathname === pathname ? "active" : "";
-  };
 
   const handleLogout = () => {
     router.push("/");
@@ -210,40 +216,155 @@ const Navigation = () => {
     }
   };
 
+  useEffect(() => {
+    const handleOutsideClick = (event) => {
+      if (showOverlayPanel && event.target.closest(".overlay-panel")) {
+        // console.log("Clicked inside of the open panel.");
+        setShowOverlayPanel((prev) => !prev);
+      }
+    };
+
+    document.addEventListener("click", handleOutsideClick);
+
+    return () => {
+      document.removeEventListener("click", handleOutsideClick);
+    };
+  }, [showOverlayPanel]);
+
   return (
-    <nav
-      className="navigation-container"
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        padding: "12px 24px",
-        color: "black",
-        backgroundColor: "#fff",
-      }}
-    >
-      <div
-        className="logo"
+    <>
+      <nav
+        className="navigation-container"
         style={{
-          height: "45px",
-          width: "110px",
           display: "flex",
           alignItems: "center",
-          justifyContent: "center",
+          justifyContent: "space-between",
+          padding: "12px 24px",
+          color: "black",
+          backgroundColor: "#fff",
         }}
       >
-        <Image
-          alt="Logo"
-          src="/logo.png"
-          style={{ maxWidth: "100%", maxHeight: "100%" }}
-          width={150}
-          height={150}
-        />
-      </div>
+        <div
+          className="logo"
+          style={{
+            height: "45px",
+            width: "110px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Image
+            alt="Logo"
+            src="/logo.png"
+            style={{ maxWidth: "100%", maxHeight: "100%" }}
+            width={150}
+            height={150}
+          />
+        </div>
 
-      {isSmallScreen ? (
-        <>
-          {showSearchField ? (
+        {isSmallScreen ? (
+          <>
+            {showSearchField ? (
+              <div style={{ position: "relative", width: "100%" }}>
+                <div
+                  className="search-box"
+                  style={{
+                    flex: 1,
+                    display: "flex",
+                    alignItems: "center",
+                    borderRadius: "30px",
+                    backgroundColor: "white",
+                    padding: "6px 12px",
+                    marginLeft: "20px",
+                    marginRight: "20px",
+                    border: "1px solid #ccc",
+                  }}
+                >
+                  <input
+                    id="search"
+                    type="text"
+                    placeholder="Rechercher..."
+                    style={{
+                      border: "none",
+                      flex: "1",
+                      height: "100%",
+                      outline: "none",
+                    }}
+                    value={searchValue}
+                    onChange={handleSearchChange}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter") {
+                        handleSearchSubmit();
+                      }
+                    }}
+                  />
+                </div>
+                {searchResults.length > 0 && searchValue.trim() !== "" && (
+                  <div className={styles["search-results"]}>
+                    <div>
+                      {searchResults.map((user) => (
+                        <UserItem key={user.id} user={user} />
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <>
+                <div className="tabs">
+                  <>
+                    <div
+                      className={`tab ${
+                        router.pathname === "/explorer"
+                          ? activeTab === "explorer"
+                            ? "active"
+                            : ""
+                          : activeTab === ""
+                          ? "active"
+                          : ""
+                      }`}
+                      onClick={() => handleTabChange("explorer")}
+                    >
+                      Explorer
+                    </div>
+                    <div
+                      className={`tab ${
+                        router.pathname === "/explorer"
+                          ? activeTab === "event"
+                            ? "active"
+                            : ""
+                          : activeTab === ""
+                          ? "active"
+                          : ""
+                      }`}
+                      onClick={() => handleTabChange("event")}
+                    >
+                      Évènements
+                    </div>
+                  </>
+                </div>
+              </>
+            )}
+
+            <div
+              className="icon-button"
+              style={{ cursor: "pointer", marginRight: "10px" }}
+              onClick={toggleSearchField}
+            >
+              <FontAwesomeIcon icon={faSearch} />
+            </div>
+
+            <div
+              className="icon-button"
+              style={{ cursor: "pointer" }}
+              onClick={toggleOverlayPanel}
+            >
+              <FontAwesomeIcon icon={faBars} />
+            </div>
+          </>
+        ) : (
+          <>
             <div style={{ position: "relative", width: "100%" }}>
               <div
                 className="search-box"
@@ -254,9 +375,9 @@ const Navigation = () => {
                   borderRadius: "30px",
                   backgroundColor: "white",
                   padding: "6px 12px",
-                  marginLeft: "20px",
-                  marginRight: "20px",
                   border: "1px solid #ccc",
+                  marginLeft: "12px",
+                  marginRight: "2px",
                 }}
               >
                 <input
@@ -271,11 +392,6 @@ const Navigation = () => {
                   }}
                   value={searchValue}
                   onChange={handleSearchChange}
-                  onKeyDown={(event) => {
-                    if (event.key === "Enter") {
-                      handleSearchSubmit();
-                    }
-                  }}
                 />
               </div>
               {searchResults.length > 0 && searchValue.trim() !== "" && (
@@ -288,348 +404,353 @@ const Navigation = () => {
                 </div>
               )}
             </div>
-          ) : (
-            <>
-              <div
-                className="nav-link"
-                style={{ margin: "0 20px", cursor: "pointer" }}
-              >
-                <a
-                  className={`nav-link ${isActive("/explorer")}`}
-                  href="explorer"
+            <div className="tabs">
+              <>
+                <div
+                  className={`tab ${
+                    router.pathname === "/explorer"
+                      ? activeTab === "explorer"
+                        ? "active"
+                        : ""
+                      : activeTab === ""
+                      ? "active"
+                      : ""
+                  }`}
+                  onClick={() => handleTabChange("explorer")}
                 >
                   Explorer
-                </a>
-              </div>
-              <div
-                className="nav-link"
-                style={{ margin: "0 20px", cursor: "pointer" }}
-              >
-                <a className={`nav-link ${isActive("/event")}`} href="event">
-                  {" "}
-                  Évènements
-                </a>
-              </div>
-            </>
-          )}
-
-          <div
-            className="icon-button"
-            style={{ cursor: "pointer", marginRight: "10px" }}
-            onClick={toggleSearchField}
-          >
-            <FontAwesomeIcon icon={faSearch} />
-          </div>
-
-          <div
-            className="icon-button"
-            style={{ cursor: "pointer" }}
-            onClick={toggleOverlayPanel}
-          >
-            <FontAwesomeIcon icon={faBars} />
-          </div>
-        </>
-      ) : (
-        <>
-          <div style={{ position: "relative", width: "100%" }}>
-            <div
-              className="search-box"
-              style={{
-                flex: 1,
-                display: "flex",
-                alignItems: "center",
-                borderRadius: "30px",
-                backgroundColor: "white",
-                padding: "6px 12px",
-                border: "1px solid #ccc",
-                marginLeft: "12px",
-                marginRight: "2px",
-              }}
-            >
-              <input
-                id="search"
-                type="text"
-                placeholder="Rechercher..."
-                style={{
-                  border: "none",
-                  flex: "1",
-                  height: "100%",
-                  outline: "none",
-                }}
-                value={searchValue}
-                onChange={handleSearchChange}
-              />
-            </div>
-            {searchResults.length > 0 && searchValue.trim() !== "" && (
-              <div className={styles["search-results"]}>
-                <div>
-                  {searchResults.map((user) => (
-                    <UserItem key={user.id} user={user} />
-                  ))}
                 </div>
-              </div>
-            )}
-          </div>
-          <div
-            className="nav-link"
-            style={{ margin: "0 20px", cursor: "pointer" }}
-          >
-            <a className={`nav-link ${isActive("/explorer")}`} href="explorer">
-              Explorer
-            </a>
-          </div>
-          <div
-            className="nav-link"
-            style={{ margin: "0 20px", cursor: "pointer" }}
-          >
-            <a className={`nav-link ${isActive("/event")}`} href="event">
-              Évènements
-            </a>
-          </div>
-        </>
-      )}
+                <div
+                  className={`tab ${
+                    router.pathname === "/explorer"
+                      ? activeTab === "event"
+                        ? "active"
+                        : ""
+                      : activeTab === ""
+                      ? "active"
+                      : ""
+                  }`}
+                  onClick={() => handleTabChange("event")}
+                >
+                  Évènements
+                </div>
+              </>
+            </div>
+          </>
+        )}
 
-      {/* Overlay Panel for small screens */}
-      {showOverlayPanel && isSmallScreen && (
-        <div
-          className="overlay-panel"
-          style={{
-            position: "fixed",
-            top: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "white",
-            zIndex: 999,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            width: "280px",
-            borderWidth: 1,
-          }}
-        >
+        {/* Overlay Panel for small screens */}
+        {showOverlayPanel && isSmallScreen && (
           <div
-            className="overlay-title"
+            className="overlay-panel"
             style={{
+              position: "fixed",
+              top: 10,
+              right: 10,
+              bottom: 0,
+              backgroundColor: "white",
+              zIndex: 999,
               display: "flex",
+              flexDirection: "column",
               alignItems: "center",
-              justifyContent: "space-between",
-              width: "100%",
-              padding: "10px 15px",
-              borderBottom: "1px solid #ccc",
+              width: "280px",
+              borderWidth: 1,
+              height: "270px",
+              borderRadius: 20,
             }}
           >
-            <span style={{ fontSize: "25px" }}> Menu</span>
             <div
-              className="close-icon"
+              className="overlay-title"
               style={{
-                cursor: "pointer",
-              }}
-              onClick={toggleOverlayPanel}
-            >
-              <FontAwesomeIcon icon={faTimes} />
-            </div>
-          </div>
-          <div className="overlay-content">
-            <div
-              style={{
-                marginTop: "10px",
                 display: "flex",
-                flexDirection: "column",
+                alignItems: "center",
                 justifyContent: "space-between",
-                height: "90vh",
+                width: "100%",
+                padding: "10px 15px",
+                borderBottom: "1px solid #ccc",
               }}
             >
-              <div>
-                <div
-                  className={`${styles["overlay-link"]} ${styles["link-profile"]}`}
+              <div className={`${styles["user"]}`}>
+                <a
+                  href="/profil"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    textDecoration: "none",
+                    cursor: "pointer",
+                  }}
                 >
-                  <FontAwesomeIcon
-                    icon={faUser}
-                    className={styles["link-icon"]}
+                  <img
+                    style={{
+                      width: "40px",
+                      height: "40px",
+                      borderRadius: "60px",
+                      marginRight: 12,
+                    }}
+                    src={userPhoto}
+                    alt="User Avatar"
                   />
-                  Profil
-                </div>
-                <div
-                  className={`${styles["overlay-link"]} ${styles["link-logout"]}`}
-                  onClick={handleLogout}
-                >
-                  <FontAwesomeIcon
-                    icon={faSignOut}
-                    className={styles["link-icon"]}
-                  />
-                  Déconnexion
-                </div>
-                <div
-                  className={`${styles["overlay-link"]} ${styles["link-new-event"]}`}
-                  onClick={handleModalOpen}
-                >
-                  <FontAwesomeIcon
-                    icon={faPlus}
-                    className={styles["link-icon"]}
-                  />
-                  Nouvel événement
-                </div>
-                {isModalOpen && (
-                  <Modal
-                    accessibilityCloseLabel="Fermer"
-                    accessibilityModalLabel="Créer un événement"
-                    heading="Créer un événement"
-                    size="sm"
-                    onDismiss={handleModalClose}
-                    footer={
-                      <Box display="flex" justifyContent="end">
-                        <Button
-                          text="Publier"
-                          color="red"
-                          onClick={handlePublishEvent}
-                        />
-                        <Box marginLeft={2}>
-                          <Button text="Annuler" onClick={handleModalClose} />
-                        </Box>
-                      </Box>
-                    }
-                    role="alertdialog"
-                  >
-                    {!isLoading ? (
-                      <>
-                        <Box marginTop={4} marginBottom={4}>
-                          {/* Media preview */}
-                          <div
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              height: "150px",
-                              border: "1px dashed #000",
-                              marginBottom: "2px",
-                              cursor: "pointer",
-                              position: "relative",
-                            }}
-                            onClick={handleOpenFileSelector}
-                          >
-                            {selectedMedia ? (
-                              <Image
-                                src={URL.createObjectURL(selectedMedia)}
-                                alt="Media Preview"
-                                style={{ maxWidth: "100%", maxHeight: "100%" }}
-                                width={150}
-                                height={150}
-                              />
-                            ) : (
-                              <div>
-                                <FontAwesomeIcon
-                                  icon={faPlus}
-                                  size="3x"
-                                  color="#ccc"
-                                />
-                              </div>
-                            )}
-                          </div>
-                          {/* Sélecteur de fichiers caché */}
-                          <input
-                            type="file"
-                            ref={inputFileRef}
-                            style={{ display: "none" }}
-                            accept="image/*, video/*" // Acceptez à la fois les images et les vidéos
-                            onChange={handleMediaChange}
-                          />
-                        </Box>
-                        <Box
-                          marginTop={4}
-                          display="flex"
-                          alignItems="start"
-                          direction="column"
-                        >
-                          <TextField
-                            id="title"
-                            name="title"
-                            onChange={({ value }) =>
-                              handleInputChange("title", value)
-                            }
-                            placeholder="Nom de l'événement"
-                            value={eventData.title}
-                          />
-                          <Box
-                            display="flex"
-                            marginTop={2}
-                            justifyContent="between"
-                          >
-                            <Box marginEnd={2}>
-                              <TextField
-                                id="eventDate"
-                                name="eventDate"
-                                type="date"
-                                onChange={({ value }) =>
-                                  handleInputChange("date", value)
-                                }
-                                value={eventData.date}
-                              />
-                            </Box>
-                            <Box marginL={4}>
-                              <TextField
-                                id="eventTime"
-                                name="eventTime"
-                                type="time"
-                                onChange={({ value }) =>
-                                  handleInputChange("time", value)
-                                }
-                                value={eventData.time}
-                              />
-                            </Box>
-                          </Box>
-                          <Box marginTop={2}>
-                            <TextField
-                              id="eventLocation"
-                              name="eventLocation"
-                              type="text"
-                              placeholder="Lieu"
-                              onChange={({ value }) =>
-                                handleInputChange("location", value)
-                              }
-                              value={eventData.location}
-                            />
-                          </Box>
-                          <Box marginTop={2} width="100%">
-                            <TextArea
-                              id="eventDescription"
-                              name="eventDescription"
-                              type="text"
-                              placeholder="Description"
-                              onChange={({ value }) =>
-                                handleInputChange("description", value)
-                              }
-                              value={eventData.description}
-                            />
-                          </Box>
-                        </Box>
-                      </>
-                    ) : (
-                      <Box
-                        position="absolute"
-                        top
-                        left
-                        right
-                        bottom
-                        display="flex"
-                        justifyContent="center"
-                        alignItems="center"
-                        zIndex={0}
-                      >
-                        <Spinner
-                          show={isLoading}
-                          accessibilityLabel="Chargement"
-                        />
-                      </Box>
-                    )}
-                  </Modal>
-                )}
+                  <span style={{ fontSize: 18, color: "white" }}>
+                    {user?.username}
+                  </span>
+                  <span />
+                </a>
               </div>
-              <div>Exclusivity © 2023. Tout droit réservé</div>
+            </div>
+            <div className="overlay-content">
+              <div
+                style={{
+                  marginTop: "10px",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  height: "90vh",
+                }}
+              >
+                <div>
+                  <a
+                    href="/profil"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      textDecoration: "none",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <div
+                      className={`${styles["overlay-link"]} ${styles["link-profile"]}`}
+                    >
+                      <FontAwesomeIcon
+                        icon={faUser}
+                        className={styles["link-icon"]}
+                      />
+                      Profil
+                    </div>
+                  </a>
+                  <div
+                    className={`${styles["overlay-link"]} ${styles["link-logout"]}`}
+                    onClick={handleLogout}
+                  >
+                    <FontAwesomeIcon
+                      icon={faSignOut}
+                      className={styles["link-icon"]}
+                    />
+                    Déconnexion
+                  </div>
+                  <div
+                    className={`${styles["overlay-link-event"]} ${styles["link-new-event"]}`}
+                    onClick={handleModalOpen}
+                  >
+                    <FontAwesomeIcon
+                      icon={faPlus}
+                      className={styles["link-icon"]}
+                    />
+                    Nouvel événement
+                  </div>
+                  <div
+                    style={{
+                      fontSize: "12px",
+                      justifyContent: "center",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                    }}
+                  >
+                    Exclusivity © 2023. Tout droit réservé
+                    <br />
+                    <a
+                      href="/conditions_d_utilisation"
+                      style={{ textDecoration: "underline" }}
+                    >
+                      Politique de confidentialité
+                    </a>
+                  </div>
+                  {isModalOpen && (
+                    <Modal
+                      accessibilityCloseLabel="Fermer"
+                      accessibilityModalLabel="Créer un événement"
+                      heading="Créer un événement"
+                      size="sm"
+                      onDismiss={handleModalClose}
+                      footer={
+                        <Box display="flex" justifyContent="end">
+                          <Button
+                            text="Publier"
+                            color="red"
+                            onClick={handlePublishEvent}
+                          />
+                          <Box marginLeft={2}>
+                            <Button text="Annuler" onClick={handleModalClose} />
+                          </Box>
+                        </Box>
+                      }
+                      role="alertdialog"
+                    >
+                      {!isLoading ? (
+                        <>
+                          <Box marginTop={4} marginBottom={4}>
+                            {/* Media preview */}
+                            <div
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                height: "150px",
+                                border: "1px dashed #000",
+                                marginBottom: "2px",
+                                cursor: "pointer",
+                                position: "relative",
+                              }}
+                              onClick={handleOpenFileSelector}
+                            >
+                              {selectedMedia ? (
+                                <Image
+                                  src={URL.createObjectURL(selectedMedia)}
+                                  alt="Media Preview"
+                                  style={{
+                                    maxWidth: "100%",
+                                    maxHeight: "100%",
+                                  }}
+                                  width={150}
+                                  height={150}
+                                />
+                              ) : (
+                                <div>
+                                  <FontAwesomeIcon
+                                    icon={faPlus}
+                                    size="3x"
+                                    color="#ccc"
+                                  />
+                                </div>
+                              )}
+                            </div>
+                            {/* Sélecteur de fichiers caché */}
+                            <input
+                              type="file"
+                              ref={inputFileRef}
+                              style={{ display: "none" }}
+                              accept="image/*, video/*" // Acceptez à la fois les images et les vidéos
+                              onChange={handleMediaChange}
+                            />
+                          </Box>
+                          <Box
+                            marginTop={4}
+                            display="flex"
+                            alignItems="start"
+                            direction="column"
+                          >
+                            <TextField
+                              id="title"
+                              name="title"
+                              onChange={({ value }) =>
+                                handleInputChange("title", value)
+                              }
+                              placeholder="Nom de l'événement"
+                              value={eventData.title}
+                            />
+                            <Box
+                              display="flex"
+                              marginTop={2}
+                              justifyContent="between"
+                            >
+                              <Box marginEnd={2}>
+                                <TextField
+                                  id="eventDate"
+                                  name="eventDate"
+                                  type="date"
+                                  onChange={({ value }) =>
+                                    handleInputChange("date", value)
+                                  }
+                                  value={eventData.date}
+                                />
+                              </Box>
+                              <Box marginL={4}>
+                                <TextField
+                                  id="eventTime"
+                                  name="eventTime"
+                                  type="time"
+                                  onChange={({ value }) =>
+                                    handleInputChange("time", value)
+                                  }
+                                  value={eventData.time}
+                                />
+                              </Box>
+                            </Box>
+                            <Box marginTop={2}>
+                              <TextField
+                                id="eventLocation"
+                                name="eventLocation"
+                                type="text"
+                                placeholder="Lieu"
+                                onChange={({ value }) =>
+                                  handleInputChange("location", value)
+                                }
+                                value={eventData.location}
+                              />
+                            </Box>
+                            <Box marginTop={2} width="100%">
+                              <TextArea
+                                id="eventDescription"
+                                name="eventDescription"
+                                type="text"
+                                placeholder="Description"
+                                onChange={({ value }) =>
+                                  handleInputChange("description", value)
+                                }
+                                value={eventData.description}
+                              />
+                            </Box>
+                          </Box>
+                        </>
+                      ) : (
+                        <Box
+                          position="absolute"
+                          top
+                          left
+                          right
+                          bottom
+                          display="flex"
+                          justifyContent="center"
+                          alignItems="center"
+                          zIndex={0}
+                        >
+                          <Spinner
+                            show={isLoading}
+                            accessibilityLabel="Chargement"
+                          />
+                        </Box>
+                      )}
+                    </Modal>
+                  )}
+                </div>
+                <div>Exclusivity © 2023. Tout droit réservé</div>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </nav>
+        )}
+      </nav>
+      <style jsx>{`
+        .tabs {
+          display: flex;
+          gap: 20px;
+          margin-left: 20px;
+        }
+
+        .tab {
+          cursor: pointer;
+          padding: 10px;
+          font-size: 16px;
+          color: #333;
+          border-bottom: 2px solid transparent;
+          transition: border-color 0.3s ease-in-out, color 0.3s ease-in-out;
+        }
+
+        .tab.active {
+          border-color: blue;
+          color: blue;
+        }
+      `}</style>
+    </>
   );
 };
 

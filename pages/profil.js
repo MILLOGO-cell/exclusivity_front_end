@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import styles from "../app/ProfilePage.module.css";
 import IconButton from "@/components/IconButton";
+import CustomButton from "@/components/NickButton";
 import {
   Box,
   Button,
@@ -40,6 +41,7 @@ const ProfilePage = () => {
   const [email, setEmail] = useState("");
   const [telephone, setTelephone] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [userIdentity, setUserIdentity] = useState(null);
   const [userImage, setUserImage] = useState("");
   const router = useRouter();
@@ -107,16 +109,16 @@ const ProfilePage = () => {
         setTelephone(data.user_details.telephone);
         getUserImage();
       } else {
-        console.log(
-          "Erreur lors de la récupération des détails de l'utilisateur:",
-          response.data
-        );
+        // console.log(
+        //   "Erreur lors de la récupération des détails de l'utilisateur:",
+        //   response.data
+        // );
       }
     } catch (error) {
-      console.log(
-        "Une erreur s'est produite lors de la récupération des détails de l'utilisateur:",
-        error
-      );
+      // console.log(
+      //   "Une erreur s'est produite lors de la récupération des détails de l'utilisateur:",
+      //   error
+      // );
     }
   };
 
@@ -154,21 +156,21 @@ const ProfilePage = () => {
       });
 
       if (response.status === 200) {
-        console.log(
-          "Informations de l'utilisateur mises à jour:",
-          response.data
-        );
+        // console.log(
+        //   "Informations de l'utilisateur mises à jour:",
+        //   response.data
+        // );
         fetchUserDetails();
       } else {
-        console.log(
-          "Une erreur s'est produite lors de la mise à jour des informations de l'utilisateur."
-        );
+        // console.log(
+        //   "Une erreur s'est produite lors de la mise à jour des informations de l'utilisateur."
+        // );
       }
     } catch (error) {
-      console.log(
-        "Une erreur s'est produite lors de la mise à jour des informations de l'utilisateur:",
-        error
-      );
+      // console.log(
+      //   "Une erreur s'est produite lors de la mise à jour des informations de l'utilisateur:",
+      //   error
+      // );
     } finally {
       setIsLoading(false);
     }
@@ -177,7 +179,7 @@ const ProfilePage = () => {
 
   const handleUploadPhoto = async () => {
     if (selectedPhoto) {
-      setIsLoading(true);
+      setLoading(true);
       try {
         const formData = new FormData();
         formData.append("image", selectedPhoto);
@@ -204,7 +206,7 @@ const ProfilePage = () => {
           error
         );
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     }
   };
@@ -219,7 +221,7 @@ const ProfilePage = () => {
       }}
     >
       <Box>
-        <Navigation />
+        <Navigation userPhoto={userImage} user={userIdentity} />
       </Box>
       <div
         style={{
@@ -246,9 +248,9 @@ const ProfilePage = () => {
                     src={
                       selectedPhoto
                         ? URL.createObjectURL(selectedPhoto)
-                        : userImage // Utiliser l'URL de l'image de profil de l'utilisateur connecté
+                        : userImage
                         ? userImage
-                        : "../user1.png" // Afficher une image par défaut si l'utilisateur n'a pas de photo de profil
+                        : "../user1.png"
                     }
                     alt="Photo de profil"
                     className={styles.profilePhoto}
@@ -265,7 +267,7 @@ const ProfilePage = () => {
                 />
                 <div className={styles.buttonsContainer}>
                   <Button
-                    text="Changer de profil"
+                    text={loading ? "chargement ..." : "Changer de profil"}
                     color="gray"
                     onClick={handleUploadPhoto}
                     disabled={!selectedPhoto}
@@ -281,7 +283,7 @@ const ProfilePage = () => {
             </div>
             <form onSubmit={handleSubmit} className={styles.formContainer}>
               <div className={styles.formTitle}>Informations personnelles</div>
-              <Box display="flex" direction="column" padding={2} Width="100%">
+              <Box display="flex" direction="column" padding={2} width="100%">
                 <Box marginBottom={3}>
                   <TextField
                     id="username"
@@ -330,16 +332,17 @@ const ProfilePage = () => {
                     onChange={({ value }) => setTelephone(value)}
                   />
                 </Box>
-                <Button
+                <CustomButton
                   text={isLoading ? "Chargement en cours..." : "Enregistrer"}
-                  color="gray"
+                  buttonColor="gray"
                   type="submit"
+                  rounded
                 />
               </Box>
             </form>
             <form onSubmit={handleSubmit} className={styles.formContainer}>
               <div className={styles.formTitle}>Mot de passe</div>
-              <Box display="flex" direction="column" padding={2} Width="100%">
+              <Box display="flex" direction="column" padding={2} width="100%">
                 <Box marginBottom={3}>
                   <TextField
                     id="password"

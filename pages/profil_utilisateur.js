@@ -288,224 +288,225 @@ const ProfileArtisteImages = ({}) => {
   return (
     <>
       <Navigation />
-      <div className={styles.container}>
-        <div className={`${styles.artistInfoContainer}`}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              direction: "column",
-              justifyContent: "center",
-            }}
-          >
-            <img
-              src={userImage}
-              alt={userIdentity?.username}
-              style={{
-                width: "100px",
-                height: "100px",
-                borderRadius: "50%",
-                marginRight: "15px",
-              }}
-              width={100}
-              height={100}
-            />
-            <div className={styles.artistFollowersContainer}>
-              <div>
-                <span className={styles.artistUsername}>
-                  {userProfile?.username}
-                </span>
-              </div>
-              <div>
-                <span className={styles.artistLink}>@{formattedUsername}</span>
-                <span style={{ marginRight: "5px" }}>•</span>
-                <span className={styles.artistFollowers}>
-                  {formatFollowersCount(userProfile?.followers_count)} abonné(s)
-                </span>
-              </div>
-            </div>
-          </div>
-          <div className={`${styles.artistButtonContainer}`}>
-            {userProfile?.is_creator && (
-              <IconButton
-                icon={
-                  <FontAwesomeIcon
-                    icon={isUserSubscribed ? faWarning : faAdd}
-                  />
-                }
-                label={isUserSubscribed ? "Se désabonner" : "S'abonner"}
-                buttonColor={isUserSubscribed ? "white" : "blue"}
-                textColor={isUserSubscribed ? "red" : "white"}
-                iconColor={isUserSubscribed ? "red" : "white"}
-                iconPosition="left"
-                borderColor={isUserSubscribed ? "red" : "blue"}
-                border
-                onClick={() => {
-                  if (isUserSubscribed) {
-                    setShowModal(true);
-                  } else {
-                    handleFollow(id);
-                  }
-                }}
-              />
-            )}
-          </div>
-          {showModal && (
-            <Modal
-              accessibilityModalLabel="Confirmation de désabonnement"
-              heading="Confirmation de désabonnement"
-              onDismiss={() => setShowModal(false)}
-              footer={
-                <Box display="flex" justifyContent="center">
-                  <Box marginEnd={2}>
-                    <Button
-                      text="Confirmer"
-                      inline
-                      color="red"
-                      onClick={() => {
-                        handleFollow(id);
-                        setShowModal(false);
-                      }}
-                    />
-                  </Box>
-
-                  <Button
-                    text="Annuler"
-                    inline
-                    onClick={() => setShowModal(false)}
-                    color="gray"
-                  />
-                </Box>
-              }
-              size={450}
-              role="alertdialog"
-              headingLevel={2}
-              footerType="sticky"
-              preventScroll
-            >
-              <Box padding={2}>
-                <Text>
-                  Cher utilisateur/trice, en vous désabonnant de ce compte, vous
-                  n&apos;aurez plus accès aux différents contenus qui y sont
-                  liés. Êtes-vous sûr(e) de vouloir continuer et vous désabonner
-                  ?
-                </Text>
-              </Box>
-            </Modal>
-          )}
-        </div>
-
-        <div
-          style={{
-            backgroundColor: "white",
-            padding: "12px",
-            width: "435px",
-            margin: "20px",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            borderRadius: "15px",
-          }}
-        >
-          <div>
-            <button
-              style={{
-                marginRight: "10px",
-                backgroundColor:
-                  activeTab === "gallery" ? "white" : "transparent",
-                color: activeTab === "gallery" ? "blue" : "black",
-                borderBottom:
-                  activeTab === "gallery" ? "2px solid #ccc" : "white",
-                borderColor: activeTab === "gallery" ? "blue" : "black",
-                padding: "6px 5px",
-              }}
-              onClick={() => setActiveTab("gallery")}
-            >
-              Galerie
-            </button>
-            <button
-              style={{
-                backgroundColor:
-                  activeTab === "about" ? "white" : "transparent",
-                color: activeTab === "about" ? "blue" : "black",
-                borderBottom:
-                  activeTab === "about" ? "2px solid #ccc" : "white",
-                borderColor: activeTab === "about" ? "blue" : "black",
-                padding: "6px 5px",
-              }}
-              onClick={() => setActiveTab("about")}
-            >
-              À propos
-            </button>
-          </div>
-          {activeTab === "gallery" && (
-            // <div className={`${styles.galleryContainer}`}>
-            //   {photoPairs.map((pair, index) => (
-            //     <>
-            //       <div
-            //         key={index}
-            //         style={{
-            //           display: "flex",
-            //           marginBottom: "10px",
-            //           marginTop: "2px",
-            //         }}
-            //       >
-            //         {pair.map((photo) => (
-            //           <img
-            //             key={photo.id}
-            //             src={photo.url}
-            //             alt={`Photo ${photo.id}`}
-            //             style={{
-            //               width: "200px",
-            //               height: "200px",
-            //               marginRight: "10px",
-            //             }}
-            //           />
-            //         ))}
-            //       </div>
-            //     </>
-            //   ))}
-            //   <div
-            //     style={{
-            //       display: "flex",
-            //       justifyContent: "center",
-            //       marginTop: "10px",
-            //     }}
-            //   >
-            //     {currentPage > 1 && (
-            //       <button onClick={() => setCurrentPage(currentPage - 1)}>
-            //         Précédent
-            //       </button>
-            //     )}
-            //     {userPhotos.length > currentPage * 6 && (
-            //       <button onClick={() => setCurrentPage(currentPage + 1)}>
-            //         Suivant
-            //       </button>
-            //     )}
-            //   </div>
-            // </div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <div className={styles.container}>
+          <div className={`${styles.artistInfoContainer}`}>
             <div
               style={{
-                textAlign: "center",
-                marginTop: "20px",
-                color: "red",
+                display: "flex",
+                alignItems: "center",
+                direction: "column",
+                justifyContent: "center",
               }}
             >
-              <p>
-                Le contenu est temporairement indisponible et sera rétabli dans
-                un bref délai. Veuillez nous excuser pour la gêne occasionnée.
-              </p>
+              <img
+                src={userImage}
+                alt={userIdentity?.username}
+                style={{
+                  width: "100px",
+                  height: "100px",
+                  borderRadius: "50%",
+                  marginRight: "15px",
+                }}
+                width={100}
+                height={100}
+              />
+              <div className={styles.artistFollowersContainer}>
+                <div>
+                  <span className={styles.artistUsername}>
+                    {userProfile?.username}
+                  </span>
+                </div>
+                <div>
+                  <span className={styles.artistLink}>
+                    @{formattedUsername}
+                  </span>
+                  <span style={{ marginRight: "5px" }}>•</span>
+                  <span className={styles.artistFollowers}>
+                    {formatFollowersCount(userProfile?.followers_count)}{" "}
+                    abonné(s)
+                  </span>
+                </div>
+              </div>
             </div>
-          )}
-          {activeTab === "about" ? <About userInfo={userInfo} /> : null}
-        </div>
+            <div className={`${styles.artistButtonContainer}`}>
+              {userProfile?.is_creator && (
+                <IconButton
+                  icon={
+                    <FontAwesomeIcon
+                      icon={isUserSubscribed ? faWarning : faAdd}
+                    />
+                  }
+                  label={isUserSubscribed ? "Se désabonner" : "S'abonner"}
+                  buttonColor={isUserSubscribed ? "white" : "blue"}
+                  textColor={isUserSubscribed ? "red" : "white"}
+                  iconColor={isUserSubscribed ? "red" : "white"}
+                  iconPosition="left"
+                  borderColor={isUserSubscribed ? "red" : "blue"}
+                  border
+                  onClick={() => {
+                    if (isUserSubscribed) {
+                      setShowModal(true);
+                    } else {
+                      handleFollow(id);
+                    }
+                  }}
+                />
+              )}
+            </div>
+            {showModal && (
+              <Modal
+                accessibilityModalLabel="Confirmation de désabonnement"
+                heading="Confirmation de désabonnement"
+                onDismiss={() => setShowModal(false)}
+                footer={
+                  <Box display="flex" justifyContent="center">
+                    <Box marginEnd={2}>
+                      <Button
+                        text="Confirmer"
+                        inline
+                        color="red"
+                        onClick={() => {
+                          handleFollow(id);
+                          setShowModal(false);
+                        }}
+                      />
+                    </Box>
 
-        <div className={styles.sidemenu}>
-          <SideMenu
-            username={userIdentity?.username}
-            fansCount={userIdentity?.followers_count}
-            userPhoto={userProfilImage}
-          />
+                    <Button
+                      text="Annuler"
+                      inline
+                      onClick={() => setShowModal(false)}
+                      color="gray"
+                    />
+                  </Box>
+                }
+                size={450}
+                role="alertdialog"
+                headingLevel={2}
+                footerType="sticky"
+                preventScroll
+              >
+                <Box padding={2}>
+                  <Text>
+                    Cher utilisateur/trice, en vous désabonnant de ce compte,
+                    vous n&apos;aurez plus accès aux différents contenus qui y
+                    sont liés. Êtes-vous sûr(e) de vouloir continuer et vous
+                    désabonner ?
+                  </Text>
+                </Box>
+              </Modal>
+            )}
+          </div>
+
+          <div className={styles.fetchContainer}>
+            <div>
+              <button
+                style={{
+                  marginRight: "10px",
+                  backgroundColor:
+                    activeTab === "gallery" ? "white" : "transparent",
+                  color: activeTab === "gallery" ? "blue" : "black",
+                  borderBottom:
+                    activeTab === "gallery" ? "2px solid #ccc" : "white",
+                  borderColor: activeTab === "gallery" ? "blue" : "black",
+                  padding: "6px 5px",
+                }}
+                onClick={() => setActiveTab("gallery")}
+              >
+                Galerie
+              </button>
+              <button
+                style={{
+                  backgroundColor:
+                    activeTab === "about" ? "white" : "transparent",
+                  color: activeTab === "about" ? "blue" : "black",
+                  borderBottom:
+                    activeTab === "about" ? "2px solid #ccc" : "white",
+                  borderColor: activeTab === "about" ? "blue" : "black",
+                  padding: "6px 5px",
+                }}
+                onClick={() => setActiveTab("about")}
+              >
+                À propos
+              </button>
+            </div>
+            {activeTab === "gallery" && (
+              // <div className={`${styles.galleryContainer}`}>
+              //   {photoPairs.map((pair, index) => (
+              //     <>
+              //       <div
+              //         key={index}
+              //         style={{
+              //           display: "flex",
+              //           marginBottom: "10px",
+              //           marginTop: "2px",
+              //         }}
+              //       >
+              //         {pair.map((photo) => (
+              //           <img
+              //             key={photo.id}
+              //             src={photo.url}
+              //             alt={`Photo ${photo.id}`}
+              //             style={{
+              //               width: "200px",
+              //               height: "200px",
+              //               marginRight: "10px",
+              //             }}
+              //           />
+              //         ))}
+              //       </div>
+              //     </>
+              //   ))}
+              //   <div
+              //     style={{
+              //       display: "flex",
+              //       justifyContent: "center",
+              //       marginTop: "10px",
+              //     }}
+              //   >
+              //     {currentPage > 1 && (
+              //       <button onClick={() => setCurrentPage(currentPage - 1)}>
+              //         Précédent
+              //       </button>
+              //     )}
+              //     {userPhotos.length > currentPage * 6 && (
+              //       <button onClick={() => setCurrentPage(currentPage + 1)}>
+              //         Suivant
+              //       </button>
+              //     )}
+              //   </div>
+              // </div>
+              <div
+                style={{
+                  textAlign: "center",
+                  marginTop: "20px",
+                  color: "red",
+                }}
+              >
+                <p>
+                  Le contenu est temporairement indisponible et sera rétabli
+                  dans un bref délai. Veuillez nous excuser pour la gêne
+                  occasionnée.
+                </p>
+              </div>
+            )}
+            {activeTab === "about" ? <About userInfo={userInfo} /> : null}
+          </div>
+
+          <div className={styles.sidemenu}>
+            <SideMenu
+              username={userIdentity?.username}
+              fansCount={userIdentity?.followers_count}
+              userPhoto={userProfilImage}
+            />
+          </div>
         </div>
       </div>
     </>

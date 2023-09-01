@@ -110,15 +110,24 @@ const EventBoard = ({ events }) => {
 };
 
 const Item = ({ photo, date, title }) => {
+  const isVideo = photo && photo.includes(".mp4");
+
   return (
     <div className={styles.itemContainer}>
-      <img
-        src={photo}
-        alt="Event"
-        className={styles.itemPhoto}
-        width={16}
-        height={16}
-      />
+      {isVideo ? (
+        <video className={styles.itemMedia} controls>
+          <source src={photo} type="video/mp4" />
+          Votre navigateur ne prend pas en charge la lecture de vidéos.
+        </video>
+      ) : (
+        <img
+          src={photo}
+          alt="Event"
+          className={styles.itemPhoto}
+          width={16}
+          height={16}
+        />
+      )}
       <div>
         <div className={styles.itemDate}>{date}</div>
         <div className={styles.itemTitle}>{title}</div>

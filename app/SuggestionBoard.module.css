@@ -4,6 +4,7 @@
   background-color: #ffffff;
   border-radius: 20px;
   padding: 10px;
+  width: 300px;
 }
 
 .suggestionBoardTitle {
@@ -81,7 +82,7 @@
 .blockUserInfo {
   display: flex;
   flex-direction: row;
-  width: 120px;
+  width: 150px;
   flex-wrap: wrap;
 }
 

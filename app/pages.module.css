@@ -2,7 +2,7 @@
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  align-content: centers;
+  align-content: center;
   height: 100vh;
 }
 
@@ -17,8 +17,9 @@
   height: 100%;
   width: 100%;
   background-color: #f4f4f4;
-  overflow-y: hidden; /* Masquer la barre de défilement */
+  overflow-y: hidden;
   overflow-x: hidden;
+  max-width: 700px;
 }
 
 .scrollWrapper {
@@ -44,7 +45,7 @@
 
 .box {
   margin: 10px;
-  width: 100%; /* Les boîtes occuperont toute la largeur disponible */
+  width: 100%;
   height: 150px;
 }
 
@@ -58,7 +59,15 @@
 .overlay-link {
   display: flex;
   align-items: center;
-  padding: 10px 20px;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 30px;
+  width: 100%;
+}
+.overlay-link-event {
+  display: flex;
+  align-items: center;
+  padding: 5px 10px;
   cursor: pointer;
   border-radius: 30px;
 }
@@ -75,33 +84,37 @@
 
 /* Styles pour les différentes couleurs de lien */
 .link-profile {
-  color: #000; /* Couleur pour le lien "Profil" */
-  border-radius: 30px;
+  color: #000;
+  border-radius: 10px;
   margin-bottom: 10px;
 }
 
 .link-logout {
-  color: #f84403; /* Couleur pour le lien "Déconnexion" */
-  border-radius: 30px;
+  color: #f84403;
+  border-radius: 10px;
   margin-bottom: 10px;
 }
 
 .link-new-event {
-  color: #f8f8f8; /* Couleur pour le lien "Nouvel événement" */
+  color: #f8f8f8;
   background-color: blue;
-  border-radius: 30px;
+  border-radius: 10px;
   margin-bottom: 10px;
 }
 
 .link-subscriptions {
-  color: #33ffaa; /* Couleur pour le lien "Mes abonnements" */
+  color: #33ffaa;
   border-radius: 30px;
 }
 
 /* Style du lien au survol (hover) */
 .overlay-link:hover {
   background-color: #f2f2f2;
-  border-radius: 30px;
+  border-radius: 10px;
+}
+.overlay-link-event:hover {
+  background-color: rgb(116, 116, 249);
+  border-radius: 10px;
 }
 
 /* Style du lien lorsqu'il est cliqué (active) */
@@ -111,10 +124,24 @@
 
 /** style du composant CreatePost dans les page***/
 .create {
-  max-width: 450px;
+  max-width: 350px;
   height: auto;
   padding-bottom: 30px;
+  /* width: 100%; */
+  display: flex;
   /* background-color: rgb(3, 61, 81); */
+}
+
+.user {
+  display: "flex";
+  justify-content: "flex-start";
+  align-items: "center";
+  padding: 5px;
+  width: 280px;
+  border-radius: 10px;
+  backdrop-filter: blur(10px);
+  background: rgba(10, 10, 120, 0.775); /* Couleur de fond avec transparence */
+  box-shadow: 0 8px 6px rgba(0, 0, 0, 0.1);
 }
 
 .search-results {
@@ -181,15 +208,15 @@
 /* Ecrans larges extra larges*/
 @media (min-width: 1201px) {
   .create {
-    max-width: 653px;
-    padding-bottom: 30px;
+    min-width: 500px;
+    padding-bottom: 10px;
     /* background-color: rgb(1, 13, 1); */
-    display: flex;
+    /* display: flex; */
   }
 }
 
 /* Ecrans ordinateur portable*/
-@media (min-width: 769px) and (max-width: 1024px) {
+@media (min-width: 1025px) and (max-width: 1200px) {
   .container {
     flex-direction: column;
     align-items: center;
@@ -205,13 +232,38 @@
   }
   .create {
     max-width: 500px;
-    padding-bottom: 30px;
+    padding-bottom: 10px;
+    width: 100%;
+
     /* background-color: rgb(223, 18, 107); */
   }
 }
 
 /* Ecrans pour tablettes*/
-@media (min-width: 481px) and (max-width: 768px) {
+@media (min-width: 769px) and (max-width: 1024px) {
+  .container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .sideDiv {
+    display: none;
+  }
+
+  .centerDiv {
+    flex: 1;
+    width: 100%;
+  }
+  .create {
+    min-width: 400px;
+    padding-bottom: 10px;
+    width: 100%;
+    /* background-color: rgb(206, 35, 13); */
+  }
+}
+/* Pour les petits écrans, masquez les divs latérales et centrez la div du milieu */
+/* Ecrans pour mobiles*/
+@media (min-width: 481px) and (max-width: 1024px) {
   .container {
     flex-direction: column;
     align-items: center;
@@ -227,12 +279,11 @@
   }
   .create {
     max-width: 400px;
-    padding-bottom: 30px;
-    /* background-color: rgb(206, 35, 13); */
+    padding-bottom: 10px;
+    width: 100%;
+    /* background-color: rgb(64, 33, 200); */
   }
 }
-/* Pour les petits écrans, masquez les divs latérales et centrez la div du milieu */
-/* Ecrans pour mobiles*/
 @media (min-width: 320px) and (max-width: 480px) {
   .container {
     flex-direction: column;
@@ -248,8 +299,9 @@
     width: 100%;
   }
   .create {
-    max-width: 100%;
-    padding-bottom: 30px;
+    max-width: 350px;
+    padding-bottom: 10px;
+    width: 100%;
     /* background-color: rgb(64, 33, 200); */
   }
 }

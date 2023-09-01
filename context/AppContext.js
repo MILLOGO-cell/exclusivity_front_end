@@ -21,6 +21,7 @@ export function AppProvider({ children }) {
   const [userList, setUserList] = useState([]);
   const [userId, setUserId] = useState(null);
   const [userDetails, setUserDetails] = useState("");
+
   const fetchPosts = async () => {
     setIsLoading(true);
     try {
@@ -186,3 +187,4 @@ export function AppProvider({ children }) {
     </AppContext.Provider>
   );
 }
+5;

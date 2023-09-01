@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Button, TextField, Text, IconButton } from "gestalt";
+import { Box, Button, TextField, Text, IconButton, Checkbox } from "gestalt";
 import Link from "next/link";
 import LoginForm from "./LoginForm";
 import { REGISTER_URL } from "@/configs/api";
@@ -13,6 +13,11 @@ const RegisterForm = ({ handleCloseRegisterForm, showCloseButton }) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isChecked, setIsChecked] = useState(false);
+
+  const handleCheckboxChange = () => {
+    setIsChecked(!isChecked);
+  };
 
   const handleSubmit = async () => {
     setErrorMessage("");
@@ -27,6 +32,10 @@ const RegisterForm = ({ handleCloseRegisterForm, showCloseButton }) => {
     }
     if (password.length < 8) {
       setErrorMessage("Le mot de passe doit contenir au moins 8 caractères");
+      return;
+    }
+    if (!isChecked) {
+      setErrorMessage("Veuillez accepeter les conditions d'utilisation!");
       return;
     }
     try {
@@ -134,6 +143,34 @@ const RegisterForm = ({ handleCloseRegisterForm, showCloseButton }) => {
             onChange={({ value }) => setConfirmPassword(value)}
           />
         </Box>
+        <div
+          style={{
+            margin: 15,
+          }}
+        >
+          <div
+            style={{
+              margin: 5,
+              display: "flex",
+              justifyContent: "flex-start",
+            }}
+          >
+            <div
+              style={{
+                marginRight: 5,
+              }}
+            >
+              <label style={{ gap: 2 }}>
+                <input
+                  type="checkbox"
+                  checked={isChecked}
+                  onChange={handleCheckboxChange}
+                />
+              </label>
+            </div>
+            J&apos;accepte les conditions d'utilisation
+          </div>
+        </div>
         <Box marginBottom={2}>
           <Button
             text={loading ? "Chargement en cours..." : "S'inscrire"}
