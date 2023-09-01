@@ -20,14 +20,14 @@ const Conditions = () => {
   return (
     <div className="conditions-page">
       <nav className="navbar">
-        <a href="/">
+        <Link href="/">
           <div className="logo">
             <img src="/logo.png" alt="Logo" />
           </div>
-        </a>
+        </Link>
       </nav>
       <div className="content-wrapper">
-        <h1 className="title">Conditions d'utilisation</h1>
+        <h1 className="title">Conditions d&apos;utilisation</h1>
         <div
           className="content"
           dangerouslySetInnerHTML={{ __html: conditionsContent }}

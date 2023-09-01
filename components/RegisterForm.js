@@ -168,7 +168,7 @@ const RegisterForm = ({ handleCloseRegisterForm, showCloseButton }) => {
                 />
               </label>
             </div>
-            J&apos;accepte les conditions d'utilisation
+            J&apos;accepte les conditions d&apos;utilisation
           </div>
         </div>
         <Box marginBottom={2}>
