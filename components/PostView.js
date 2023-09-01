@@ -374,7 +374,7 @@ const PostView = ({
               onClick={handleLike}
             >
               {liked ? (
-                <span style={{ color: "black" }}>J'aime ·👍 </span>
+                <span style={{ color: "black" }}>J&apos;aime ·👍 </span>
               ) : (
                 <span style={{ color: "blue" }}>Vous aimez ·👍 </span>
               )}

@@ -6,6 +6,7 @@ import CustomButton from "@/components/NickButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import styles from "../app/pages.module.css";
 import { faSignOut, faPlus } from "@fortawesome/free-solid-svg-icons";
+import Link from "next/link";
 
 const Abonnement = () => {
   const { user, token, setUser, setToken, setIsAuthenticated } =
@@ -207,12 +208,12 @@ const Abonnement = () => {
                 >
                   Exclusivity © 2023. Tout droit réservé
                   <br />
-                  <a
+                  <Link
                     href="/conditions_d_utilisation"
                     style={{ textDecoration: "underline" }}
                   >
                     Politique de confidentialité
-                  </a>
+                  </Link>
                 </div>
               </div>
               <div>Exclusivity © 2023. Tout droit réservé</div>

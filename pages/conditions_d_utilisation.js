@@ -20,11 +20,11 @@ const Conditions = () => {
   return (
     <div className="conditions-page">
       <nav className="navbar">
-        <Link href="/">
-          <div className="logo">
-            <img src="/logo.png" alt="Logo" />
-          </div>
-        </Link>
+        {/* <Link href="/"> */}
+        <div className="logo">
+          <img src="/logo.png" alt="Logo" />
+        </div>
+        {/* </Link> */}
       </nav>
       <div className="content-wrapper">
         <h1 className="title">Conditions d&apos;utilisation</h1>
@@ -43,7 +43,7 @@ const Conditions = () => {
           display: flex;
           justify-content: flex-start;
           align-items: center;
-          padding: 1rem;
+          padding: 0.1rem;
           background-color: #fff;
           color: white;
           box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);

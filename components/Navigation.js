@@ -77,7 +77,7 @@ const Navigation = ({ onTabChange, userPhoto, user }) => {
   };
 
   useEffect(() => {
-    handleResize(); // Vérifiez la taille initiale
+    handleResize();
     window.addEventListener("resize", handleResize);
 
     // Initialisez activeTab en fonction du chemin d'accès de l'URL
@@ -471,7 +471,7 @@ const Navigation = ({ onTabChange, userPhoto, user }) => {
               }}
             >
               <div className={`${styles["user"]}`}>
-                <a
+                <Link
                   href="/profil"
                   style={{
                     display: "flex",
@@ -494,7 +494,7 @@ const Navigation = ({ onTabChange, userPhoto, user }) => {
                     {user?.username}
                   </span>
                   <span />
-                </a>
+                </Link>
               </div>
             </div>
             <div className="overlay-content">
@@ -508,7 +508,7 @@ const Navigation = ({ onTabChange, userPhoto, user }) => {
                 }}
               >
                 <div>
-                  <a
+                  <Link
                     href="/profil"
                     style={{
                       display: "flex",
@@ -526,7 +526,7 @@ const Navigation = ({ onTabChange, userPhoto, user }) => {
                       />
                       Profil
                     </div>
-                  </a>
+                  </Link>
                   <div
                     className={`${styles["overlay-link"]} ${styles["link-logout"]}`}
                     onClick={handleLogout}
@@ -558,12 +558,12 @@ const Navigation = ({ onTabChange, userPhoto, user }) => {
                   >
                     Exclusivity © 2023. Tout droit réservé
                     <br />
-                    <a
+                    <Link
                       href="/conditions_d_utilisation"
                       style={{ textDecoration: "underline" }}
                     >
                       Politique de confidentialité
-                    </a>
+                    </Link>
                   </div>
                   {isModalOpen && (
                     <Modal

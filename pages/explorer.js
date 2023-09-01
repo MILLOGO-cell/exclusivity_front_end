@@ -13,6 +13,7 @@ import allowedRoutes from "@/components/allowedRoutes";
 import { useRouter } from "next/router";
 import ExplorerPage from "@/components/ExplorerPage";
 import EventPage from "@/components/EventPage";
+import Link from "next/link";
 
 const Home = () => {
   const router = useRouter();
@@ -155,12 +156,12 @@ const Home = () => {
               >
                 Exclusivity © 2023. Tout droit réservé
                 <br />
-                <a
+                <Link
                   href="/conditions_d_utilisation"
                   style={{ textDecoration: "underline" }}
                 >
                   Politique de confidentialité
-                </a>
+                </Link>
               </div>
             </div>
           </div>
