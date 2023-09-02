@@ -42,7 +42,7 @@ const Conditions = () => {
               justifyContent: "center",
             }}
           >
-            Oups, cette page n'est pas encore disponible !
+            Oups, cette page n&apos;`est pas encore disponible !
           </div>
         )}
       </div>
