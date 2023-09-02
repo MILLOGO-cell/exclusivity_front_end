@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { API_URL } from "@/configs/api";
-import Link from "next/link";
 import Image from "next/image";
 
 const Conditions = () => {
@@ -27,10 +26,25 @@ const Conditions = () => {
       </nav>
       <div className="content-wrapper">
         <h1 className="title">Conditions d&apos;utilisation</h1>
-        <div
-          className="content"
-          dangerouslySetInnerHTML={{ __html: conditionsContent }}
-        />
+        {conditionsContent ? (
+          <div
+            className="content"
+            dangerouslySetInnerHTML={{ __html: conditionsContent }}
+          />
+        ) : (
+          <div
+            style={{
+              marginTop: 132,
+              fontSize: 32,
+              color: "blue",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            Oups, cette page n'est pas encore disponible !
+          </div>
+        )}
       </div>
 
       <style jsx>{`
