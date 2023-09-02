@@ -7,6 +7,15 @@ import axios from "axios";
 import { useAppContext } from "@/context/AppContext";
 import Link from "next/link";
 import Image from "next/image";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faThumbsUp,
+  faThumbsUp as faThumbsUpSolid,
+  faHeart,
+  faComment,
+  faUser,
+} from "@fortawesome/free-solid-svg-icons";
+import { useMediaQuery } from "react-responsive";
 
 const PostView = ({
   profilePhoto,
@@ -40,6 +49,7 @@ const PostView = ({
   const [likedUsers, setLikedUsers] = useState([]);
   const { token, setToken, fetchPosts, fetchEventPosts } = useAppContext();
   const [userIdentity, setUserIdentity] = useState(null);
+  const isSmallScreen = useMediaQuery({ maxWidth: 768 });
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -260,15 +270,34 @@ const PostView = ({
     ) {
       return "Vous aimez ce poste ·";
     } else if (likesCount === 1) {
-      return "1 personne aime ce poste ·";
+      return isSmallScreen ? (
+        <FontAwesomeIcon icon={faHeart} style={{ color: "red" }} />
+      ) : (
+        "1 personne aime ce poste ·"
+      );
     } else if (likedUsers.includes(userIdentity?.username)) {
-      return `Vous et ${likesCount - 1} personne${
-        likesCount === 2 ? "" : "s"
-      } aiment ce poste`;
+      return isSmallScreen ? (
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <span> Vous et {likesCount - 1}</span>
+          <FontAwesomeIcon icon={faHeart} style={{ color: "red" }} />
+        </div>
+      ) : (
+        `Vous et ${likesCount - 1} personne${
+          likesCount === 2 ? "" : "s"
+        } aimez ce poste ·`
+      );
     } else {
-      return `${likesCount} personnes aiment ce poste`;
+      return isSmallScreen ? (
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <span> {likesCount}</span>
+          <FontAwesomeIcon icon={faHeart} style={{ color: "red" }} />
+        </div>
+      ) : (
+        `${likesCount} personnes aiment ce poste ·`
+      );
     }
   };
+
   const rootComments = commentData?.filter(
     (comment) => comment.parent_comment === null
   );
@@ -367,22 +396,34 @@ const PostView = ({
             ) : (
               ""
             )}
-            {
-              commentsCount > 0 ? (
-                <span>
-                  {" "}
-                  {formatCount(commentsCount)} commentaire
-                  {commentsCount !== 1 ? "s" : ""}
-                </span>
-              ) : (
-                ""
+            {isSmallScreen ? (
+              commentsCount > 0 && (
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    width: 30,
+                    marginLeft: 0,
+                  }}
+                >
+                  {commentsCount}
+                  <FontAwesomeIcon icon={faComment} style={{ color: "gray" }} />
+                </div>
               )
-              // (
-              //   <div className={styles.noCommentsText}>
-              //     Soyez la première personne à commenter ce poste.
-              //   </div>
-              // )
-            }
+            ) : (
+              <span className={`hide-on-small-screen ${styles.commentCount}`}>
+                {commentsCount > 0 ? (
+                  <span>
+                    {" "}
+                    {formatCount(commentsCount)} commentaire
+                    {commentsCount !== 1 ? "s" : ""}
+                  </span>
+                ) : (
+                  ""
+                )}
+              </span>
+            )}
           </div>
         </div>
         <Box display="flex" direction="row">
@@ -486,6 +527,7 @@ const Comment = ({ commentData, token, userIdentity, postId, level = 0 }) => {
   const commentRef = useRef(null);
   const { fetchPosts, fetchEventPosts } = useAppContext();
   const [likedUsers, setLikedUsers] = useState([]);
+  const isSmallScreen = useMediaQuery({ maxWidth: 768 });
 
   const Refresh = async () => {
     try {
@@ -704,22 +746,47 @@ const Comment = ({ commentData, token, userIdentity, postId, level = 0 }) => {
             onClick={handleLike}
           >
             {liked ? (
-              <span style={{ color: "black" }}>J&apos;aime ·👍 </span>
+              <div>
+                <FontAwesomeIcon
+                  icon={faThumbsUpSolid}
+                  style={{ color: "blue" }}
+                />{" "}
+                <span className="hide-on-small-screen">Vous aimez</span>
+              </div>
             ) : (
-              <span style={{ color: "blue" }}>Vous aimez ·👍 </span>
+              <div>
+                <FontAwesomeIcon icon={faThumbsUp} style={{ color: "gray" }} />{" "}
+                <span className="hide-on-small-screen"> J&apos;aime</span>
+              </div>
             )}
-
-            {/* {likeCount} */}
           </button>
+
           {!showReplyInput && (
             <button className={styles.replyButton} onClick={handleReplyClick}>
               | Répondre
             </button>
           )}
-          <span style={{ marginLeft: "10px" }}>
-            · {commentCount > 0 ? commentCount : "0 "} {""}
-            commentaire{commentCount > 1 ? "s" : ""}
-          </span>
+          {isSmallScreen ? (
+            // Afficher une icône ou du texte alternatif sur les petits écrans
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: 40,
+                marginLeft: 4,
+              }}
+            >
+              · {commentCount}
+              <FontAwesomeIcon icon={faComment} style={{ color: "gray" }} />
+            </div>
+          ) : (
+            // Afficher le texte complet sur les écrans plus larges
+            <span className={`hide-on-small-screen ${styles.commentCount}`}>
+              · {commentCount > 0 ? commentCount : "0 "}{" "}
+              {commentCount > 1 ? "commentaires" : "commentaire"}
+            </span>
+          )}
         </Box>
         {showReplyInput && (
           <Box
@@ -788,6 +855,13 @@ const Comment = ({ commentData, token, userIdentity, postId, level = 0 }) => {
           </button>
         )}
       </Box>
+      <style jsx>{`
+        @media screen and (max-width: 768px) {
+          .hide-on-small-screen {
+            display: none;
+          }
+        }
+      `}</style>
     </div>
   );
 };
