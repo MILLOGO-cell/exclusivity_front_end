@@ -89,7 +89,7 @@ const EventPage = () => {
   }, [userIdentity, token]);
 
   const renderPostView = (post) => {
-    if (post && post.author_get && post.author_get.image && post.content) {
+    if (post && post.content) {
       return (
         <PostView
           postId={post.id}

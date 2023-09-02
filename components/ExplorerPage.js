@@ -87,32 +87,31 @@ const ExplorerPage = () => {
   }, [userIdentity, token]);
 
   const renderPostView = (post) => {
-    if (!post || !post.author_get || !post.author_get.image || !post.content) {
+    if (post && post.content) {
+      return (
+        <PostView
+          postId={post.id}
+          profilePhoto={post.author_get.image}
+          eventTitle={post.title}
+          eventDate={post.date}
+          eventTime={post.time}
+          eventLocation={post.location}
+          id={post.author_get?.id}
+          username={post.author_get.username}
+          moment={new Date(post.created_at)}
+          postText={post.content}
+          media={post.media}
+          lastLikeUser={post.lastLikeUser}
+          likesCount={post.likes_count}
+          recentComment={post.recentComment}
+          commentData={post.commentData}
+          commentsCount={post.comments_count}
+        />
+      );
+    } else {
       return <div>Chargement...</div>;
     }
-
-    return (
-      <PostView
-        postId={post.id}
-        profilePhoto={post.author_get.image}
-        eventTitle={post.title}
-        eventDate={post.date}
-        eventTime={post.time}
-        eventLocation={post.location}
-        id={post.author_get?.id}
-        username={post.author_get.username}
-        moment={new Date(post.created_at)}
-        postText={post.content}
-        media={post.media}
-        lastLikeUser={post.lastLikeUser}
-        likesCount={post.likes_count}
-        recentComment={post.recentComment}
-        commentData={post.commentData}
-        commentsCount={post.comments_count}
-      />
-    );
   };
-
   const comparePostsByDate = (postA, postB) => {
     const dateA = new Date(postA.created_at);
     const dateB = new Date(postB.created_at);

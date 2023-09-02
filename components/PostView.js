@@ -295,7 +295,7 @@ const PostView = ({
       >
         <div className={styles.userInfo}>
           <Image
-            src={profilePhoto}
+            src={profilePhoto || "/user1.png"}
             alt="Photo de profil"
             style={imageStyle}
             width={40}
