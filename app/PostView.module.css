@@ -258,7 +258,7 @@
 /* Ecrans pour mobiles*/
 @media (min-width: 320px) and (max-width: 480px) {
   .postViewContainer {
-    width: 350px;
+    width: 320px;
   }
   .eventInfo {
     flex-direction: column;
