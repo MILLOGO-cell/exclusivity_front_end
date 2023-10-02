@@ -59,7 +59,7 @@ const Navbar = ({ onLoginButtonClick, onRegisterButtonClick }) => {
       <div className={styles.logoContainer}>
         <Image
           alt="Logo"
-          src={"/Logo.png"}
+          src="/Logo.png"
           width={110}
           height={45}
           style={{
