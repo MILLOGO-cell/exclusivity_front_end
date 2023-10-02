@@ -111,7 +111,7 @@ const Abonnement = () => {
     <div>
       <nav className="navbar">
         <div className="logo">
-          <img src="/logo.png" alt="Logo" />
+          <Image src="/logo.png" alt="Logo" width={150} height={50} />
         </div>
 
         <div className="user-info">
