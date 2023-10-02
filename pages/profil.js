@@ -412,8 +412,9 @@ const ProfilePage = () => {
         <form onSubmit={handleSubmit} className={styles.formContainer}>
           <div className={styles.formTitle}>Changement de mot de passe</div>
           <p style={{ color: "red" }}>
-            Nous vous rappelons l'importance d'utiliser un mot de passe fort,
-            d'au moins 8 caractères, pour garantir la sécurité de votre compte.
+            Nous vous rappelons l&apos;importance d&apos;utiliser un mot de
+            passe fort, d&apos;au moins 8 caractères, pour garantir la sécurité
+            de votre compte.
           </p>
           <Box display="flex" direction="column" padding={2} width="100%">
             <Box marginBottom={3}>

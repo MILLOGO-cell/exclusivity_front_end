@@ -696,7 +696,7 @@ const Comment = ({ commentData, token, userIdentity, postId, level = 0 }) => {
                     unoptimized
                   />
                 ) : (
-                  <img
+                  <Image
                     src="/user1.png"
                     alt="Default"
                     style={commentProfilePhotoStyle}
