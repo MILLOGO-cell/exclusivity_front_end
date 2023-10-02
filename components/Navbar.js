@@ -79,7 +79,7 @@ const Navbar = ({ onLoginButtonClick, onRegisterButtonClick }) => {
           className={styles.registeringButton}
           onClick={onRegisterButtonClick}
         >
-          S'inscrire
+          S&apos;inscrire
         </button>
       </div>
     </div>

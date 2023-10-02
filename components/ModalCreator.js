@@ -32,7 +32,7 @@ const ModalCreator = ({ Id, onClose }) => {
                 icon={faCheckCircle}
                 style={{ color: "green" }}
               />{" "}
-              Gagnez de l'argent grâce à vos contenus.
+              Gagnez de l&apos;argent grâce à vos contenus.
             </li>
             <li>
               <FontAwesomeIcon
