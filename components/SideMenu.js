@@ -10,7 +10,12 @@ import {
 import "@/app/globals.css";
 import IconButton from "./IconButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus, faSignOut, faUser } from "@fortawesome/free-solid-svg-icons";
+import {
+  faPlus,
+  faSignOut,
+  faUser,
+  faHomeUser,
+} from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useRef, useState } from "react";
 import { useAppContext } from "../context/AppContext";
 import { useRouter } from "next/router";
@@ -19,6 +24,7 @@ import axios from "axios";
 import allowedRoutes from "./allowedRoutes";
 import jwtDecode from "jwt-decode";
 import Image from "next/image";
+import ModalCreator from "./ModalCreator";
 
 const SideMenu = ({ username, fansCount, userPhoto }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -27,6 +33,7 @@ const SideMenu = ({ username, fansCount, userPhoto }) => {
   const inputFileRef = useRef(null);
   const router = useRouter();
   const [modalErrorMessage, setModalErrorMessage] = useState("");
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const {
     setUser,
     setToken,
@@ -39,6 +46,10 @@ const SideMenu = ({ username, fansCount, userPhoto }) => {
   } = useAppContext();
 
   const [userIdentity, setUserIdentity] = useState(null);
+
+  const handleCreator = () => {
+    setShowSubscriptionModal(true);
+  };
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -204,7 +215,7 @@ const SideMenu = ({ username, fansCount, userPhoto }) => {
         <Box marginBottom={2}>
           <IconButton
             icon={<FontAwesomeIcon icon={faUser} />}
-            label="Mon profil"
+            label="Mon compte"
             buttonColor="white"
             textColor="black"
             iconColor="black"
@@ -371,7 +382,7 @@ const SideMenu = ({ username, fansCount, userPhoto }) => {
       )}
 
       <Box marginBottom={2}>
-        {userIdentity?.is_creator && (
+        {userIdentity?.is_creator ? (
           <IconButton
             icon={<FontAwesomeIcon icon={faPlus} />}
             label="Nouvel évènement"
@@ -381,8 +392,24 @@ const SideMenu = ({ username, fansCount, userPhoto }) => {
             iconPosition="left"
             onClick={handleModalOpen}
           />
+        ) : (
+          <IconButton
+            icon={<FontAwesomeIcon icon={faHomeUser} />}
+            label="Devenir créateur"
+            buttonColor="blue"
+            textColor="white"
+            iconColor="white"
+            iconPosition="left"
+            onClick={handleCreator}
+          />
         )}
       </Box>
+      {showSubscriptionModal && (
+        <ModalCreator
+          userName={username}
+          onClose={() => setShowSubscriptionModal(false)}
+        />
+      )}
     </Box>
   );
 };

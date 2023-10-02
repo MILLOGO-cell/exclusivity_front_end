@@ -7,6 +7,7 @@ import {
   faUser,
   faSignOut,
   faPlus,
+  faHomeUser,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   Box,
@@ -24,6 +25,7 @@ import { useAppContext } from "@/context/AppContext";
 import { API_URL, BASIC_URL } from "@/configs/api";
 import axios from "axios";
 import Image from "next/image";
+import ModalCreator from "./ModalCreator";
 
 const Navigation = ({ onTabChange, userPhoto, user }) => {
   const [isSmallScreen, setIsSmallScreen] = useState(false);
@@ -38,6 +40,11 @@ const Navigation = ({ onTabChange, userPhoto, user }) => {
   const [searchResults, setSearchResults] = useState([]);
   const { token, logout, userList } = useAppContext();
   const [activeTab, setActiveTab] = useState(null);
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+
+  const handleCreator = () => {
+    setShowSubscriptionModal((prev) => !prev);
+  };
 
   const handleItemClick = (id) => {
     if (user) {
@@ -67,6 +74,7 @@ const Navigation = ({ onTabChange, userPhoto, user }) => {
       <span className={styles["user-item-username"]}>{user.email}</span>
     </div>
   );
+
   const handleTabChange = (tabName) => {
     if (router.pathname !== "/explorer") {
       router.push(`/explorer?tab=${tabName}`);
@@ -262,6 +270,156 @@ const Navigation = ({ onTabChange, userPhoto, user }) => {
           backgroundColor: "#fff",
         }}
       >
+        {showSubscriptionModal && (
+          <ModalCreator
+            userName={user?.username}
+            onClose={() => setShowSubscriptionModal(false)}
+          />
+        )}
+        {isModalOpen && (
+          <Modal
+            accessibilityCloseLabel="Fermer"
+            accessibilityModalLabel="Créer un événement"
+            heading="Créer un événement"
+            size="sm"
+            onDismiss={handleModalClose}
+            footer={
+              <Box display="flex" justifyContent="end">
+                <Button
+                  text="Publier"
+                  color="red"
+                  onClick={handlePublishEvent}
+                />
+                <Box marginLeft={2}>
+                  <Button text="Annuler" onClick={handleModalClose} />
+                </Box>
+              </Box>
+            }
+            role="alertdialog"
+          >
+            {!isLoading ? (
+              <>
+                <Box marginTop={4} marginBottom={4}>
+                  {/* Media preview */}
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      height: "150px",
+                      border: "1px dashed #000",
+                      marginBottom: "2px",
+                      cursor: "pointer",
+                      position: "relative",
+                    }}
+                    onClick={handleOpenFileSelector}
+                  >
+                    {selectedMedia ? (
+                      <Image
+                        src={URL.createObjectURL(selectedMedia)}
+                        alt="Media Preview"
+                        style={{
+                          maxWidth: "100%",
+                          maxHeight: "100%",
+                        }}
+                        width={150}
+                        height={150}
+                      />
+                    ) : (
+                      <div>
+                        <FontAwesomeIcon icon={faPlus} size="3x" color="#ccc" />
+                      </div>
+                    )}
+                  </div>
+                  {/* Sélecteur de fichiers caché */}
+                  <input
+                    type="file"
+                    ref={inputFileRef}
+                    style={{ display: "none" }}
+                    accept="image/*, video/*" // Acceptez à la fois les images et les vidéos
+                    onChange={handleMediaChange}
+                  />
+                </Box>
+                <Box
+                  marginTop={4}
+                  display="flex"
+                  alignItems="start"
+                  direction="column"
+                >
+                  <TextField
+                    id="title"
+                    name="title"
+                    onChange={({ value }) => handleInputChange("title", value)}
+                    placeholder="Nom de l'événement"
+                    value={eventData.title}
+                  />
+                  <Box display="flex" marginTop={2} justifyContent="between">
+                    <Box marginEnd={2}>
+                      <TextField
+                        id="eventDate"
+                        name="eventDate"
+                        type="date"
+                        onChange={({ value }) =>
+                          handleInputChange("date", value)
+                        }
+                        value={eventData.date}
+                      />
+                    </Box>
+                    <Box marginLeft={4}>
+                      <TextField
+                        id="eventTime"
+                        name="eventTime"
+                        type="time"
+                        onChange={({ value }) =>
+                          handleInputChange("time", value)
+                        }
+                        value={eventData.time}
+                      />
+                    </Box>
+                  </Box>
+                  <Box marginTop={2}>
+                    <TextField
+                      id="eventLocation"
+                      name="eventLocation"
+                      type="text"
+                      placeholder="Lieu"
+                      onChange={({ value }) =>
+                        handleInputChange("location", value)
+                      }
+                      value={eventData.location}
+                    />
+                  </Box>
+                  <Box marginTop={2} width="100%">
+                    <TextArea
+                      id="eventDescription"
+                      name="eventDescription"
+                      type="text"
+                      placeholder="Description"
+                      onChange={({ value }) =>
+                        handleInputChange("description", value)
+                      }
+                      value={eventData.description}
+                    />
+                  </Box>
+                </Box>
+              </>
+            ) : (
+              <Box
+                position="absolute"
+                top
+                left
+                right
+                bottom
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                zIndex={0}
+              >
+                <Spinner show={isLoading} accessibilityLabel="Chargement" />
+              </Box>
+            )}
+          </Modal>
+        )}
         <div
           className="logo"
           style={{
@@ -540,7 +698,7 @@ const Navigation = ({ onTabChange, userPhoto, user }) => {
                         icon={faUser}
                         className={styles["link-icon"]}
                       />
-                      Profil
+                      Mon compte
                     </div>
                   </Link>
                   <div
@@ -553,8 +711,7 @@ const Navigation = ({ onTabChange, userPhoto, user }) => {
                     />
                     Déconnexion
                   </div>
-
-                  {user?.is_creator && (
+                  {user?.is_creator ? (
                     <div
                       className={`${styles["overlay-link-event"]} ${styles["link-new-event"]}`}
                       onClick={handleModalOpen}
@@ -565,7 +722,19 @@ const Navigation = ({ onTabChange, userPhoto, user }) => {
                       />
                       Nouvel événement
                     </div>
+                  ) : (
+                    <div
+                      className={`${styles["overlay-link-event"]} ${styles["link-new-event"]}`}
+                      onClick={handleCreator}
+                    >
+                      <FontAwesomeIcon
+                        icon={faHomeUser}
+                        className={styles["link-icon"]}
+                      />
+                      Devenir créateur
+                    </div>
                   )}
+
                   <div
                     style={{
                       fontSize: "12px",
@@ -584,163 +753,6 @@ const Navigation = ({ onTabChange, userPhoto, user }) => {
                       Politique de confidentialité
                     </Link>
                   </div>
-                  {isModalOpen && (
-                    <Modal
-                      accessibilityCloseLabel="Fermer"
-                      accessibilityModalLabel="Créer un événement"
-                      heading="Créer un événement"
-                      size="sm"
-                      onDismiss={handleModalClose}
-                      footer={
-                        <Box display="flex" justifyContent="end">
-                          <Button
-                            text="Publier"
-                            color="red"
-                            onClick={handlePublishEvent}
-                          />
-                          <Box marginLeft={2}>
-                            <Button text="Annuler" onClick={handleModalClose} />
-                          </Box>
-                        </Box>
-                      }
-                      role="alertdialog"
-                    >
-                      {!isLoading ? (
-                        <>
-                          <Box marginTop={4} marginBottom={4}>
-                            {/* Media preview */}
-                            <div
-                              style={{
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                height: "150px",
-                                border: "1px dashed #000",
-                                marginBottom: "2px",
-                                cursor: "pointer",
-                                position: "relative",
-                              }}
-                              onClick={handleOpenFileSelector}
-                            >
-                              {selectedMedia ? (
-                                <Image
-                                  src={URL.createObjectURL(selectedMedia)}
-                                  alt="Media Preview"
-                                  style={{
-                                    maxWidth: "100%",
-                                    maxHeight: "100%",
-                                  }}
-                                  width={150}
-                                  height={150}
-                                />
-                              ) : (
-                                <div>
-                                  <FontAwesomeIcon
-                                    icon={faPlus}
-                                    size="3x"
-                                    color="#ccc"
-                                  />
-                                </div>
-                              )}
-                            </div>
-                            {/* Sélecteur de fichiers caché */}
-                            <input
-                              type="file"
-                              ref={inputFileRef}
-                              style={{ display: "none" }}
-                              accept="image/*, video/*" // Acceptez à la fois les images et les vidéos
-                              onChange={handleMediaChange}
-                            />
-                          </Box>
-                          <Box
-                            marginTop={4}
-                            display="flex"
-                            alignItems="start"
-                            direction="column"
-                          >
-                            <TextField
-                              id="title"
-                              name="title"
-                              onChange={({ value }) =>
-                                handleInputChange("title", value)
-                              }
-                              placeholder="Nom de l'événement"
-                              value={eventData.title}
-                            />
-                            <Box
-                              display="flex"
-                              marginTop={2}
-                              justifyContent="between"
-                            >
-                              <Box marginEnd={2}>
-                                <TextField
-                                  id="eventDate"
-                                  name="eventDate"
-                                  type="date"
-                                  onChange={({ value }) =>
-                                    handleInputChange("date", value)
-                                  }
-                                  value={eventData.date}
-                                />
-                              </Box>
-                              <Box marginL={4}>
-                                <TextField
-                                  id="eventTime"
-                                  name="eventTime"
-                                  type="time"
-                                  onChange={({ value }) =>
-                                    handleInputChange("time", value)
-                                  }
-                                  value={eventData.time}
-                                />
-                              </Box>
-                            </Box>
-                            <Box marginTop={2}>
-                              <TextField
-                                id="eventLocation"
-                                name="eventLocation"
-                                type="text"
-                                placeholder="Lieu"
-                                onChange={({ value }) =>
-                                  handleInputChange("location", value)
-                                }
-                                value={eventData.location}
-                              />
-                            </Box>
-                            <Box marginTop={2} width="100%">
-                              <TextArea
-                                id="eventDescription"
-                                name="eventDescription"
-                                type="text"
-                                placeholder="Description"
-                                onChange={({ value }) =>
-                                  handleInputChange("description", value)
-                                }
-                                value={eventData.description}
-                              />
-                            </Box>
-                          </Box>
-                        </>
-                      ) : (
-                        <Box
-                          position="absolute"
-                          top
-                          left
-                          right
-                          bottom
-                          display="flex"
-                          justifyContent="center"
-                          alignItems="center"
-                          zIndex={0}
-                        >
-                          <Spinner
-                            show={isLoading}
-                            accessibilityLabel="Chargement"
-                          />
-                        </Box>
-                      )}
-                    </Modal>
-                  )}
                 </div>
                 <div>Exclusivity © 2023. Tout droit réservé</div>
               </div>

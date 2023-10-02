@@ -1,29 +1,38 @@
-import React, { useState, useEffect } from "react";
-import { Box, Button, TextField, Text, IconButton } from "gestalt";
-import Link from "next/link";
+import React, { useState } from "react";
 import axios from "axios";
 import { LOGIN_URL } from "../configs/api";
 import { useRouter } from "next/router";
 import { useAppContext } from "../context/AppContext";
+import styles from "../app/Login.module.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTimes, faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import CustomButton from "./NickButton";
+import Link from "next/link";
 
 const LoginForm = ({ handleCloseLoginForm }) => {
-  const [username, setUsername] = useState("");
+  const [login_identifier, setLoginIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [responseMessage, setResponseMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   const { setUser, setToken, setIsAuthenticated } = useAppContext();
   const router = useRouter();
 
   const handleSubmit = async () => {
     setResponseMessage("");
-    if (!username || !password) {
-      setResponseMessage("Veuillez remplir tous les champs du formulaire");
+    if (!login_identifier || !password) {
+      setResponseMessage("Veuillez remplir tous les champs du formulaire!");
       return;
     }
     setLoading(true);
     try {
       const response = await axios.post(LOGIN_URL, {
-        username: username,
+        login_identifier: login_identifier,
         password: password,
       });
 
@@ -45,79 +54,72 @@ const LoginForm = ({ handleCloseLoginForm }) => {
     }
   };
 
-  const formStyle = {
-    position: "relative",
-    zIndex: 9999,
-  };
-
-  const closeButtonStyle = {
-    position: "absolute",
-    top: 0,
-    right: 0,
-  };
-
   return (
-    <Box>
-      <form onSubmit={handleSubmit} style={formStyle}>
-        <Box height={20} marginBottom={12}>
-          <div style={closeButtonStyle}>
-            <IconButton
-              icon="cancel"
-              accessibilityLabel="Fermer"
-              onClick={handleCloseLoginForm}
+    <div className={styles.modal}>
+      <div className={styles.modalContent}>
+        <button className={styles.closeButton} onClick={handleCloseLoginForm}>
+          <FontAwesomeIcon icon={faTimes} style={{ color: "red" }} />
+        </button>
+
+        <p className={styles.modalTitle}>Bonjour</p>
+        <p className={styles.modalSubtitle}>
+          Veuillez saisir vos identifiants svp
+        </p>
+        <div className={styles.form}>
+          <input
+            type="text"
+            placeholder="Email ou nom d'utilisateur"
+            value={login_identifier}
+            onChange={(e) => setLoginIdentifier(e.target.value)}
+            className={styles.input}
+          />
+          <div className={styles.passwordInput}>
+            <div className={styles.inputContainer}>
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Mot de passe"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className={styles.input}
+              />
+
+              <button
+                className={styles.passwordToggle}
+                onClick={togglePasswordVisibility}
+              >
+                <FontAwesomeIcon
+                  icon={showPassword ? faEye : faEyeSlash}
+                  color="gray"
+                />
+              </button>
+            </div>
+          </div>
+
+          <div className={styles.link}>
+            <Link href="/reset_password_request">
+              <span>😞 J&apos;ai oublié mon mot de passe</span>
+            </Link>
+          </div>
+          <div className={styles.button}>
+            <CustomButton
+              text={loading ? "Chargement..." : "Se connecter"}
+              buttonColor="red"
+              type="submit"
+              rounded
+              fullWidth={true}
+              onClick={handleSubmit}
             />
           </div>
-        </Box>
-        <Text align="center" weight="bold" size="500">
-          Bonjour
-        </Text>
-        <Text align="center" weight="bold">
-          Veuillez saisir vos identifiants svp
-        </Text>
-
-        <Box marginTop={4} marginBottom={3}>
-          <TextField
-            id="username"
-            type="text"
-            placeholder="Nom d'utilisateur"
-            value={username}
-            onChange={({ value }) => setUsername(value)}
-          />
-        </Box>
-        <Box marginBottom={3}>
-          <TextField
-            id="password"
-            type="password"
-            placeholder="Mot de passe"
-            value={password}
-            onChange={({ value }) => setPassword(value)}
-          />
-        </Box>
-        <Box marginBottom={2}>
-          <Button
-            text={loading ? "Chargement..." : "Se connecter"}
-            color="red"
-            type="button"
-            fullWidth
-            disabled={loading}
-            onClick={handleSubmit}
-          />
-        </Box>
-        {responseMessage && (
-          <Text align="center" color="error">
-            {responseMessage}
-          </Text>
-        )}
-        <Text align="center">
-          {" "}
-          <Link href="/reset_password_request">
-            <Text as="a" inline color="link" weight="bold">
-              😞 J&apos;ai oublié mon mot de passe
-            </Text>
-          </Link>
-        </Text>
-      </form>
-    </Box>
+          <div className={styles.response}>
+            {responseMessage && (
+              <span align="center" color="error">
+                {responseMessage}
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

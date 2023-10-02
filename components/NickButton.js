@@ -12,7 +12,7 @@ function CustomButton({
   const [isClicked, setIsClicked] = useState(false);
   const colorSchemes = {
     blue: {
-      bgColor: "#115FEE",
+      bgColor: "#0000FF",
       textColor: "white",
     },
     red: {

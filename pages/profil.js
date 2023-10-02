@@ -1,16 +1,19 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "../app/ProfilePage.module.css";
-import IconButton from "@/components/IconButton";
 import CustomButton from "@/components/NickButton";
 import {
   Box,
   Button,
-  Flex,
   IconButton as GestaltIconButton,
   TextField,
 } from "gestalt";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus, faSignOut, faUser } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCamera,
+  faTrash,
+  faEye,
+  faEyeSlash,
+} from "@fortawesome/free-solid-svg-icons";
 import "@/app/globals.css";
 import Navigation from "@/components/Navigation";
 import { useAppContext } from "../context/AppContext";
@@ -25,6 +28,7 @@ import axios from "axios";
 import allowedRoutes from "@/components/allowedRoutes";
 import { useRouter } from "next/router";
 import Image from "next/image";
+import Tabs from "@/components/Tabs";
 
 const ProfilePage = () => {
   const [selectedPhoto, setSelectedPhoto] = useState(null);
@@ -40,7 +44,14 @@ const ProfilePage = () => {
   const [userIdentity, setUserIdentity] = useState(null);
   const [userImage, setUserImage] = useState("");
   const router = useRouter();
-
+  const [activeTab, setActiveTab] = useState("profil");
+  const [bio, setBio] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     const storedToken = localStorage.getItem("token");
@@ -208,7 +219,237 @@ const ProfilePage = () => {
   };
   const imageStyle = {
     borderRadius: "50%",
+    width: "150px",
+    height: "150px",
   };
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+  };
+
+  function PublicationsTab() {
+    return (
+      <div
+        style={{
+          marginTop: "150px",
+          color: "red",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          textAlign: "center",
+        }}
+      >
+        {" "}
+        😞 oups! contenu indisponible ...
+      </div>
+    );
+  }
+
+  function ProfilTab() {
+    return (
+      <div className={styles.profileContainer}>
+        <div className={styles.profileInfo}>
+          <div className={styles.profileBox}>
+            <div className={styles.photoTitle}>
+              <span>Photo de profil</span>
+            </div>
+            <label htmlFor="photoInput" className={styles.profilePhotoLabel}>
+              <div className={styles.profilePhotoContainer}>
+                <Image
+                  src={
+                    selectedPhoto
+                      ? URL.createObjectURL(selectedPhoto)
+                      : userImage === `${BASIC_URL}null` || userImage === null
+                      ? "/user1.png"
+                      : userImage
+                  }
+                  alt="Photo de profil"
+                  style={imageStyle}
+                  width={150}
+                  height={150}
+                  unoptimized
+                />
+                <div className={styles.photoOverlay}>
+                  <FontAwesomeIcon
+                    icon={faCamera}
+                    className={styles.cameraIcon}
+                  />
+                </div>
+              </div>
+            </label>
+            <input
+              id="photoInput"
+              type="file"
+              accept="image/*"
+              onChange={handlePhotoChange}
+              style={{ display: "none" }}
+            />
+            <div className={styles.buttonsContainer}>
+              <CustomButton
+                text={loading ? "chargement ..." : "Changer de profil"}
+                buttonColor="white"
+                onClick={handleUploadPhoto}
+                disabled={!selectedPhoto}
+                rounded
+              />
+              <button onClick={handleRemovePhoto}>
+                <FontAwesomeIcon
+                  icon={faTrash}
+                  style={{
+                    color: "red",
+                    backgroundColor: "white",
+                    borderRadius: "25px",
+                  }}
+                />
+              </button>
+            </div>
+          </div>
+          <form onSubmit={handleSubmit} className={styles.formContainer}>
+            <div className={styles.formTitle}>Informations personnelles</div>
+            <div className={styles.form}>
+              <div className={styles.inputDiv}>
+                <input
+                  id="username"
+                  name="username"
+                  placeholder="Nom d'utilisateur"
+                  value={username}
+                  onChange={({ value }) => setUsername(value)}
+                  className={styles.input}
+                />
+              </div>
+              <div className={styles.inputDiv}>
+                <input
+                  id="nom"
+                  name="nom"
+                  placeholder="Nom"
+                  value={last_name}
+                  onChange={({ value }) => setLastName(value)}
+                  className={styles.input}
+                />
+              </div>
+              <div className={styles.inputDiv}>
+                <input
+                  id="prenom"
+                  name="prenom"
+                  placeholder="Prénom"
+                  value={first_name}
+                  onChange={({ value }) => setFirstName(value)}
+                  className={styles.input}
+                />
+              </div>
+              <div className={styles.inputDiv}>
+                <input
+                  id="email"
+                  name="email"
+                  placeholder={email}
+                  type="email"
+                  value={email}
+                  onChange={({ value }) => setEmail(value)}
+                  size="lg"
+                  disabled
+                  className={styles.inputDisabled}
+                />
+              </div>
+
+              <div className={styles.inputDiv}>
+                <input
+                  id="telephone"
+                  name="telephone"
+                  placeholder="Téléphone"
+                  value={telephone}
+                  onChange={({ value }) => setTelephone(value)}
+                  className={styles.input}
+                />
+              </div>
+              <div className={styles.inputDiv}>
+                <textarea
+                  id="bio"
+                  name="bio"
+                  placeholder={bio ? bio : "Bio"}
+                  type="text"
+                  value={bio}
+                  onChange={({ value }) => setBio(value)}
+                  className={styles.textInput}
+                />
+              </div>
+              <CustomButton
+                text={isLoading ? "Chargement en cours..." : "Enregistrer"}
+                buttonColor="blue"
+                type="submit"
+                rounded
+              />
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  function AboutTab() {
+    return (
+      <div
+        style={{
+          marginTop: "150px",
+          color: "red",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          textAlign: "center",
+        }}
+      >
+        {" "}
+        😞 oups! contenu indisponible ...
+      </div>
+    );
+  }
+
+  function SubscriptionTab() {
+    return <div>Contenu abonnement</div>;
+  }
+
+  function ConfidentialTab() {
+    return (
+      <div style={{ marginTop: "50px" }}>
+        <form onSubmit={handleSubmit} className={styles.formContainer}>
+          <div className={styles.formTitle}>Changement de mot de passe</div>
+          <p style={{ color: "red" }}>
+            Nous vous rappelons l'importance d'utiliser un mot de passe fort,
+            d'au moins 8 caractères, pour garantir la sécurité de votre compte.
+          </p>
+          <Box display="flex" direction="column" padding={2} width="100%">
+            <Box marginBottom={3}>
+              <TextField
+                id="password"
+                name="password"
+                placeholder="Mot de passe actuel"
+                type="password"
+                onChange={handleChange}
+              />
+            </Box>
+            <Box marginBottom={3}>
+              <TextField
+                id="password"
+                name="password"
+                placeholder="Nouveau mot de passe"
+                type="password"
+                onChange={handleChange}
+              />
+            </Box>
+            <Box marginBottom={3}>
+              <TextField
+                id="password"
+                name="password"
+                placeholder="Confirmer le mot de passe"
+                type="password"
+                onChange={handleChange}
+              />
+            </Box>
+
+            <Button text="Changer le mot de passe" color="red" />
+          </Box>
+        </form>
+      </div>
+    );
+  }
   return (
     <div
       style={{
@@ -221,160 +462,26 @@ const ProfilePage = () => {
       <Box>
         <Navigation userPhoto={userImage} user={userIdentity} />
       </Box>
+      <div className={styles.pageTitle}>
+        <h1>Mon compte</h1>
+      </div>
+
       <div
         style={{
           display: "flex",
           justifyContent: "flex-start",
-          alignContent: "center",
+          alignContent: "flex-start",
           alignItems: "center",
           flexDirection: "column",
-          marginTop: "50px",
           minHeight: "100vh",
         }}
       >
-        <h1 className={styles.pageTitle}>Mon profil</h1>
-        <div className={styles.profileContainer}>
-          <div className={styles.profileInfo}>
-            <div className={styles.profilePhotoContainer}>
-              <div className={styles.profileBox}>
-                <div className={styles.photoTitle}>Photo de profil</div>
-                <label
-                  htmlFor="photoInput"
-                  className={styles.profilePhotoLabel}
-                >
-                  <Image
-                    src={
-                      selectedPhoto
-                        ? URL.createObjectURL(selectedPhoto)
-                        : userImage === `${BASIC_URL}null` || userImage === null
-                        ? "/user1.png"
-                        : userImage
-                    }
-                    alt="Photo de profil"
-                    style={imageStyle}
-                    width={150}
-                    height={150}
-                    unoptimized
-                  />
-                </label>
-                <input
-                  id="photoInput"
-                  type="file"
-                  accept="image/*"
-                  onChange={handlePhotoChange}
-                  style={{ display: "none" }}
-                />
-                <div className={styles.buttonsContainer}>
-                  <Button
-                    text={loading ? "chargement ..." : "Changer de profil"}
-                    color="gray"
-                    onClick={handleUploadPhoto}
-                    disabled={!selectedPhoto}
-                  />
-                  <GestaltIconButton
-                    icon="trash-can"
-                    size="md"
-                    iconColor="red"
-                    onClick={handleRemovePhoto}
-                  />
-                </div>
-              </div>
-            </div>
-            <form onSubmit={handleSubmit} className={styles.formContainer}>
-              <div className={styles.formTitle}>Informations personnelles</div>
-              <Box display="flex" direction="column" padding={2} width="100%">
-                <Box marginBottom={3}>
-                  <TextField
-                    id="username"
-                    name="username"
-                    placeholder="Nom d'utilisateur"
-                    value={username}
-                    onChange={({ value }) => setUsername(value)}
-                  />
-                </Box>
-                <Box marginBottom={3}>
-                  <TextField
-                    id="nom"
-                    name="nom"
-                    placeholder="Nom"
-                    value={last_name}
-                    onChange={({ value }) => setLastName(value)}
-                  />
-                </Box>
-                <Box marginBottom={3}>
-                  <TextField
-                    id="prenom"
-                    name="prenom"
-                    placeholder="Prénom"
-                    value={first_name}
-                    onChange={({ value }) => setFirstName(value)}
-                  />
-                </Box>
-                <Box marginBottom={3}>
-                  <TextField
-                    id="email"
-                    name="email"
-                    placeholder={email}
-                    type="email"
-                    value={email}
-                    onChange={({ value }) => setEmail(value)}
-                    size="lg"
-                    disabled
-                  />
-                </Box>
-                <Box marginBottom={3}>
-                  <TextField
-                    id="telephone"
-                    name="telephone"
-                    placeholder="Téléphone"
-                    value={telephone}
-                    onChange={({ value }) => setTelephone(value)}
-                  />
-                </Box>
-                <CustomButton
-                  text={isLoading ? "Chargement en cours..." : "Enregistrer"}
-                  buttonColor="gray"
-                  type="submit"
-                  rounded
-                />
-              </Box>
-            </form>
-            <form onSubmit={handleSubmit} className={styles.formContainer}>
-              <div className={styles.formTitle}>Mot de passe</div>
-              <Box display="flex" direction="column" padding={2} width="100%">
-                <Box marginBottom={3}>
-                  <TextField
-                    id="password"
-                    name="password"
-                    placeholder="Mot de passe actuel"
-                    type="password"
-                    onChange={handleChange}
-                  />
-                </Box>
-                <Box marginBottom={3}>
-                  <TextField
-                    id="password"
-                    name="password"
-                    placeholder="Nouveau mot de passe"
-                    type="password"
-                    onChange={handleChange}
-                  />
-                </Box>
-                <Box marginBottom={3}>
-                  <TextField
-                    id="password"
-                    name="password"
-                    placeholder="Confirmer le mot de passe"
-                    type="password"
-                    onChange={handleChange}
-                  />
-                </Box>
-
-                <Button text="Changer le mot de passe" color="red" />
-              </Box>
-            </form>
-          </div>
-        </div>
+        <Tabs activeTab={activeTab} onTabChange={handleTabChange} />
+        {activeTab === "publications" && <PublicationsTab />}
+        {activeTab === "profil" && <ProfilTab />}
+        {activeTab === "about" && <AboutTab />}
+        {activeTab === "abonnement" && <SubscriptionTab />}
+        {activeTab === "confidentialite" && <ConfidentialTab />}
       </div>
     </div>
   );

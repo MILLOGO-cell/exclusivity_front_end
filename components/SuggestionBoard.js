@@ -19,6 +19,7 @@ import {
 } from "@/configs/api";
 import axios from "axios";
 import Image from "next/image";
+import ModalSubscription from "./Modal";
 
 const SuggestionBoard = ({ suggestions }) => {
   const [showAll, setShowAll] = useState(false);
@@ -71,7 +72,7 @@ const SuggestionBoard = ({ suggestions }) => {
     }
     return false;
   };
-  // console.log(userDetails.subscribed_creators);
+
   const handleFollow = (suggestionId) => {
     const isFollowing = isUserFollowingCreator(suggestionId);
     const action = isFollowing ? "unsubscribe" : "subscribe";
@@ -168,6 +169,16 @@ const SuggestionBoard = ({ suggestions }) => {
 };
 
 const Item = ({ photo, username, suggestionId, onFollow, isUserFollowing }) => {
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+
+  const handleFollowClick = () => {
+    if (isUserFollowing) {
+      onFollow();
+    } else {
+      setShowSubscriptionModal(true);
+    }
+  };
+
   const imageStyle = {
     width: "48px",
     height: "48px",
@@ -210,9 +221,19 @@ const Item = ({ photo, username, suggestionId, onFollow, isUserFollowing }) => {
           iconPosition="right"
           border
           borderColor={isUserFollowing ? "blue" : "#ccc"}
-          onClick={() => onFollow()}
+          // onClick={() => onFollow()}
+          onClick={handleFollowClick}
         />
       </div>
+      {showSubscriptionModal && (
+        <ModalSubscription
+          suggestionId={suggestionId}
+          userName={username}
+          userImage={photo}
+          onFollow={() => onFollow()}
+          onClose={() => setShowSubscriptionModal(false)}
+        />
+      )}
     </div>
   );
 };

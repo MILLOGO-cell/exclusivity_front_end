@@ -88,6 +88,8 @@ const ExplorerPage = () => {
 
   const renderPostView = (post) => {
     if (post && post.content) {
+      // console.log("***", post?.commentData);
+
       return (
         <PostView
           postId={post.id}

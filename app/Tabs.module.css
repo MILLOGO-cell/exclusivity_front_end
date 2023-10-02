@@ -1,0 +1,47 @@
+/* Utilisez une classe pour les boutons au lieu de l'élément "button" */
+.tabButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0px 16px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Ajoutez une classe pour l'onglet actif */
+.activeTab {
+  color: blue;
+  border-bottom: 1px solid blue;
+}
+
+/* .dropdownButton {
+   background-color: #333; 
+} */
+.additionalTabs {
+  display: flex;
+  flex-direction: column;
+  /* position: absolute; */
+  /* top: 150px;*/
+  /* left: 250px; */
+  background-color: rgb(212, 212, 246);
+  border: 1 px solid #ccc;
+  border-radius: 8px;
+  padding: 8px;
+  z-index: 1;
+}
+
+.additionalTabs .tabs {
+  padding: 8px 16px;
+  font-size: 16px;
+  position: absolute;
+  color: #333;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.additionalTabs .tabButton:hover {
+  background-color: rgb(175, 175, 231);
+}

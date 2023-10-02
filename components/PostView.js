@@ -13,7 +13,6 @@ import {
   faThumbsUp as faThumbsUpSolid,
   faHeart,
   faComment,
-  faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import { useMediaQuery } from "react-responsive";
 
@@ -322,7 +321,7 @@ const PostView = ({
         }
         passHref
       >
-        <div className={styles.userInfo}>
+        <div className={styles.userInfos}>
           <Image
             src={profilePhoto || "/user1.png"}
             alt="Photo de profil"
@@ -433,9 +432,9 @@ const PostView = ({
               onClick={handleLike}
             >
               {liked ? (
-                <span style={{ color: "black" }}>J&apos;aime ·👍 </span>
+                <span style={{ color: "blue" }}>J&apos;aime ·👍 </span>
               ) : (
-                <span style={{ color: "blue" }}>Vous aimez ·👍 </span>
+                <span style={{ color: "black" }}>J&apos;aime ·👍 </span>
               )}
             </button>
           </div>
@@ -529,29 +528,13 @@ const Comment = ({ commentData, token, userIdentity, postId, level = 0 }) => {
   const [likedUsers, setLikedUsers] = useState([]);
   const isSmallScreen = useMediaQuery({ maxWidth: 768 });
 
-  const Refresh = async () => {
-    try {
-      if (!token) {
-        return;
-      }
-
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      };
-
-      const response = await axios.get(
-        `${API_URL}/postes/postes/comment/${commentData?.id}/likes/`,
-        config
-      );
-      const likedUserIds = response.data.map((like) => like.user);
-      setLikedUsers(likedUserIds);
-      setLiked(likedUserIds.includes(userIdentity.username));
-    } catch (error) {
-      console.error("Erreur lors de la récupération des likes :", error);
-    }
+  const Refresh = () => {
+    setLiked(commentData?.liked_users.includes(userIdentity?.username));
   };
+
+  useEffect(() => {
+    Refresh();
+  }, [commentData, userIdentity]);
 
   const handleLike = async () => {
     try {
@@ -566,16 +549,13 @@ const Comment = ({ commentData, token, userIdentity, postId, level = 0 }) => {
         },
       };
 
-      const data = {
+      const likeData = {
         user: userIdentity?.id,
-        post: postId,
       };
 
-      const response = await axios.post(
-        `${API_URL}/postes/postes/comment/${commentData?.id}/likes/`,
-        data,
-        config
-      );
+      const endpoint = `${API_URL}/postes/postes/comment/${commentData?.id}/likes/`;
+
+      const response = await axios.post(endpoint, likeData, config);
 
       if (response.status === 201 || response.status === 200) {
         // Mettre à jour l'état du like dans le frontend
@@ -593,8 +573,7 @@ const Comment = ({ commentData, token, userIdentity, postId, level = 0 }) => {
           );
         }
 
-        // Actualiser les données si nécessaire
-        Refresh();
+        // Vous n'avez pas montré la définition de la fonction Refresh, assurez-vous qu'elle fonctionne correctement
 
         // console.log("Opération de like/dislike réussie!");
       } else {
@@ -642,7 +621,6 @@ const Comment = ({ commentData, token, userIdentity, postId, level = 0 }) => {
   const handleToggleReplies = () => {
     setShowReplies((prevShowReplies) => !prevShowReplies);
   };
-
   const handleSendReply = async () => {
     try {
       if (!token || !userIdentity || !userIdentity.id) {
@@ -658,7 +636,7 @@ const Comment = ({ commentData, token, userIdentity, postId, level = 0 }) => {
       const data = {
         user: userIdentity?.id,
         content: replyText,
-        parent_comment_id: commentData.id, // Mettez ici l'ID du commentaire parent
+        parent_comment_id: commentData.id,
       };
       const response = await axios.post(
         `${API_URL}/postes/posts/${postId}/comments/`,
@@ -667,15 +645,11 @@ const Comment = ({ commentData, token, userIdentity, postId, level = 0 }) => {
       );
       fetchPosts();
       fetchEventPosts();
-      // Si l'envoi de la réponse réussit, l'API doit renvoyer la réponse nouvellement créée
-      // Nous pouvons extraire le nombre total de réponses du commentaire parent
       const newReplyData = response.data;
       const totalReplyCountFromAPI = newReplyData.commentCount;
 
-      // Mettre à jour le nombre total de réponses du commentaire parent dans le composant PostView
       setCommentCount(totalReplyCountFromAPI);
 
-      // Réinitialisez l'état et cachez le champ de réponse après avoir envoyé la réponse
       setReplyText("");
       setShowReplyInput(false);
     } catch (error) {
@@ -690,57 +664,61 @@ const Comment = ({ commentData, token, userIdentity, postId, level = 0 }) => {
   };
   return (
     <div className={styles.comment} ref={commentRef}>
-      <Box marginLeft={`${level * 30}px`}>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <Link
-            href={
-              commentData?.user_details?.id === userIdentity?.id
-                ? "/profil"
-                : `/profil_utilisateur?id=${commentData?.user_details?.id}`
-            }
-            passHref
-          >
-            <div style={{ display: "flex", justifyContent: "center" }}>
-              {commentData?.user_details?.image ? (
-                <Image
-                  src={
-                    commentData.user_details.image.startsWith("http")
-                      ? commentData.user_details.image
-                      : `${BASIC_URL}${commentData.user_details.image}`
-                  }
-                  alt="Photo"
-                  style={commentProfilePhotoStyle}
-                  width={32}
-                  height={32}
-                  unoptimized
-                />
-              ) : (
-                <Image
-                  src="/user1.png"
-                  alt="Default"
-                  style={commentProfilePhotoStyle}
-                  width={32}
-                  height={32}
-                  unoptimized
-                />
-              )}
-              <span className={styles.commentUsername}>
-                {commentData?.user_details?.username}
-              </span>
-            </div>
-          </Link>
-          <span className={styles.commentMoment}>
-            {formatMomentText(new Date(commentData?.created_at))}
-          </span>
+      <div style={{ marginLeft: `${level * 30}px` }}>
+        <div className={styles.commentWrapper}>
+          <div className={styles.userInfo}>
+            <Link
+              href={
+                commentData?.user_details?.id === userIdentity?.id
+                  ? "/profil"
+                  : `/profil_utilisateur?id=${commentData?.user_details?.id}`
+              }
+              passHref
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                {commentData?.user_details?.image ? (
+                  <Image
+                    src={
+                      commentData.user_details.image.startsWith("http")
+                        ? commentData.user_details.image
+                        : `${BASIC_URL}${commentData.user_details.image}`
+                    }
+                    // src={commentData.user_details.image}
+                    alt="Photo"
+                    style={commentProfilePhotoStyle}
+                    width={32}
+                    height={32}
+                    unoptimized
+                  />
+                ) : (
+                  <img
+                    src="/user1.png"
+                    alt="Default"
+                    style={commentProfilePhotoStyle}
+                    width={32}
+                    height={32}
+                  />
+                )}
+                <span className={styles.commentUsername}>
+                  {commentData?.user_details?.username}
+                </span>
+              </div>
+            </Link>
+            <span className={styles.commentMoment}>
+              {formatMomentText(new Date(commentData?.created_at))}
+            </span>
+          </div>
+          <div className={styles.commentData}>
+            <span className={styles.commentText}>{commentData.content}</span>
+          </div>
         </div>
-        <p className={styles.commentText}>{commentData.content}</p>
-        <Box display="flex" direction="row">
+
+        <div style={{ display: "flex", flexDirection: "row" }}>
           <button
             className={`${styles.likeButton} ${liked ? styles.liked : ""}`}
             onClick={handleLike}
@@ -767,66 +745,52 @@ const Comment = ({ commentData, token, userIdentity, postId, level = 0 }) => {
             </button>
           )}
           {isSmallScreen ? (
-            // Afficher une icône ou du texte alternatif sur les petits écrans
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                width: 40,
-                marginLeft: 4,
+                width: "40px",
+                marginLeft: "4px",
               }}
             >
               · {commentCount}
               <FontAwesomeIcon icon={faComment} style={{ color: "gray" }} />
             </div>
           ) : (
-            // Afficher le texte complet sur les écrans plus larges
             <span className={`hide-on-small-screen ${styles.commentCount}`}>
               · {commentCount > 0 ? commentCount : "0 "}{" "}
               {commentCount > 1 ? "commentaires" : "commentaire"}
             </span>
           )}
-        </Box>
+        </div>
         {showReplyInput && (
-          <Box
-            alignItems="center"
-            justifyContent="space-between"
-            display="flex"
-            direction="row"
-            width="100%"
-            marginTop={2}
-          >
-            <Box width="100%">
-              <TextField
+          <div className={styles.InputWrapper}>
+            <div>
+              <input
+                type="text"
                 placeholder="Répondre au commentaire..."
                 value={replyText}
-                onChange={({ value }) => setReplyText(value)}
-              />
-            </Box>
-            <div style={{ marginLeft: "auto" }}>
-              <IconButton
-                icon="send"
-                accessibilityLabel="Envoyer"
-                size="lg"
-                onClick={handleSendReply}
+                onChange={(e) => setReplyText(e.target.value)}
+                className={styles.input}
               />
             </div>
-          </Box>
+            <div className={styles.sendButton}>
+              <button onClick={handleSendReply}>Envoyer</button>
+            </div>
+          </div>
         )}
-        {/* Afficher les réponses associées à ce commentaire si showReplies est vrai */}
         {showReplies && (
           <div className={styles.replies}>
-            {/* Appel récursif à Comment pour afficher les réponses hiérarchiquement */}
             {commentData.sub_comments &&
               commentData.sub_comments.map((reply) => (
-                <div key={reply.id}>
+                <div key={reply.id} className={styles.subCommentSeparator}>
                   <Comment
                     commentData={reply}
                     token={token}
                     userIdentity={userIdentity}
                     postId={postId}
-                    level={level + 1}
+                    // level={level + 1}
                   />
                 </div>
               ))}
@@ -842,7 +806,6 @@ const Comment = ({ commentData, token, userIdentity, postId, level = 0 }) => {
               )}
           </div>
         )}
-        {/* Afficher le nombre de réponses si le commentaire a des réponses */}
         {commentData?.sub_comments && commentData.sub_comments.length > 0 && (
           <button
             className={styles.viewRepliesButton}
@@ -854,7 +817,7 @@ const Comment = ({ commentData, token, userIdentity, postId, level = 0 }) => {
               : `Voir les réponses (${commentData?.sub_comments.length})`}
           </button>
         )}
-      </Box>
+      </div>
       <style jsx>{`
         @media screen and (max-width: 768px) {
           .hide-on-small-screen {

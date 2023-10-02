@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import { Box, Button, TextField, Text, IconButton, Checkbox } from "gestalt";
-import Link from "next/link";
-import LoginForm from "./LoginForm";
 import { REGISTER_URL } from "@/configs/api";
 import axios from "axios";
+import styles from "../app/Register.module.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTimes, faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import CustomButton from "./NickButton";
+import Link from "next/link";
 
 const RegisterForm = ({ handleCloseRegisterForm, showCloseButton }) => {
   const [username, setUsername] = useState("");
@@ -14,6 +16,11 @@ const RegisterForm = ({ handleCloseRegisterForm, showCloseButton }) => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   const handleCheckboxChange = () => {
     setIsChecked(!isChecked);
@@ -21,9 +28,15 @@ const RegisterForm = ({ handleCloseRegisterForm, showCloseButton }) => {
 
   const handleSubmit = async () => {
     setErrorMessage("");
+    setShowSuccessMessage(false);
     if (!username || !email || !password || !confirmPassword) {
-      console.error("Veuillez remplir tous les champs du formulaire");
-      setErrorMessage("Veuillez remplir tous les champs du formulaire");
+      setErrorMessage("Veuillez remplir tous les champs du formulaire!");
+      return;
+    }
+    if (username.length < 3) {
+      setErrorMessage(
+        "Le nom d'utilisateur doit contenir au moins 6 caractères"
+      );
       return;
     }
     if (password !== confirmPassword) {
@@ -35,7 +48,7 @@ const RegisterForm = ({ handleCloseRegisterForm, showCloseButton }) => {
       return;
     }
     if (!isChecked) {
-      setErrorMessage("Veuillez accepeter les conditions d'utilisation!");
+      setErrorMessage("Veuillez accepter les conditions d'utilisation!");
       return;
     }
     try {
@@ -47,9 +60,11 @@ const RegisterForm = ({ handleCloseRegisterForm, showCloseButton }) => {
       });
 
       if (response.status === 201) {
+        setErrorMessage("");
         setShowSuccessMessage(true);
       } else {
         setErrorMessage("Erreur lors de la création du compte");
+        setShowSuccessMessage(false);
       }
     } catch (error) {
       if (error.response) {
@@ -60,160 +75,146 @@ const RegisterForm = ({ handleCloseRegisterForm, showCloseButton }) => {
             setErrorMessage(error.response.data.message);
           }
         } else {
-          setResponseMessage(`Erreur de serveur : ${error.response.data}`);
+          setErrorMessage(`Erreur de serveur : ${error.response.data}`);
         }
       } else if (error.request) {
-        setResponseMessage(`Pas de réponse du serveur : ${error.request}`);
+        setErrorMessage(`Pas de réponse du serveur : ${error.request}`);
       } else {
-        setResponseMessage(
+        setErrorMessage(
           `Erreur de configuration de la requête : ${error.message}`
         );
       }
+      setShowSuccessMessage(false);
     } finally {
       setLoading(false);
     }
   };
 
-  const formStyle = {
-    position: "relative",
-    zIndex: 9999,
-  };
-
-  const closeButtonStyle = {
-    position: "absolute",
-    top: 0,
-    right: 0,
-    display: showCloseButton ? "block" : "none",
-  };
-
   return (
-    <Box>
-      <form onSubmit={handleSubmit} style={formStyle}>
-        {showCloseButton && (
-          <Box height={20} marginBottom={12}>
-            <div style={closeButtonStyle}>
-              <IconButton
-                icon="cancel"
-                accessibilityLabel="Fermer"
-                onClick={handleCloseRegisterForm}
-              />
-            </div>
-          </Box>
-        )}
-        <Text align="center" weight="bold" size="500">
-          Créer un compte
-        </Text>
-        <Text align="center" weight="bold">
+    <div className={styles.modal}>
+      <div className={styles.modalContent}>
+        <button
+          className={styles.closeButton}
+          onClick={handleCloseRegisterForm}
+        >
+          <FontAwesomeIcon icon={faTimes} style={{ color: "red" }} />
+        </button>
+        <p className={styles.modalTitle}>Création de compte</p>
+        <p className={styles.modalSubtitle}>
           Veuillez remplir les champs ci-dessous
-        </Text>
-
-        <Box marginTop={4} marginBottom={3}>
-          <TextField
-            id="username"
+        </p>
+        <div className={styles.form}>
+          <input
             type="text"
             placeholder="Nom d'utilisateur"
             value={username}
-            onChange={({ value }) => setUsername(value)}
+            onChange={(e) => setUsername(e.target.value)}
+            className={styles.input}
           />
-        </Box>
-        <Box marginBottom={3}>
-          <TextField
-            id="email"
-            type="email"
-            placeholder="Adresse e-mail"
+          <input
+            type="text"
+            placeholder="Adresse email"
             value={email}
-            onChange={({ value }) => setEmail(value)}
+            onChange={(e) => setEmail(e.target.value)}
+            className={styles.input}
           />
-        </Box>
-        <Box marginBottom={3}>
-          <TextField
-            id="password"
-            type="password"
-            placeholder="Mot de passe"
-            value={password}
-            onChange={({ value }) => setPassword(value)}
-          />
-        </Box>
-        <Box marginBottom={3}>
-          <TextField
-            id="confirmPassword"
-            type="password"
-            placeholder="Confirmer le mot de passe"
-            value={confirmPassword}
-            onChange={({ value }) => setConfirmPassword(value)}
-          />
-        </Box>
-        <div
-          style={{
-            margin: 15,
-          }}
-        >
           <div
             style={{
-              margin: 5,
+              width: "100%",
               display: "flex",
-              justifyContent: "flex-start",
+              flexDirection: "column",
+              gap: 10,
             }}
           >
-            <div
+            <div className={styles.passwordInput}>
+              <div className={styles.inputContainer}>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Mot de passe"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className={styles.input}
+                />
+
+                <button
+                  className={styles.passwordToggle}
+                  onClick={togglePasswordVisibility}
+                >
+                  <FontAwesomeIcon
+                    icon={showPassword ? faEye : faEyeSlash}
+                    color="gray"
+                  />
+                </button>
+              </div>
+            </div>
+
+            <div className={styles.passwordInput}>
+              <div className={styles.inputContainer}>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Confirmer mot de passe"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className={styles.input}
+                />
+
+                <button
+                  className={styles.passwordToggle}
+                  onClick={togglePasswordVisibility}
+                >
+                  <FontAwesomeIcon
+                    icon={showPassword ? faEye : faEyeSlash}
+                    color="gray"
+                  />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.linkDiv}>
+            <label
               style={{
-                marginRight: 5,
+                marginRight: "5px",
               }}
             >
-              <label style={{ gap: 2 }}>
-                <input
-                  type="checkbox"
-                  checked={isChecked}
-                  onChange={handleCheckboxChange}
-                />
-              </label>
-            </div>
-            J&apos;accepte les conditions d&apos;utilisation
+              <input
+                type="checkbox"
+                checked={isChecked}
+                onChange={handleCheckboxChange}
+              />
+            </label>
+            {/* </div> */}
+            <Link href="/conditions_d_utilisation">
+              <span className={styles.link}>
+                J&apos;accepte les conditions d&apos;utilisation
+              </span>
+            </Link>
+          </div>
+          <div className={styles.button}>
+            <CustomButton
+              text={loading ? "Chargement..." : "S'inscrire"}
+              buttonColor="red"
+              type="submit"
+              rounded
+              fullWidth={true}
+              onClick={handleSubmit}
+            />
+          </div>
+          <div className={styles.response}>
+            {errorMessage && <span>{errorMessage}</span>}
+            {showSuccessMessage && (
+              <div className={styles.SuccessResponse}>
+                <span>🎉 Compte créé avec succès! 🎉</span>
+                <span align="center" color="success" size="lg" weight="bold">
+                  Content de vous compter parmis nous! Veuillez consulter votre
+                  boite mail pour activer votre compte.😊
+                </span>
+              </div>
+            )}
           </div>
         </div>
-        <Box marginBottom={2}>
-          <Button
-            text={loading ? "Chargement en cours..." : "S'inscrire"}
-            color="red"
-            fullWidth
-            onClick={handleSubmit}
-          />
-        </Box>
-        {errorMessage && (
-          <Box
-            display="flex"
-            alignItems="center"
-            marginBottom={3}
-            width="100%"
-            direction="column"
-            justifyContent="center"
-          >
-            {" "}
-            <Text align="center" color="error">
-              {errorMessage}
-            </Text>{" "}
-          </Box>
-        )}
-        {showSuccessMessage && (
-          <Box
-            display="flex"
-            alignItems="center"
-            marginBottom={3}
-            width="100%"
-            direction="column"
-            justifyContent="center"
-          >
-            <Text color="success" size="lg" weight="bold">
-              🎉 Compte créé avec succès! 🎉
-            </Text>
-            <Text align="center" color="success" size="lg" weight="bold">
-              Content de vous compter parmis nous! Veuillez consulter votre
-              boite mail pour activer votre compte.😊
-            </Text>
-          </Box>
-        )}
-      </form>
-    </Box>
+      </div>
+    </div>
   );
 };
 

@@ -57,9 +57,9 @@ const Conditions = () => {
           justify-content: flex-start;
           align-items: center;
           padding: 0.1rem;
-          background-color: #fff;
+          // background-color: #fff;
           color: white;
-          box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+          // box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .logo {
